@@ -1,15 +1,22 @@
-name: Build and Push Docker Images to GHCR (Auto Versioning)
+name: Build and Push Docker Images to GHCR (User-Specified Version)
 
 on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Specify a custom version (e.g., 1.5)"
+        required: false
+        default: ""
+
   push:
     branches:
       - main
     paths:
       - "skj-2025/**"
-      
+
 permissions:
   contents: read
-  packages: write      
+  packages: write
 
 jobs:
   build-and-push:
@@ -22,51 +29,53 @@ jobs:
       - name: Convert Repository Owner to Lowercase
         run: echo "OWNER=$(echo ${{ github.repository_owner }} | tr '[:upper:]' '[:lower:]')" >> $GITHUB_ENV
 
+      - name: Determine Version
+        id: get_version
+        run: |
+          # If user specified a version, use it
+          if [[ -n "${{ github.event.inputs.version }}" ]]; then
+            NEW_VERSION="${{ github.event.inputs.version }}"
+            echo "Using user-specified version: $NEW_VERSION"
+          else
+            # Fetch latest version from GHCR
+            PACKAGE_URL="https://api.github.com/orgs/${{ env.OWNER }}/packages/container/skj-2025/versions"
+            echo "Checking latest version from: $PACKAGE_URL"
+            
+            API_RESPONSE=$(curl -s -H "Authorization: Bearer ${{ secrets.GHCR_TOKEN }}" $PACKAGE_URL)
+            
+            if [[ -z "$API_RESPONSE" || "$API_RESPONSE" == "[]" ]]; then
+              echo "No existing versions found. Setting initial version to 1.0"
+              NEW_VERSION="1.0"
+            else
+              LATEST_VERSION=$(echo "$API_RESPONSE" | jq -r '.[0].name' | sed 's/v//')
+              
+              if [[ -z "$LATEST_VERSION" || "$LATEST_VERSION" == "null" ]]; then
+                echo "Latest version is empty or invalid. Setting initial version to 1.0"
+                NEW_VERSION="1.0"
+              else
+                NEW_VERSION=$(awk -F. '{print $1 "." $2+1}' <<< "$LATEST_VERSION")
+                echo "Auto-incremented to: $NEW_VERSION"
+              fi
+            fi
+          fi
+          
+          echo "NEW_VERSION=$NEW_VERSION" >> $GITHUB_ENV
+          echo "Final version to be used: $NEW_VERSION"
+
       - name: Log in to GitHub Container Registry
         run: echo "${{ secrets.GHCR_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
 
-
-- name: Get Latest Version
-  id: get_version
-  run: |
-    PACKAGE_URL="https://api.github.com/orgs/${{ env.OWNER }}/packages/container/skj-2025/versions"
-    echo "Checking latest version from: $PACKAGE_URL"
-
-    # Fetch the latest versions from GitHub API
-    API_RESPONSE=$(curl -s -H "Authorization: Bearer ${{ secrets.GHCR_TOKEN }}" $PACKAGE_URL)
-    
-    # Check if API call was successful
-    if [[ -z "$API_RESPONSE" || "$API_RESPONSE" == "[]" ]]; then
-      echo "No existing versions found. Setting initial version to 1.0"
-      NEW_VERSION="1.0"
-    else
-      echo "API Response: $API_RESPONSE"
-      
-      # Extract the latest version and remove 'v' prefix if exists
-      LATEST_VERSION=$(echo "$API_RESPONSE" | jq -r '.[0].name' | sed 's/v//')
-
-      # Check if LATEST_VERSION is valid
-      if [[ -z "$LATEST_VERSION" || "$LATEST_VERSION" == "null" ]]; then
-        echo "Latest version is empty or invalid. Setting initial version to 1.0"
-        NEW_VERSION="1.0"
-      else
-        NEW_VERSION=$(awk -F. '{print $1 "." $2+1}' <<< "$LATEST_VERSION")
-        echo "Latest version detected: $LATEST_VERSION. Incrementing to: $NEW_VERSION"
-      fi
-    fi
-
-    # Store new version in GitHub environment
-    echo "NEW_VERSION=$NEW_VERSION" >> $GITHUB_ENV
-    echo "Final version to be used: $NEW_VERSION"
-
-- name: Build and Push Docker Image
+      - name: Build and Push Docker Image
         run: |
-          IMAGE_NAME=ghcr.io/pacificcommunity/skj-2025
+          IMAGE_NAME=ghcr.io/${{ env.OWNER }}/skj-2025
+          echo "Building Docker image with version: v${{ env.NEW_VERSION }}"
+
+          # Docker Build & Push
           docker build -t $IMAGE_NAME:v${{ env.NEW_VERSION }} -t $IMAGE_NAME:latest skj-2025/
           docker push $IMAGE_NAME:v${{ env.NEW_VERSION }}
           docker push $IMAGE_NAME:latest
 
-- name: Make GHCR Public
+      - name: Make GHCR Public
         run: |
           curl -X PATCH https://api.github.com/orgs/${{ env.OWNER }}/packages/container/skj-2025/visibility \
             -H "Authorization: Bearer ${{ secrets.GHCR_TOKEN }}" \
