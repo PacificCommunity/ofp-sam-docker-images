@@ -6,6 +6,10 @@ on:
       - main
     paths:
       - "skj-2025/**"
+      
+permissions:
+  contents: read
+  packages: write      
 
 jobs:
   build-and-push:
