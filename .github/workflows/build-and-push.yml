@@ -59,14 +59,14 @@ jobs:
     echo "NEW_VERSION=$NEW_VERSION" >> $GITHUB_ENV
     echo "Final version to be used: $NEW_VERSION"
 
-    - name: Build and Push Docker Image
+- name: Build and Push Docker Image
         run: |
           IMAGE_NAME=ghcr.io/pacificcommunity/skj-2025
           docker build -t $IMAGE_NAME:v${{ env.NEW_VERSION }} -t $IMAGE_NAME:latest skj-2025/
           docker push $IMAGE_NAME:v${{ env.NEW_VERSION }}
           docker push $IMAGE_NAME:latest
 
-      - name: Make GHCR Public
+- name: Make GHCR Public
         run: |
           curl -X PATCH https://api.github.com/orgs/${{ env.OWNER }}/packages/container/skj-2025/visibility \
             -H "Authorization: Bearer ${{ secrets.GHCR_TOKEN }}" \
