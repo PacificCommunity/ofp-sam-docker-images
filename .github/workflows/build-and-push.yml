@@ -1,10 +1,10 @@
-name: Build and Push Docker Images to GHCR (User-Specified Version)
+name: Build and Push Docker Images to GHCR (User-Specified or Auto-Increment Version)
 
 on:
   workflow_dispatch:
     inputs:
       version:
-        description: "Specify a custom version (e.g., 1.5)"
+        description: "Specify a custom version (e.g., 1.5). Leave empty for auto-increment."
         required: false
         default: ""
 
@@ -32,33 +32,35 @@ jobs:
       - name: Determine Version
         id: get_version
         run: |
+          # Define the GHCR API URL
+          PACKAGE_URL="https://api.github.com/orgs/${{ env.OWNER }}/packages/container/skj-2025/versions"
+          echo "Checking latest version from: $PACKAGE_URL"
+
+          # Fetch versions from GitHub API
+          API_RESPONSE=$(curl -s -H "Authorization: Bearer ${{ secrets.GHCR_TOKEN }}" $PACKAGE_URL)
+          
+          # Debug: Print API response
+          echo "API Response: $API_RESPONSE"
+
           # If user specified a version, use it
           if [[ -n "${{ github.event.inputs.version }}" ]]; then
             NEW_VERSION="${{ github.event.inputs.version }}"
             echo "Using user-specified version: $NEW_VERSION"
           else
-            # Fetch latest version from GHCR
-            PACKAGE_URL="https://api.github.com/orgs/${{ env.OWNER }}/packages/container/skj-2025/versions"
-            echo "Checking latest version from: $PACKAGE_URL"
-            
-            API_RESPONSE=$(curl -s -H "Authorization: Bearer ${{ secrets.GHCR_TOKEN }}" $PACKAGE_URL)
-            
-            if [[ -z "$API_RESPONSE" || "$API_RESPONSE" == "[]" ]]; then
-              echo "No existing versions found. Setting initial version to 1.0"
+            # Extract latest version and filter out SHA256 hashes
+            LATEST_VERSION=$(echo "$API_RESPONSE" | jq -r '[.[].name] | map(select(test("^[vV]?[0-9]+\\.[0-9]+$"))) | max' | sed 's/v//I')
+
+            # If no valid version is found, start at 1.0
+            if [[ -z "$LATEST_VERSION" || "$LATEST_VERSION" == "null" ]]; then
+              echo "No valid versions found. Setting initial version to 1.0"
               NEW_VERSION="1.0"
             else
-              LATEST_VERSION=$(echo "$API_RESPONSE" | jq -r '.[0].name' | sed 's/v//')
-              
-              if [[ -z "$LATEST_VERSION" || "$LATEST_VERSION" == "null" ]]; then
-                echo "Latest version is empty or invalid. Setting initial version to 1.0"
-                NEW_VERSION="1.0"
-              else
-                NEW_VERSION=$(awk -F. '{print $1 "." $2+1}' <<< "$LATEST_VERSION")
-                echo "Auto-incremented to: $NEW_VERSION"
-              fi
+              NEW_VERSION=$(awk -F. '{print $1 "." $2+1}' <<< "$LATEST_VERSION")
+              echo "Latest version detected: $LATEST_VERSION. Incrementing to: $NEW_VERSION"
             fi
           fi
-          
+
+          # Save version in GitHub environment
           echo "NEW_VERSION=$NEW_VERSION" >> $GITHUB_ENV
           echo "Final version to be used: $NEW_VERSION"
 
@@ -80,4 +82,5 @@ jobs:
           curl -X PATCH https://api.github.com/orgs/${{ env.OWNER }}/packages/container/skj-2025/visibility \
             -H "Authorization: Bearer ${{ secrets.GHCR_TOKEN }}" \
             -H "Accept: application/vnd.github.v3+json" \
+            -d '{"visibility":"public"}'
             -d '{"visibility":"public"}'
