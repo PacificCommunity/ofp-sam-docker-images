@@ -40,10 +40,10 @@ jobs:
 
       - name: Build and Push Docker Image
         run: |
-          IMAGE_NAME=ghcr.io/${{ env.OWNER }}/skj-2025
-          docker build -t $IMAGE_NAME:latest -t $IMAGE_NAME:v${{ env.NEW_VERSION }} skj-2025/
-          docker push $IMAGE_NAME:latest
+          IMAGE_NAME=ghcr.io/pacificcommunity/skj-2025
+          docker build -t $IMAGE_NAME:v${{ env.NEW_VERSION }} -t $IMAGE_NAME:latest skj-2025/
           docker push $IMAGE_NAME:v${{ env.NEW_VERSION }}
+          docker push $IMAGE_NAME:latest
 
       - name: Make GHCR Public
         run: |
