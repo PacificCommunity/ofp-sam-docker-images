@@ -38,4 +38,3 @@ USER rstudio
 EXPOSE 8787
 
 
-
