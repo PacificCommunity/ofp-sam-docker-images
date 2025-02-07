@@ -12,7 +12,7 @@ on:
     branches:
       - main
     paths:
-      - "**/**"  # Detects any changed paths
+      - "**/**"  # Detect any changed paths
 
 permissions:
   contents: read
@@ -25,6 +25,8 @@ jobs:
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v3
+        with:
+          fetch-depth: 2  # Ensure at least one previous commit is available
 
       - name: Convert Repository Owner to Lowercase
         run: echo "OWNER=$(echo ${{ github.repository_owner }} | tr '[:upper:]' '[:lower:]')" >> $GITHUB_ENV
@@ -32,8 +34,14 @@ jobs:
       - name: Detect Changed Directories
         id: detect_dirs
         run: |
-          # Extract top-level directories from changed files (excluding hidden/system files)
-          CHANGED_DIRS=$(git diff --name-only HEAD^ HEAD | awk -F/ '{print $1}' | sort -u | uniq | grep -v '^\.' || true)
+          # Check if there's at least one previous commit
+          if git rev-parse HEAD^ >/dev/null 2>&1; then
+            # Extract changed top-level directories
+            CHANGED_DIRS=$(git diff --name-only HEAD^ HEAD -- | awk -F/ '{print $1}' | sort -u | uniq | grep -v '^\.' || true)
+          else
+            # If first commit, consider all existing top-level directories
+            CHANGED_DIRS=$(ls -d */ | cut -f1 -d'/' | grep -v '^\.' || true)
+          fi
 
           # Debug output
           echo "Changed directories: $CHANGED_DIRS"
@@ -42,10 +50,18 @@ jobs:
           echo "CHANGED_DIRS=$(echo $CHANGED_DIRS | tr '\n' ' ')" >> $GITHUB_ENV
 
       - name: Log in to GitHub Container Registry
-        run: echo "${{ secrets.GHCR_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+        run: |
+          mkdir -p ~/.docker
+          echo '{ "credsStore": "secretservice" }' > ~/.docker/config.json
+          echo "${{ secrets.GHCR_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
 
       - name: Build and Push Docker Images
         run: |
+          if [[ -z "${{ env.CHANGED_DIRS }}" ]]; then
+            echo "No directories were modified. Skipping build."
+            exit 0
+          fi
+
           for dir in ${{ env.CHANGED_DIRS }}; do
             if [[ ! -d "$dir" ]]; then
               echo "Skipping non-directory: $dir"
