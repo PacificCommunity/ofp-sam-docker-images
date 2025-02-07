@@ -46,7 +46,9 @@ jobs:
             CHANGED_JSON=$(echo "$CHANGED_DIRS" | jq -R -s -c 'split("\n") | map(select(. != ""))')
           fi
 
-          echo "CHANGED_DIRS=$CHANGED_JSON" >> $GITHUB_ENV
+          echo "changed_dirs=$CHANGED_JSON" >> $GITHUB_ENV
+          echo "::echo::changed_dirs=$CHANGED_JSON"
+          echo "::set-output name=changed_dirs::$CHANGED_JSON"
 
   determine-version:
     needs: detect-changes
@@ -90,6 +92,7 @@ jobs:
           fi
 
           echo "NEW_VERSION=\"$NEW_VERSION\"" >> $GITHUB_ENV
+          echo "::set-output name=new_version::$NEW_VERSION"
 
   build:
     needs: determine-version
@@ -131,3 +134,4 @@ jobs:
           echo "Pushing Docker image: $IMAGE_NAME:v$VERSION"
           docker push $IMAGE_NAME:v$VERSION
           docker push $IMAGE_NAME:latest
+
