@@ -33,35 +33,31 @@ jobs:
         id: get_version
         run: |
           # Define the GHCR API URL
-          PACKAGE_URL="https://api.github.com/orgs/${{ env.OWNER }}/packages/container/skj-2025/versions"
-          echo "Checking latest version from: $PACKAGE_URL"
+          PACKAGE_URL="https://api.github.com/orgs/pacificcommunity/packages/container/skj-2025/versions"
+          echo "Fetching GHCR versions from: $PACKAGE_URL"
 
-          # Fetch versions from GitHub API
-          API_RESPONSE=$(curl -s -H "Authorization: Bearer ${{ secrets.GHCR_TOKEN }}" $PACKAGE_URL)
+          # Fetch all versions from GHCR
+          API_RESPONSE=$(curl -s -H "Authorization: Bearer ${{ secrets.GHCR_TOKEN }}" \
+              -H "Accept: application/vnd.github.v3+json" \
+              $PACKAGE_URL)
 
-          # Debug: Print API response
-          echo "API Response: $API_RESPONSE"
+          # Debugging: Print API response
+          echo "GHCR API Response: $API_RESPONSE"
 
-          # If user specified a version, use it
-          if [[ -n "${{ github.event.inputs.version }}" ]]; then
-            NEW_VERSION="${{ github.event.inputs.version }}"
-            echo "Using user-specified version: $NEW_VERSION"
+          # Extract all version tags (ignoring SHA256 digests)
+          VERSION_TAGS=$(echo "$API_RESPONSE" | jq -r '[.[].metadata.container.tags | select(length > 0) | .[]] | map(select(test("^[0-9]+\\.[0-9]+$"))) | sort | last')
+
+          # If no valid version is found, start at 1.0
+          if [[ -z "$VERSION_TAGS" || "$VERSION_TAGS" == "null" ]]; then
+            echo "No valid versions found. Setting initial version to 1.0"
+            NEW_VERSION="1.0"
           else
-            # Extract all numeric versions from API response
-            LATEST_VERSION=$(echo "$API_RESPONSE" | jq -r '[.[].name] | map(select(test("^[0-9]+\\.[0-9]+$"))) | max')
-
-            # If no valid version is found, start at 1.0
-            if [[ -z "$LATEST_VERSION" || "$LATEST_VERSION" == "null" ]]; then
-              echo "No valid versions found. Setting initial version to 1.0"
-              NEW_VERSION="1.0"
-            else
-              # Increment minor version (e.g., 1.0 → 1.1)
-              NEW_VERSION=$(awk -F. '{print $1 "." $2+1}' <<< "$LATEST_VERSION")
-              echo "Latest version detected: $LATEST_VERSION. Incrementing to: $NEW_VERSION"
-            fi
+            # Increment the minor version (e.g., 1.0 -> 1.1)
+            NEW_VERSION=$(awk -F. '{print $1 "." $2+1}' <<< "$VERSION_TAGS")
+            echo "Latest version detected: $VERSION_TAGS. Incrementing to: $NEW_VERSION"
           fi
 
-          # Save version in GitHub environment
+          # Save version to GitHub environment
           echo "NEW_VERSION=$NEW_VERSION" >> $GITHUB_ENV
           echo "Final version to be used: $NEW_VERSION"
 
