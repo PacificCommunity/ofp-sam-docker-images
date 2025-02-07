@@ -22,7 +22,7 @@ jobs:
   detect-changes:
     runs-on: ubuntu-latest
     outputs:
-      changed_dirs: ${{ steps.detect.outputs.changed_dirs }}
+      changed_dirs: ${{ env.changed_dirs }}
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v3
@@ -41,8 +41,8 @@ jobs:
             CHANGED_DIRS=$(ls -d */ | cut -f1 -d'/' | grep -v '^\.' || true)
           fi
 
-          # Debug output
-          echo "Changed directories: $CHANGED_DIRS"
+          # Debugging output
+          echo "Detected changed directories: $CHANGED_DIRS"
 
           # Convert to JSON array (ensure it's never empty)
           if [[ -z "$CHANGED_DIRS" ]]; then
@@ -51,11 +51,12 @@ jobs:
             CHANGED_JSON=$(echo "$CHANGED_DIRS" | jq -R -s -c 'split("\n") | map(select(. != ""))')
           fi
 
-          echo "::set-output name=changed_dirs::$CHANGED_JSON"
+          echo "Final JSON output: $CHANGED_JSON"
+          echo "changed_dirs=$CHANGED_JSON" >> $GITHUB_ENV
 
   determine-version:
     needs: detect-changes
-    if: needs.detect-changes.outputs.changed_dirs != '[]'  # Prevents running if no directories changed
+    if: needs.detect-changes.outputs.changed_dirs != '[]'
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -102,11 +103,11 @@ jobs:
           fi
 
           # Save version to GitHub Actions outputs
-          echo "::set-output name=new_version::$NEW_VERSION"
+          echo "new_version=$NEW_VERSION" >> $GITHUB_ENV
 
   build:
     needs: determine-version
-    if: needs.detect-changes.outputs.changed_dirs != '[]'  # Prevents running if no directories changed
+    if: needs.detect-changes.outputs.changed_dirs != '[]'
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -119,14 +120,14 @@ jobs:
         run: |
           dir="${{ matrix.directory }}"
           IMAGE_NAME=ghcr.io/${{ github.repository_owner }}/$dir
-          VERSION="${{ needs.determine-version.outputs.versions }}"
+          VERSION="${{ env.new_version }}"
 
           echo "Building Docker image: $IMAGE_NAME:v$VERSION"
           docker build -t $IMAGE_NAME:v$VERSION -t $IMAGE_NAME:latest $dir/
 
   push:
     needs: build
-    if: needs.detect-changes.outputs.changed_dirs != '[]'  # Prevents running if no directories changed
+    if: needs.detect-changes.outputs.changed_dirs != '[]'
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -139,7 +140,7 @@ jobs:
         run: |
           dir="${{ matrix.directory }}"
           IMAGE_NAME=ghcr.io/${{ github.repository_owner }}/$dir
-          VERSION="${{ needs.determine-version.outputs.versions }}"
+          VERSION="${{ env.new_version }}"
 
           echo "Pushing Docker image: $IMAGE_NAME:v$VERSION"
           docker push $IMAGE_NAME:v$VERSION
