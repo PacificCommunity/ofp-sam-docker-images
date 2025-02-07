@@ -5,16 +5,20 @@ on:
     branches:
       - main
     paths:
-      - "**/**"  # Detect changes in any path
+      - '**/**'  # Detect any file changes
+
+permissions:
+  contents: read
+  packages: write
 
 jobs:
   ##################################################################
-  # 1) DETECT CHANGED DIRECTORIES
+  # JOB A) DETECT CHANGES
   ##################################################################
   detect-changes:
     runs-on: ubuntu-latest
 
-    # Job-level output referencing step 'detect' -> outputs.changed_dirs
+    # We define one output: "changed_dirs"
     outputs:
       changed_dirs: ${{ steps.detect.outputs.changed_dirs }}
 
@@ -22,157 +26,119 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v3
         with:
-          # Ensure we have at least one previous commit
+          # Ensures we have a previous commit if it exists
           fetch-depth: 2
 
       - name: Detect Changed Directories
         id: detect
         shell: bash
         run: |
-          # If there's a previous commit, detect changed top-level dirs
+          echo "=== [Detect Step] Checking for changed directories ==="
+
+          # 1) Check if there's a previous commit
           if git rev-parse HEAD^ >/dev/null 2>&1; then
+            # Extract top-level directories from changed files
             CHANGED_DIRS=$(git diff --name-only HEAD^ HEAD -- | awk -F/ '{print $1}' | sort -u | grep -v '^\.' || true)
           else
-            # If first commit, consider all existing top-level folders
+            # If first commit, consider all existing top-level directories
             CHANGED_DIRS=$(ls -d */ | cut -f1 -d'/' | grep -v '^\.' || true)
           fi
 
-          echo "Detected raw changed directories: $CHANGED_DIRS"
+          echo "=== Raw changed directories: $CHANGED_DIRS ==="
 
-          # Convert that to a JSON array. If none found, use '[]'
+          # 2) Convert to JSON array
           if [[ -z "$CHANGED_DIRS" ]]; then
             CHANGED_JSON="[]"
           else
             CHANGED_JSON=$(echo "$CHANGED_DIRS" | jq -R -s -c 'split("\n") | map(select(. != ""))')
           fi
 
-          echo "CHANGED_JSON=$CHANGED_JSON"
+          echo "=== JSON array of changed directories: $CHANGED_JSON ==="
 
-          # Put the JSON array into this step's output
+          # 3) Save to job output
           echo "changed_dirs=$CHANGED_JSON" >> "$GITHUB_OUTPUT"
+          echo "=== [Detect Step] Done. ==="
 
   ##################################################################
-  # 2) DETERMINE VERSIONS FOR EACH CHANGED DIRECTORY
+  # JOB B) BUILD & PUSH
   ##################################################################
-  determine-version:
+  build:
+    # This job depends on the detect-changes job
     needs: detect-changes
-    # Skip if 'changed_dirs' == '[]'
+
+    # Skip if changed_dirs == '[]'
     if: needs.detect-changes.outputs.changed_dirs != '[]'
     runs-on: ubuntu-latest
 
-    # Create a matrix from 'changed_dirs' JSON array
+    # Create a matrix from fromJson(...) of changed_dirs
     strategy:
       matrix:
         directory: ${{ fromJson(needs.detect-changes.outputs.changed_dirs) }}
 
-    outputs:
-      # We'll store just one version if you need it, but note each matrix copy might produce a different version
-      new_version: ${{ steps.determine.outputs.new_version }}
-
     steps:
+      - name: Debug changed_dirs
+        shell: bash
+        run: |
+          echo "=== [Debug Step] Checking what's in changed_dirs ==="
+          echo "Raw changed_dirs from detect-changes: '${{ needs.detect-changes.outputs.changed_dirs }}'"
+          echo "=== If this is empty or '', that caused fromJson error ==="
+
       - name: Checkout Repository
         uses: actions/checkout@v3
 
-      - name: Determine Version
-        id: determine
+      - name: Build & Push Docker Image
         shell: bash
         run: |
           dir="${{ matrix.directory }}"
-          PACKAGE_URL="https://api.github.com/orgs/pacificcommunity/packages/container/$dir/versions"
+          echo "=== [Build Step] Processing directory: $dir ==="
 
-          echo "Processing directory: $dir"
+          # 1) Determine GHCR version
+          PACKAGE_URL="https://api.github.com/orgs/pacificcommunity/packages/container/$dir/versions"
           echo "Fetching GHCR versions from: $PACKAGE_URL"
 
-          # 1) Fetch existing versions
-          API_RESPONSE=$(curl -s \
-            -H "Authorization: Bearer ${{ secrets.GHCR_TOKEN }}" \
-            -H "Accept: application/vnd.github.v3+json" \
-            "$PACKAGE_URL")
+          API_RESPONSE=$(curl -s -H "Authorization: Bearer ${{ secrets.GHCR_TOKEN }}" \
+                             -H "Accept: application/vnd.github.v3+json" \
+                             "$PACKAGE_URL")
 
           echo "GHCR API Response: $API_RESPONSE"
 
-          # 2) If "Package not found", start at '1.0'
           if echo "$API_RESPONSE" | grep -q '"message": "Package not found."'; then
             NEW_VERSION="1.0"
           else
-            # Check if it's an array
             IS_ARRAY=$(echo "$API_RESPONSE" | jq -r 'type' 2>/dev/null || true)
             if [[ "$IS_ARRAY" != "array" ]]; then
-              echo "Response not array → start at 1.0"
+              echo "Response is not an array. Starting at 1.0"
               NEW_VERSION="1.0"
             else
-              # 3) Extract X.Y format version, find the latest, increment minor
               VERSION_TAGS=$(echo "$API_RESPONSE" | jq -r '
                 [.[].metadata.container.tags? // [] | .[]]
                 | map(select(test("^[0-9]+\\.[0-9]+$") and . != "latest"))
                 | sort
                 | last
               ')
-
               if [[ -z "$VERSION_TAGS" || "$VERSION_TAGS" == "null" ]]; then
                 NEW_VERSION="1.0"
               else
                 CLEAN_VERSION=$(echo "$VERSION_TAGS" | sed 's/^v//')
                 NEW_VERSION=$(awk -F. '{print $1 "." $2+1}' <<< "$CLEAN_VERSION")
-                echo "Existing version: $CLEAN_VERSION → Next: $NEW_VERSION"
+                echo "Latest version: $CLEAN_VERSION → Next: $NEW_VERSION"
               fi
             fi
           fi
 
-          echo "Final version for $dir => $NEW_VERSION"
-          echo "new_version=$NEW_VERSION" >> "$GITHUB_OUTPUT"
+          echo "=== Final version for $dir => $NEW_VERSION ==="
 
-  ##################################################################
-  # 3) BUILD DOCKER IMAGES
-  ##################################################################
-  build:
-    needs: determine-version
-    # Skip if no changed dirs
-    if: needs.detect-changes.outputs.changed_dirs != '[]'
-    runs-on: ubuntu-latest
-
-    strategy:
-      # Reuse the same JSON array for changed dirs
-      matrix:
-        directory: ${{ fromJson(needs.detect-changes.outputs.changed_dirs) }}
-
-    steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v3
-
-      - name: Build Docker Image
-        shell: bash
-        run: |
-          dir="${{ matrix.directory }}"
           IMAGE_NAME="ghcr.io/${{ github.repository_owner }}/$dir"
-          VERSION="${{ needs.determine-version.outputs.new_version }}"
 
-          echo "Building Docker image for $dir: $IMAGE_NAME:v$VERSION"
-          docker build -t "$IMAGE_NAME:v$VERSION" -t "$IMAGE_NAME:latest" "$dir/"
+          # 2) Log into GHCR (in this step for demonstration—can be separate)
+          echo "${{ secrets.GHCR_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
 
-  ##################################################################
-  # 4) PUSH DOCKER IMAGES
-  ##################################################################
-  push:
-    needs: build
-    if: needs.detect-changes.outputs.changed_dirs != '[]'
-    runs-on: ubuntu-latest
+          # 3) Build
+          echo "=== Building Docker Image: $IMAGE_NAME:v$NEW_VERSION ==="
+          docker build -t "$IMAGE_NAME:v$NEW_VERSION" -t "$IMAGE_NAME:latest" "$dir/"
 
-    strategy:
-      matrix:
-        directory: ${{ fromJson(needs.detect-changes.outputs.changed_dirs) }}
-
-    steps:
-      - name: Log in to GHCR
-        run: echo "${{ secrets.GHCR_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
-
-      - name: Push Docker Image
-        shell: bash
-        run: |
-          dir="${{ matrix.directory }}"
-          IMAGE_NAME="ghcr.io/${{ github.repository_owner }}/$dir"
-          VERSION="${{ needs.determine-version.outputs.new_version }}"
-
-          echo "Pushing Docker image: $IMAGE_NAME:v$VERSION"
-          docker push "$IMAGE_NAME:v$VERSION"
+          # 4) Push
+          echo "=== Pushing Docker Image: $IMAGE_NAME:v$NEW_VERSION ==="
+          docker push "$IMAGE_NAME:v$NEW_VERSION"
           docker push "$IMAGE_NAME:latest"
+          echo "=== [Build Step] Done for directory: $dir ==="
