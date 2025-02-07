@@ -12,7 +12,7 @@ on:
     branches:
       - main
     paths:
-      - "**/**"  # Detect any file changes at top level
+      - "**/**"  # Detect changes at any path
 
 permissions:
   contents: read
@@ -22,9 +22,8 @@ jobs:
   build-and-push:
     runs-on: ubuntu-latest
 
-    # Make the ephemeral Docker config apply to the entire job
     env:
-      DOCKER_CONFIG: /tmp/docker-config
+      DOCKER_CONFIG: /tmp/docker-config  # ephemeral Docker config folder
 
     steps:
       ##################################################################
@@ -36,7 +35,7 @@ jobs:
           fetch-depth: 2  # Ensure we have a previous commit if it exists
 
       ##################################################################
-      # 2) PREPARE EPHEMERAL DOCKER CONFIG FOLDER
+      # 2) PREPARE EPHEMERAL DOCKER CONFIG
       ##################################################################
       - name: Prepare Ephemeral Docker Config
         run: mkdir -p /tmp/docker-config
@@ -109,7 +108,7 @@ jobs:
               ##################################################################
               # AUTO-INCREMENT LOGIC
               ##################################################################
-              PACKAGE_URL="https://api.github.com/orgs/pacificcommunity/packages/container/$dir/versions"
+              PACKAGE_URL="https://api.github.com/orgs/${{ env.OWNER }}/packages/container/$dir/versions"
               echo "Fetching GHCR versions from: $PACKAGE_URL"
 
               API_RESPONSE=$(curl -s \
@@ -160,5 +159,17 @@ jobs:
             docker push "$IMAGE_NAME:v$NEW_VERSION"
             docker push "$IMAGE_NAME:latest"
 
+            ##############################################################################
+            # AFTER PUSH: MAKE THE PACKAGE PUBLIC
+            ##############################################################################
+            echo "Making the GHCR package '$dir' public..."
+            curl -X PATCH "https://api.github.com/orgs/${{ env.OWNER }}/packages/container/$dir/visibility" \
+              -H "Authorization: Bearer ${{ secrets.GHCR_TOKEN }}" \
+              -H "Accept: application/vnd.github.v3+json" \
+              -d '{"visibility":"public"}'
+
             echo "=== Done with $dir (version $NEW_VERSION) ==="
           done
+
+          echo "=== All directories processed ==="
+          
