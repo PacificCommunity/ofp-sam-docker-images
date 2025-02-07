@@ -32,27 +32,21 @@ jobs:
       - name: Detect Changed Directories
         id: detect
         run: |
-          # Check if there's at least one previous commit
           if git rev-parse HEAD^ >/dev/null 2>&1; then
-            # Extract top-level directories from changed files
             CHANGED_DIRS=$(git diff --name-only HEAD^ HEAD -- | awk -F/ '{print $1}' | sort -u | uniq | grep -v '^\.' || true)
           else
-            # If first commit, consider all existing top-level directories
             CHANGED_DIRS=$(ls -d */ | cut -f1 -d'/' | grep -v '^\.' || true)
           fi
 
-          # Debugging output
           echo "Detected changed directories: $CHANGED_DIRS"
 
-          # Convert to JSON array (ensure it's never empty)
           if [[ -z "$CHANGED_DIRS" ]]; then
             CHANGED_JSON="[]"
           else
             CHANGED_JSON=$(echo "$CHANGED_DIRS" | jq -R -s -c 'split("\n") | map(select(. != ""))')
           fi
 
-          echo "changed_dirs=$CHANGED_JSON" >> $GITHUB_ENV
-          echo "::set-output name=changed_dirs::$CHANGED_JSON"  # Keep this for backward compatibility
+          echo "CHANGED_DIRS=$CHANGED_JSON" >> $GITHUB_ENV
 
   determine-version:
     needs: detect-changes
@@ -72,28 +66,21 @@ jobs:
         run: |
           dir="${{ matrix.directory }}"
           PACKAGE_URL="https://api.github.com/orgs/pacificcommunity/packages/container/$dir/versions"
-          
+
           echo "Fetching GHCR versions from: $PACKAGE_URL"
 
-          # Fetch versions with error handling
           API_RESPONSE=$(curl -s -H "Authorization: Bearer ${{ secrets.GHCR_TOKEN }}" \
               -H "Accept: application/vnd.github.v3+json" \
               $PACKAGE_URL)
 
-          # Debugging: Print API response
           echo "GHCR API Response: $API_RESPONSE"
 
-          # Check if API_RESPONSE contains an error message
           if echo "$API_RESPONSE" | grep -q "Not Found"; then
-            echo "No package found in GHCR for $dir. Starting with version 1.0."
             NEW_VERSION="1.0"
           else
-            # Extract valid version tags while handling unexpected responses
-            VERSION_TAGS=$(echo "$API_RESPONSE" | jq -r 'select(type=="array") | .[].metadata.container.tags? // [] | map(select(test("^v?[0-9]+\\.[0-9]+$") and . != "latest")) | sort | last')
+            VERSION_TAGS=$(echo "$API_RESPONSE" | jq -r '[.[].metadata.container.tags? // [] | .[]] | map(select(test("^[0-9]+\\.[0-9]+$") and . != "latest")) | sort | last')
 
-            # If no valid version is found, start at 1.0
             if [[ -z "$VERSION_TAGS" || "$VERSION_TAGS" == "null" ]]; then
-              echo "No valid versions found. Setting initial version to 1.0"
               NEW_VERSION="1.0"
             else
               CLEAN_VERSION=$(echo "$VERSION_TAGS" | sed 's/^v//')
@@ -102,8 +89,7 @@ jobs:
             fi
           fi
 
-          echo "new_version=$NEW_VERSION" >> $GITHUB_ENV
-          echo "::set-output name=new_version::$NEW_VERSION"  # Keep for compatibility
+          echo "NEW_VERSION=\"$NEW_VERSION\"" >> $GITHUB_ENV
 
   build:
     needs: determine-version
@@ -120,7 +106,7 @@ jobs:
         run: |
           dir="${{ matrix.directory }}"
           IMAGE_NAME=ghcr.io/${{ github.repository_owner }}/$dir
-          VERSION="${{ needs.determine-version.outputs.versions }}"
+          VERSION="${{ env.NEW_VERSION }}"
 
           echo "Building Docker image: $IMAGE_NAME:v$VERSION"
           docker build -t $IMAGE_NAME:v$VERSION -t $IMAGE_NAME:latest $dir/
@@ -140,7 +126,7 @@ jobs:
         run: |
           dir="${{ matrix.directory }}"
           IMAGE_NAME=ghcr.io/${{ github.repository_owner }}/$dir
-          VERSION="${{ needs.determine-version.outputs.versions }}"
+          VERSION="${{ env.NEW_VERSION }}"
 
           echo "Pushing Docker image: $IMAGE_NAME:v$VERSION"
           docker push $IMAGE_NAME:v$VERSION
