@@ -44,17 +44,23 @@ jobs:
           # Debugging: Print API response
           echo "GHCR API Response: $API_RESPONSE"
 
-          # Extract version tags while handling empty tags correctly
-          VERSION_TAGS=$(echo "$API_RESPONSE" | jq -r '[.[].metadata.container.tags? // [] | .[]] | map(select(test("^[0-9]+\\.[0-9]+$"))) | sort | last')
+          # Extract valid version tags while filtering out empty arrays and 'latest'
+          VERSION_TAGS=$(echo "$API_RESPONSE" | jq -r '[.[].metadata.container.tags? // [] | .[]] | map(select(test("^v?[0-9]+\\.[0-9]+$") and . != "latest")) | sort | last')
+
+          # Debugging: Print extracted version tags
+          echo "Extracted version tags: $VERSION_TAGS"
 
           # If no valid version is found, start at 1.0
           if [[ -z "$VERSION_TAGS" || "$VERSION_TAGS" == "null" ]]; then
             echo "No valid versions found. Setting initial version to 1.0"
             NEW_VERSION="1.0"
           else
+            # Remove 'v' prefix if present (e.g., "v1.0" → "1.0")
+            CLEAN_VERSION=$(echo "$VERSION_TAGS" | sed 's/^v//')
+
             # Increment minor version (e.g., 1.0 → 1.1)
-            NEW_VERSION=$(awk -F. '{print $1 "." $2+1}' <<< "$VERSION_TAGS")
-            echo "Latest version detected: $VERSION_TAGS. Incrementing to: $NEW_VERSION"
+            NEW_VERSION=$(awk -F. '{print $1 "." $2+1}' <<< "$CLEAN_VERSION")
+            echo "Latest version detected: $CLEAN_VERSION. Incrementing to: $NEW_VERSION"
           fi
 
           # Save version to GitHub environment
