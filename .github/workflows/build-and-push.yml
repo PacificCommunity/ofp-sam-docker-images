@@ -163,19 +163,9 @@ jobs:
             docker build -t "$IMAGE_NAME:v$NEW_VERSION" -t "$IMAGE_NAME:latest" "$dir/"
             docker push "$IMAGE_NAME:v$NEW_VERSION"
             docker push "$IMAGE_NAME:latest"
-
-            ##############################################################################
-            # AFTER PUSH: MAKE THE PACKAGE PUBLIC
-            ##############################################################################
             
-            echo "Making the GHCR package '$dir' public under org: $REAL_OWNER"
-
-            curl -X PATCH "https://api.github.com/orgs/${{ env.OWNER }}/packages/container/$dir/visibility" \
-                -H "Authorization: Bearer ${{ secrets.GHCR_TOKEN }}" \
-                -H "Accept: application/vnd.github.v3+json" \
-                -d '{"visibility":"public"}'
-
             echo "=== Done with $dir (version $NEW_VERSION) ==="
+          
           done
 
           echo "=== All directories processed ==="
