@@ -1,4 +1,4 @@
-name: Build and Push Docker Images to GHCR (Auto-Detect & Versioning)
+name: Build and Push Docker Images to GHCR (Auto Versioning)
 
 on:
   workflow_dispatch:
@@ -12,27 +12,25 @@ on:
     branches:
       - main
     paths:
-      - "**/**"  # Detects any changed paths
+      - "**/**"  # Detect any changed paths
 
 permissions:
   contents: read
   packages: write
 
 jobs:
-  build-and-push:
+  detect-changes:
     runs-on: ubuntu-latest
-
+    outputs:
+      changed_dirs: ${{ steps.detect.outputs.changed_dirs }}
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v3
         with:
-          fetch-depth: 2  # Ensures we have at least one previous commit
-
-      - name: Convert Repository Owner to Lowercase
-        run: echo "OWNER=$(echo ${{ github.repository_owner }} | tr '[:upper:]' '[:lower:]')" >> $GITHUB_ENV
+          fetch-depth: 2  # Ensures at least one previous commit is available
 
       - name: Detect Changed Directories
-        id: detect_dirs
+        id: detect
         run: |
           # Check if there's at least one previous commit
           if git rev-parse HEAD^ >/dev/null 2>&1; then
@@ -46,66 +44,96 @@ jobs:
           # Debug output
           echo "Changed directories: $CHANGED_DIRS"
 
-          # Store as GitHub environment variable
-          echo "CHANGED_DIRS=$(echo $CHANGED_DIRS | tr '\n' ' ')" >> $GITHUB_ENV
+          # Convert to JSON array for GitHub Actions output
+          CHANGED_JSON=$(echo "$CHANGED_DIRS" | jq -R -s -c 'split("\n") | map(select(. != ""))')
+          echo "::set-output name=changed_dirs::$CHANGED_JSON"
 
-      - name: Log in to GitHub Container Registry
+  determine-version:
+    needs: detect-changes
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        directory: ${{ fromJson(needs.detect-changes.outputs.changed_dirs) }}
+    outputs:
+      versions: ${{ steps.get_version.outputs.new_version }}
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Determine Version
+        id: get_version
         run: |
-          mkdir -p ~/.docker
-          echo '{ "credsStore": "pass" }' > ~/.docker/config.json
-          echo "${{ secrets.GHCR_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+          dir="${{ matrix.directory }}"
+          PACKAGE_URL="https://api.github.com/orgs/pacificcommunity/packages/container/$dir/versions"
           
-      - name: Determine Version and Build/Push Docker Images
-        run: |
-          if [[ -z "${{ env.CHANGED_DIRS }}" ]]; then
-            echo "No directories were modified. Skipping build."
-            exit 0
-          fi
+          echo "Fetching GHCR versions from: $PACKAGE_URL"
 
-          for dir in ${{ env.CHANGED_DIRS }}; do
-            if [[ ! -d "$dir" ]]; then
-              echo "Skipping non-directory: $dir"
-              continue
-            fi
+          # Fetch versions with error handling
+          API_RESPONSE=$(curl -s -H "Authorization: Bearer ${{ secrets.GHCR_TOKEN }}" \
+              -H "Accept: application/vnd.github.v3+json" \
+              $PACKAGE_URL)
 
-            IMAGE_NAME=ghcr.io/${{ env.OWNER }}/$dir
-            echo "Processing directory: $dir"
+          # Debugging: Print API response
+          echo "GHCR API Response: $API_RESPONSE"
 
-            # Define the GHCR API URL for the specific package
-            PACKAGE_URL="https://api.github.com/orgs/pacificcommunity/packages/container/$dir/versions"
-            echo "Fetching GHCR versions from: $PACKAGE_URL"
-
-            # Fetch all versions from GHCR
-            API_RESPONSE=$(curl -s -H "Authorization: Bearer ${{ secrets.GHCR_TOKEN }}" \
-                -H "Accept: application/vnd.github.v3+json" \
-                $PACKAGE_URL)
-
-            # Extract valid version tags while filtering out empty arrays and 'latest'
-            VERSION_TAGS=$(echo "$API_RESPONSE" | jq -r '[.[].metadata.container.tags? // [] | .[]] | map(select(test("^v?[0-9]+\\.[0-9]+$") and . != "latest")) | sort | last')
+          # Check if API_RESPONSE contains an error message
+          if echo "$API_RESPONSE" | grep -q "Not Found"; then
+            echo "No package found in GHCR for $dir. Starting with version 1.0."
+            NEW_VERSION="1.0"
+          else
+            # Extract valid version tags while handling unexpected responses
+            VERSION_TAGS=$(echo "$API_RESPONSE" | jq -r 'select(type=="array") | .[].metadata.container.tags? // [] | map(select(test("^v?[0-9]+\\.[0-9]+$") and . != "latest")) | sort | last')
 
             # If no valid version is found, start at 1.0
             if [[ -z "$VERSION_TAGS" || "$VERSION_TAGS" == "null" ]]; then
               echo "No valid versions found. Setting initial version to 1.0"
               NEW_VERSION="1.0"
             else
-              # Remove 'v' prefix if present (e.g., "v1.0" → "1.0")
               CLEAN_VERSION=$(echo "$VERSION_TAGS" | sed 's/^v//')
-
-              # Increment minor version (e.g., 1.0 → 1.1)
               NEW_VERSION=$(awk -F. '{print $1 "." $2+1}' <<< "$CLEAN_VERSION")
               echo "Latest version detected: $CLEAN_VERSION. Incrementing to: $NEW_VERSION"
             fi
+          fi
 
-            # Save version to GitHub environment
-            echo "NEW_VERSION=$NEW_VERSION" >> $GITHUB_ENV
-            echo "Final version to be used: $NEW_VERSION"
+          # Save version to GitHub Actions outputs
+          echo "::set-output name=new_version::$NEW_VERSION"
 
-            # Build Docker Image
-            echo "Building Docker image: v${NEW_VERSION}"
-            docker build -t $IMAGE_NAME:v${NEW_VERSION} -t $IMAGE_NAME:latest $dir/
+  build:
+    needs: determine-version
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        directory: ${{ fromJson(needs.detect-changes.outputs.changed_dirs) }}
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
 
-            # Push Docker Image
-            echo "Pushing Docker image: $IMAGE_NAME"
-            docker push $IMAGE_NAME:v${NEW_VERSION}
-            docker push $IMAGE_NAME:latest
-          done
+      - name: Build Docker Image
+        run: |
+          dir="${{ matrix.directory }}"
+          IMAGE_NAME=ghcr.io/${{ github.repository_owner }}/$dir
+          VERSION="${{ needs.determine-version.outputs.versions }}"
+
+          echo "Building Docker image: $IMAGE_NAME:v$VERSION"
+          docker build -t $IMAGE_NAME:v$VERSION -t $IMAGE_NAME:latest $dir/
+
+  push:
+    needs: build
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        directory: ${{ fromJson(needs.detect-changes.outputs.changed_dirs) }}
+    steps:
+      - name: Log in to GitHub Container Registry
+        run: echo "${{ secrets.GHCR_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+
+      - name: Push Docker Image
+        run: |
+          dir="${{ matrix.directory }}"
+          IMAGE_NAME=ghcr.io/${{ github.repository_owner }}/$dir
+          VERSION="${{ needs.determine-version.outputs.versions }}"
+
+          echo "Pushing Docker image: $IMAGE_NAME:v$VERSION"
+          docker push $IMAGE_NAME:v$VERSION
+          docker push $IMAGE_NAME:latest
+
