@@ -98,12 +98,9 @@ jobs:
               ##################################################################
               # AUTO-INCREMENT LOGIC
               ##################################################################
-
-              # 1) Define GHCR API URL
               PACKAGE_URL="https://api.github.com/orgs/pacificcommunity/packages/container/$dir/versions"
               echo "Fetching GHCR versions from: $PACKAGE_URL"
 
-              # 2) Fetch all versions from GHCR
               API_RESPONSE=$(curl -s \
                 -H "Authorization: Bearer ${{ secrets.GHCR_TOKEN }}" \
                 -H "Accept: application/vnd.github.v3+json" \
@@ -111,31 +108,27 @@ jobs:
 
               echo "GHCR API Response: $API_RESPONSE"
 
-              # Check if package not found => start at 1.0
+              # If package not found => start at 1.0
               if echo "$API_RESPONSE" | grep -q '"message": "Package not found."'; then
                 NEW_VERSION="1.0"
-                echo "Package '$dir' not found in GHCR. Starting at version 1.0."
+                echo "Package '$dir' not found. Starting at version 1.0."
               else
-                # Check if the response is an array
                 IS_ARRAY=$(echo "$API_RESPONSE" | jq -r 'type' 2>/dev/null || true)
                 if [ "$IS_ARRAY" != "array" ]; then
-                  # If not an array, probably an error or no versions => start 1.0
                   NEW_VERSION="1.0"
-                  echo "GHCR response not array. Starting version at 1.0."
+                  echo "GHCR response not array. Starting at 1.0."
                 else
-                  # Parse for valid X.Y tags
-                  VERSION_TAGS=$(echo "$API_RESPONSE" | jq -r '[.[].metadata.container.tags? // [] | .[]] 
-                      | map(select(test("^[0-9]+\\.[0-9]+$") and . != "latest")) 
-                      | sort 
-                      | last')
-
+                  VERSION_TAGS=$(echo "$API_RESPONSE" | jq -r '
+                    [.[].metadata.container.tags? // [] | .[]]
+                    | map(select(test("^[0-9]+\\.[0-9]+$") and . != "latest"))
+                    | sort
+                    | last
+                  ')
                   if [ -z "$VERSION_TAGS" ] || [ "$VERSION_TAGS" = "null" ]; then
                     NEW_VERSION="1.0"
-                    echo "No valid versions found for '$dir'. Starting at 1.0."
+                    echo "No valid versions found. Starting at 1.0."
                   else
-                    # Remove any leading 'v' and increment minor version
                     CLEAN_VERSION=$(echo "$VERSION_TAGS" | sed 's/^v//')
-                    # Example: "1.4" -> "1.5"
                     NEW_VERSION=$(awk -F. '{print $1 "." $2+1}' <<< "$CLEAN_VERSION")
                     echo "Latest version: $CLEAN_VERSION => Incremented to: $NEW_VERSION"
                   fi
@@ -145,20 +138,13 @@ jobs:
 
             echo "Final version for '$dir': $NEW_VERSION"
 
-            ##################################################################
-            # 6) BUILD & PUSH DOCKER IMAGE
-            ##################################################################
+            # Build & Push
             IMAGE_NAME="ghcr.io/${{ env.OWNER }}/$dir"
             echo "Docker Image Name: $IMAGE_NAME"
-
-            # Build
             echo "=== Building Docker image: $IMAGE_NAME:v$NEW_VERSION ==="
             docker build -t "$IMAGE_NAME:v$NEW_VERSION" -t "$IMAGE_NAME:latest" "$dir/"
-
-            # Push
-            echo "=== Pushing Docker image: $IMAGE_NAME:v$NEW_VERSION ==="
             docker push "$IMAGE_NAME:v$NEW_VERSION"
             docker push "$IMAGE_NAME:latest"
 
             echo "=== Done with $dir (version $NEW_VERSION) ==="
-
+          done
