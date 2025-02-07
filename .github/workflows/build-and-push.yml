@@ -1,4 +1,4 @@
-name: Build and Push Docker Images to GHCR
+name: Build and Push Docker Images to GHCR (Auto-Detect & Versioning)
 
 on:
   workflow_dispatch:
@@ -12,7 +12,7 @@ on:
     branches:
       - main
     paths:
-      - "**/**"  # Detect any changed paths
+      - "**/**"  # Detects any changed paths
 
 permissions:
   contents: read
@@ -26,7 +26,7 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v3
         with:
-          fetch-depth: 2  # Ensure at least one previous commit is available
+          fetch-depth: 2  # Ensures we have at least one previous commit
 
       - name: Convert Repository Owner to Lowercase
         run: echo "OWNER=$(echo ${{ github.repository_owner }} | tr '[:upper:]' '[:lower:]')" >> $GITHUB_ENV
@@ -36,7 +36,7 @@ jobs:
         run: |
           # Check if there's at least one previous commit
           if git rev-parse HEAD^ >/dev/null 2>&1; then
-            # Extract changed top-level directories
+            # Extract top-level directories from changed files
             CHANGED_DIRS=$(git diff --name-only HEAD^ HEAD -- | awk -F/ '{print $1}' | sort -u | uniq | grep -v '^\.' || true)
           else
             # If first commit, consider all existing top-level directories
@@ -51,11 +51,9 @@ jobs:
 
       - name: Log in to GitHub Container Registry
         run: |
-          mkdir -p ~/.docker
-          echo '{ "credsStore": "secretservice" }' > ~/.docker/config.json
           echo "${{ secrets.GHCR_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
 
-      - name: Build and Push Docker Images
+      - name: Determine Version and Build/Push Docker Images
         run: |
           if [[ -z "${{ env.CHANGED_DIRS }}" ]]; then
             echo "No directories were modified. Skipping build."
@@ -71,25 +69,34 @@ jobs:
             IMAGE_NAME=ghcr.io/${{ env.OWNER }}/$dir
             echo "Processing directory: $dir"
 
-            # Query GHCR for existing versions
+            # Define the GHCR API URL for the specific package
             PACKAGE_URL="https://api.github.com/orgs/pacificcommunity/packages/container/$dir/versions"
+            echo "Fetching GHCR versions from: $PACKAGE_URL"
+
+            # Fetch all versions from GHCR
             API_RESPONSE=$(curl -s -H "Authorization: Bearer ${{ secrets.GHCR_TOKEN }}" \
                 -H "Accept: application/vnd.github.v3+json" \
                 $PACKAGE_URL)
 
-            # Extract valid version tags
+            # Extract valid version tags while filtering out empty arrays and 'latest'
             VERSION_TAGS=$(echo "$API_RESPONSE" | jq -r '[.[].metadata.container.tags? // [] | .[]] | map(select(test("^v?[0-9]+\\.[0-9]+$") and . != "latest")) | sort | last')
 
             # If no valid version is found, start at 1.0
             if [[ -z "$VERSION_TAGS" || "$VERSION_TAGS" == "null" ]]; then
+              echo "No valid versions found. Setting initial version to 1.0"
               NEW_VERSION="1.0"
             else
+              # Remove 'v' prefix if present (e.g., "v1.0" → "1.0")
               CLEAN_VERSION=$(echo "$VERSION_TAGS" | sed 's/^v//')
+
+              # Increment minor version (e.g., 1.0 → 1.1)
               NEW_VERSION=$(awk -F. '{print $1 "." $2+1}' <<< "$CLEAN_VERSION")
+              echo "Latest version detected: $CLEAN_VERSION. Incrementing to: $NEW_VERSION"
             fi
 
-            echo "Latest version detected: $VERSION_TAGS, Incrementing to: v$NEW_VERSION"
+            # Save version to GitHub environment
             echo "NEW_VERSION=$NEW_VERSION" >> $GITHUB_ENV
+            echo "Final version to be used: $NEW_VERSION"
 
             # Build Docker Image
             echo "Building Docker image: v${NEW_VERSION}"
