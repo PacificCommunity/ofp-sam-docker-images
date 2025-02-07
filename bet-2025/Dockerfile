@@ -26,3 +26,5 @@ RUN chmod -R 777 /var/lib/rstudio-server && chmod -R 777 /home/rstudio
 # Enable GitHub Copilot for RStudio (if applicable)
 RUN echo "copilot-enabled=1" >> /etc/rstudio/rsession.conf
 
+
+
