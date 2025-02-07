@@ -8,12 +8,10 @@ USER root
 RUN apt-get update && apt-get install -y \
     curl \
     gnupg \
-    lsb-release
-
-# Install Docker Engine and CLI using Docker's official convenience script
-RUN curl -fsSL https://get.docker.com -o get-docker.sh && \
-    sh get-docker.sh && \
-    rm get-docker.sh
+    lsb-release \
+    libclang-dev \
+    libcurl4-openssl-dev \
+    && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # Install docker-compose (pinned to version 2.23.0)
 RUN curl -L "https://github.com/docker/compose/releases/download/2.23.0/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose && \
@@ -25,18 +23,17 @@ RUN Rscript -e "install.packages('FLCore', repos='http://flr-project.org/R')"
 RUN Rscript -e "remotes::install_github('PacificCommunity/ofp-sam-flr4mfcl')"
 RUN Rscript -e "remotes::install_github('PacificCommunity/ofp-sam-CondorBox')"
 
-# Clean up unnecessary cache files
-RUN apt-get clean && rm -rf /var/lib/apt/lists/*
+# Ensure correct permissions for RStudio Server
+RUN chmod -R 777 /var/lib/rstudio-server && chmod -R 777 /home/rstudio
 
 # Enable GitHub Copilot for RStudio (if applicable)
 RUN echo "copilot-enabled=1" >> /etc/rstudio/rsession.conf
 
-# Revert to the original default user (usually 'rstudio')
+# Revert to the original default user (rstudio)
 USER rstudio
 
 # Expose the default port for RStudio Server
 EXPOSE 8787
-
 
 
 
