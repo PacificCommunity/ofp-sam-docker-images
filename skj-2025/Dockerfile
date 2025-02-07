@@ -27,4 +27,3 @@ RUN chmod -R 777 /var/lib/rstudio-server && chmod -R 777 /home/rstudio
 RUN echo "copilot-enabled=1" >> /etc/rstudio/rsession.conf
 
 
-

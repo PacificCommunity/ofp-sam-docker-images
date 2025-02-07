@@ -28,4 +28,3 @@ RUN echo "copilot-enabled=1" >> /etc/rstudio/rsession.conf
 
 
 
-
