@@ -29,12 +29,13 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v3
         with:
-          fetch-depth: 2  # Ensures we have at least one previous commit
+          # Ensure we have a previous commit for diff
+          fetch-depth: 2
 
       ##################################################################
-      # 2) CONVERT REPOSITORY OWNER TO LOWERCASE (for Docker)
+      # 2) CONVERT REPO OWNER TO LOWERCASE
       ##################################################################
-      - name: Convert Repo Owner to Lowercase
+      - name: Convert Repository Owner to Lowercase
         run: echo "OWNER=$(echo ${{ github.repository_owner }} | tr '[:upper:]' '[:lower:]')" >> $GITHUB_ENV
 
       ##################################################################
@@ -55,18 +56,22 @@ jobs:
 
           echo "Raw changed directories: $CHANGED_DIRS"
 
-          # Convert to a space-separated list for looping
-          # If none found, this will remain empty
+          # Convert to space-separated for looping
           echo "CHANGED_DIRS=$(echo "$CHANGED_DIRS" | tr '\n' ' ')" >> $GITHUB_ENV
 
       ##################################################################
-      # 4) LOG IN TO GHCR
+      # 4) LOG IN TO GHCR (SECURELY, WITH EPHEMERAL CONFIG)
       ##################################################################
-      - name: Log in to GitHub Container Registry
-        run: echo "${{ secrets.GHCR_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+      - name: Log in Securely to GitHub Container Registry
+        run: |
+          mkdir -p /tmp/docker-config
+          export DOCKER_CONFIG=/tmp/docker-config
+
+          echo "${{ secrets.GHCR_TOKEN }}" | docker login ghcr.io -u "${{ github.actor }}" --password-stdin
+          echo "Successfully logged in with ephemeral Docker config at $DOCKER_CONFIG"
 
       ##################################################################
-      # 5) LOOP OVER EACH CHANGED DIRECTORY
+      # 5) BUILD AND PUSH DOCKER IMAGES
       ##################################################################
       - name: Build and Push Docker Images
         run: |
@@ -90,7 +95,7 @@ jobs:
 
             echo "=== Processing directory: $dir ==="
 
-            # If user specified a version, use it; otherwise auto-detect
+            # If user specified a version, use that; otherwise auto-detect
             if [ -n "$USER_SPECIFIED_VERSION" ]; then
               NEW_VERSION="$USER_SPECIFIED_VERSION"
               echo "Using user-specified version: $NEW_VERSION"
@@ -113,21 +118,24 @@ jobs:
                 NEW_VERSION="1.0"
                 echo "Package '$dir' not found. Starting at version 1.0."
               else
+                # Check if GHCR returned a valid array
                 IS_ARRAY=$(echo "$API_RESPONSE" | jq -r 'type' 2>/dev/null || true)
                 if [ "$IS_ARRAY" != "array" ]; then
                   NEW_VERSION="1.0"
-                  echo "GHCR response not array. Starting at 1.0."
+                  echo "GHCR response not an array. Starting at 1.0."
                 else
+                  # Regex allows optional 'v': ^v?[0-9]+\.[0-9]+$
                   VERSION_TAGS=$(echo "$API_RESPONSE" | jq -r '
                     [.[].metadata.container.tags? // [] | .[]]
-                    | map(select(test("^[0-9]+\\.[0-9]+$") and . != "latest"))
+                    | map(select(test("^v?[0-9]+\\.[0-9]+$") and . != "latest"))
                     | sort
                     | last
                   ')
                   if [ -z "$VERSION_TAGS" ] || [ "$VERSION_TAGS" = "null" ]; then
                     NEW_VERSION="1.0"
-                    echo "No valid versions found. Starting at 1.0."
+                    echo "No valid versions found for '$dir'. Starting at 1.0."
                   else
+                    # Remove leading 'v' if present, then increment minor
                     CLEAN_VERSION=$(echo "$VERSION_TAGS" | sed 's/^v//')
                     NEW_VERSION=$(awk -F. '{print $1 "." $2+1}' <<< "$CLEAN_VERSION")
                     echo "Latest version: $CLEAN_VERSION => Incremented to: $NEW_VERSION"
@@ -142,9 +150,10 @@ jobs:
             IMAGE_NAME="ghcr.io/${{ env.OWNER }}/$dir"
             echo "Docker Image Name: $IMAGE_NAME"
             echo "=== Building Docker image: $IMAGE_NAME:v$NEW_VERSION ==="
+
             docker build -t "$IMAGE_NAME:v$NEW_VERSION" -t "$IMAGE_NAME:latest" "$dir/"
             docker push "$IMAGE_NAME:v$NEW_VERSION"
             docker push "$IMAGE_NAME:latest"
 
             echo "=== Done with $dir (version $NEW_VERSION) ==="
-          done
+
