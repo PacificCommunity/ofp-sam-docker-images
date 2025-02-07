@@ -113,7 +113,7 @@ jobs:
               ##################################################################
               # AUTO-INCREMENT LOGIC
               ##################################################################
-              PACKAGE_URL="https://api.github.com/orgs/$REAL_OWNER/packages/container/$dir/versions"
+              PACKAGE_URL="https://api.github.com/orgs/${{ env.OWNER }}/packages/container/$dir/versions"
               echo "Fetching GHCR versions from: $PACKAGE_URL"
 
               API_RESPONSE=$(curl -s \
@@ -170,7 +170,7 @@ jobs:
             
             echo "Making the GHCR package '$dir' public under org: $REAL_OWNER"
 
-            curl -X PATCH "https://api.github.com/orgs/$REAL_OWNER/packages/container/$dir/visibility" \
+            curl -X PATCH "https://api.github.com/orgs/${{ env.OWNER }}/packages/container/$dir/visibility" \
                 -H "Authorization: Bearer ${{ secrets.GHCR_TOKEN }}" \
                 -H "Accept: application/vnd.github.v3+json" \
                 -d '{"visibility":"public"}'
