@@ -22,7 +22,7 @@ jobs:
   detect-changes:
     runs-on: ubuntu-latest
     outputs:
-      changed_dirs: ${{ env.changed_dirs }}
+      changed_dirs: ${{ steps.detect.outputs.changed_dirs }}
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v3
@@ -51,8 +51,8 @@ jobs:
             CHANGED_JSON=$(echo "$CHANGED_DIRS" | jq -R -s -c 'split("\n") | map(select(. != ""))')
           fi
 
-          echo "Final JSON output: $CHANGED_JSON"
           echo "changed_dirs=$CHANGED_JSON" >> $GITHUB_ENV
+          echo "::set-output name=changed_dirs::$CHANGED_JSON"  # Keep this for backward compatibility
 
   determine-version:
     needs: detect-changes
@@ -102,8 +102,8 @@ jobs:
             fi
           fi
 
-          # Save version to GitHub Actions outputs
           echo "new_version=$NEW_VERSION" >> $GITHUB_ENV
+          echo "::set-output name=new_version::$NEW_VERSION"  # Keep for compatibility
 
   build:
     needs: determine-version
@@ -120,7 +120,7 @@ jobs:
         run: |
           dir="${{ matrix.directory }}"
           IMAGE_NAME=ghcr.io/${{ github.repository_owner }}/$dir
-          VERSION="${{ env.new_version }}"
+          VERSION="${{ needs.determine-version.outputs.versions }}"
 
           echo "Building Docker image: $IMAGE_NAME:v$VERSION"
           docker build -t $IMAGE_NAME:v$VERSION -t $IMAGE_NAME:latest $dir/
@@ -140,7 +140,7 @@ jobs:
         run: |
           dir="${{ matrix.directory }}"
           IMAGE_NAME=ghcr.io/${{ github.repository_owner }}/$dir
-          VERSION="${{ env.new_version }}"
+          VERSION="${{ needs.determine-version.outputs.versions }}"
 
           echo "Pushing Docker image: $IMAGE_NAME:v$VERSION"
           docker push $IMAGE_NAME:v$VERSION
