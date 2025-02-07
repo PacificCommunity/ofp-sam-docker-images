@@ -162,8 +162,8 @@ jobs:
 ##############################################################################
 # AFTER PUSH: MAKE THE PACKAGE PUBLIC
 ##############################################################################
-       - name: Make GHCR Package Public
-         run: |
+      - name: Make GHCR Package Public
+        run: |
           # We do NOT use ${{ env.OWNER }} here.
           # Instead, we call GitHub's actual repository_owner as returned (possibly uppercase).
           REAL_OWNER="${{ github.repository_owner }}"
