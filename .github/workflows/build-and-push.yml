@@ -22,6 +22,10 @@ jobs:
   build-and-push:
     runs-on: ubuntu-latest
 
+    # Make the ephemeral Docker config apply to the entire job
+    env:
+      DOCKER_CONFIG: /tmp/docker-config
+
     steps:
       ##################################################################
       # 1) CHECK OUT CODE
@@ -32,20 +36,26 @@ jobs:
           fetch-depth: 2  # Ensure we have a previous commit if it exists
 
       ##################################################################
-      # 2) CONVERT REPO OWNER TO LOWERCASE
+      # 2) PREPARE EPHEMERAL DOCKER CONFIG FOLDER
+      ##################################################################
+      - name: Prepare Ephemeral Docker Config
+        run: mkdir -p /tmp/docker-config
+
+      ##################################################################
+      # 3) CONVERT REPO OWNER TO LOWERCASE
       ##################################################################
       - name: Convert Repository Owner to Lowercase
         run: echo "OWNER=$(echo ${{ github.repository_owner }} | tr '[:upper:]' '[:lower:]')" >> $GITHUB_ENV
 
       ##################################################################
-      # 3) DETECT CHANGED DIRECTORIES
+      # 4) DETECT CHANGED DIRECTORIES
       ##################################################################
       - name: Detect Changed Directories
         id: detect
         run: |
           echo "=== Detecting changed top-level directories ==="
 
-          # If there's a previous commit, detect what changed
+          # If there's a previous commit, find changed directories
           if git rev-parse HEAD^ >/dev/null 2>&1; then
             CHANGED_DIRS=$(git diff --name-only HEAD^ HEAD -- | awk -F/ '{print $1}' | sort -u | grep -v '^\.' || true)
           else
@@ -55,22 +65,19 @@ jobs:
 
           echo "Raw changed directories: $CHANGED_DIRS"
 
-          # Make space-separated list
+          # Convert to space-separated for looping
           echo "CHANGED_DIRS=$(echo "$CHANGED_DIRS" | tr '\n' ' ')" >> $GITHUB_ENV
 
       ##################################################################
-      # 4) LOG IN TO GHCR (SECURELY, WITH EPHEMERAL CONFIG)
+      # 5) LOG IN TO GHCR (SECURELY, WITH EPHEMERAL CONFIG)
       ##################################################################
-      - name: Log in to GitHub Container Registry (Secure)
+      - name: Log in to GitHub Container Registry
         run: |
-          mkdir -p /tmp/docker-config
-          export DOCKER_CONFIG=/tmp/docker-config
-
           echo "${{ secrets.GHCR_TOKEN }}" | docker login ghcr.io -u "${{ github.actor }}" --password-stdin
           echo "Successfully logged in using ephemeral Docker config at $DOCKER_CONFIG"
 
       ##################################################################
-      # 5) BUILD AND PUSH DOCKER IMAGES
+      # 6) BUILD AND PUSH DOCKER IMAGES
       ##################################################################
       - name: Build and Push Docker Images
         run: |
@@ -94,7 +101,7 @@ jobs:
 
             echo "=== Processing directory: $dir ==="
 
-            # If user specified a version, use that; otherwise, auto-detect
+            # If user specified a version, use it; otherwise auto-detect
             if [ -n "$USER_SPECIFIED_VERSION" ]; then
               NEW_VERSION="$USER_SPECIFIED_VERSION"
               echo "Using user-specified version: $NEW_VERSION"
