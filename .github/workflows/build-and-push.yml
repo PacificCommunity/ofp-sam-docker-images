@@ -77,21 +77,3 @@ jobs:
           docker push $IMAGE_NAME:v${{ env.NEW_VERSION }}
           docker push $IMAGE_NAME:latest
 
-      - name: Make GHCR Public (If Package Exists)
-        run: |
-          PACKAGE_URL="https://api.github.com/orgs/${{ env.OWNER }}/packages/container/skj-2025"
-          echo "Checking if package exists before updating visibility: $PACKAGE_URL"
-
-          # Check if the package exists
-          PACKAGE_RESPONSE=$(curl -s -H "Authorization: Bearer ${{ secrets.GHCR_TOKEN }}" $PACKAGE_URL | jq -r '.name')
-
-          if [[ -z "$PACKAGE_RESPONSE" || "$PACKAGE_RESPONSE" == "null" ]]; then
-            echo "Package not found in GHCR. Skipping visibility update."
-          else
-            echo "Package found. Changing visibility to public."
-            curl -X PATCH "$PACKAGE_URL/visibility" \
-              -H "Authorization: Bearer ${{ secrets.GHCR_TOKEN }}" \
-              -H "Accept: application/vnd.github.v3+json" \
-              -d '{"visibility":"public"}'
-          fi
-            -d '{"visibility":"public"}'
