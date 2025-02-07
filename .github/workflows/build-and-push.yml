@@ -1,4 +1,4 @@
-name: Build and Push Docker Images to GHCR (User-Specified or Auto-Increment Version)
+name: Build and Push Docker Images to GHCR
 
 on:
   workflow_dispatch:
@@ -11,8 +11,6 @@ on:
   push:
     branches:
       - main
-    paths:
-      - "skj-2025/**"
 
 permissions:
   contents: read
@@ -29,54 +27,50 @@ jobs:
       - name: Convert Repository Owner to Lowercase
         run: echo "OWNER=$(echo ${{ github.repository_owner }} | tr '[:upper:]' '[:lower:]')" >> $GITHUB_ENV
 
-      - name: Determine Version
-        id: get_version
+      - name: Get Changed Directories
+        id: changed_dirs
         run: |
-          # Define the GHCR API URL
-          PACKAGE_URL="https://api.github.com/orgs/pacificcommunity/packages/container/skj-2025/versions"
-          echo "Fetching GHCR versions from: $PACKAGE_URL"
+          # Extract changed top-level directories (excluding hidden ones)
+          CHANGED_DIRS=$(git diff --name-only HEAD^ HEAD | awk -F/ '{print $1}' | sort -u | grep -v '^\.' || true)
 
-          # Fetch all versions from GHCR
-          API_RESPONSE=$(curl -s -H "Authorization: Bearer ${{ secrets.GHCR_TOKEN }}" \
-              -H "Accept: application/vnd.github.v3+json" \
-              $PACKAGE_URL)
+          # Debugging: Print detected directories
+          echo "Changed directories: $CHANGED_DIRS"
 
-          # Debugging: Print API response
-          echo "GHCR API Response: $API_RESPONSE"
+          # Save to GitHub environment
+          echo "CHANGED_DIRS=$CHANGED_DIRS" >> $GITHUB_ENV
 
-          # Extract valid version tags while filtering out empty arrays and 'latest'
-          VERSION_TAGS=$(echo "$API_RESPONSE" | jq -r '[.[].metadata.container.tags? // [] | .[]] | map(select(test("^v?[0-9]+\\.[0-9]+$") and . != "latest")) | sort | last')
-
-          # Debugging: Print extracted version tags
-          echo "Extracted version tags: $VERSION_TAGS"
-
-          # If no valid version is found, start at 1.0
-          if [[ -z "$VERSION_TAGS" || "$VERSION_TAGS" == "null" ]]; then
-            echo "No valid versions found. Setting initial version to 1.0"
-            NEW_VERSION="1.0"
-          else
-            # Remove 'v' prefix if present (e.g., "v1.0" → "1.0")
-            CLEAN_VERSION=$(echo "$VERSION_TAGS" | sed 's/^v//')
-
-            # Increment minor version (e.g., 1.0 → 1.1)
-            NEW_VERSION=$(awk -F. '{print $1 "." $2+1}' <<< "$CLEAN_VERSION")
-            echo "Latest version detected: $CLEAN_VERSION. Incrementing to: $NEW_VERSION"
-          fi
-
-          # Save version to GitHub environment
-          echo "NEW_VERSION=$NEW_VERSION" >> $GITHUB_ENV
-          echo "Final version to be used: $NEW_VERSION"
-          
       - name: Log in to GitHub Container Registry
         run: echo "${{ secrets.GHCR_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
 
-      - name: Build and Push Docker Image
+      - name: Determine and Increment Version, Build and Push Images
         run: |
-          IMAGE_NAME=ghcr.io/${{ env.OWNER }}/skj-2025
-          echo "Building Docker image with version: v${{ env.NEW_VERSION }}"
+          for dir in ${{ env.CHANGED_DIRS }}; do
+            IMAGE_NAME=ghcr.io/${{ env.OWNER }}/$dir
+            echo "Processing directory: $dir"
 
-          # Docker Build & Push
-          docker build -t $IMAGE_NAME:v${{ env.NEW_VERSION }} -t $IMAGE_NAME:latest skj-2025/
-          docker push $IMAGE_NAME:v${{ env.NEW_VERSION }}
-          docker push $IMAGE_NAME:latest
+            # Query GHCR for existing versions
+            PACKAGE_URL="https://api.github.com/orgs/pacificcommunity/packages/container/$dir/versions"
+            API_RESPONSE=$(curl -s -H "Authorization: Bearer ${{ secrets.GHCR_TOKEN }}" \
+                -H "Accept: application/vnd.github.v3+json" \
+                $PACKAGE_URL)
 
+            # Extract valid version tags
+            VERSION_TAGS=$(echo "$API_RESPONSE" | jq -r '[.[].metadata.container.tags? // [] | .[]] | map(select(test("^v?[0-9]+\\.[0-9]+$") and . != "latest")) | sort | last')
+
+            # If no valid version is found, start at 1.0
+            if [[ -z "$VERSION_TAGS" || "$VERSION_TAGS" == "null" ]]; then
+              NEW_VERSION="1.0"
+            else
+              CLEAN_VERSION=$(echo "$VERSION_TAGS" | sed 's/^v//')
+              NEW_VERSION=$(awk -F. '{print $1 "." $2+1}' <<< "$CLEAN_VERSION")
+            fi
+
+            echo "Latest version detected: $VERSION_TAGS, Incrementing to: v$NEW_VERSION"
+            echo "NEW_VERSION=$NEW_VERSION" >> $GITHUB_ENV
+
+            # Build and push Docker image
+            echo "Building Docker image: v${NEW_VERSION}"
+            docker build -t $IMAGE_NAME:v${NEW_VERSION} -t $IMAGE_NAME:latest $dir/
+            docker push $IMAGE_NAME:v${NEW_VERSION}
+            docker push $IMAGE_NAME:latest
+          done
