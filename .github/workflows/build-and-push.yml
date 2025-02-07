@@ -12,7 +12,7 @@ on:
     branches:
       - main
     paths:
-      - "**/**"  # Detect any changed paths
+      - "**/**"  # Detects any changed paths
 
 permissions:
   contents: read
@@ -44,12 +44,18 @@ jobs:
           # Debug output
           echo "Changed directories: $CHANGED_DIRS"
 
-          # Convert to JSON array for GitHub Actions output
-          CHANGED_JSON=$(echo "$CHANGED_DIRS" | jq -R -s -c 'split("\n") | map(select(. != ""))')
+          # Convert to JSON array (ensure it's never empty)
+          if [[ -z "$CHANGED_DIRS" ]]; then
+            CHANGED_JSON="[]"
+          else
+            CHANGED_JSON=$(echo "$CHANGED_DIRS" | jq -R -s -c 'split("\n") | map(select(. != ""))')
+          fi
+
           echo "::set-output name=changed_dirs::$CHANGED_JSON"
 
   determine-version:
     needs: detect-changes
+    if: needs.detect-changes.outputs.changed_dirs != '[]'  # Prevents running if no directories changed
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -100,6 +106,7 @@ jobs:
 
   build:
     needs: determine-version
+    if: needs.detect-changes.outputs.changed_dirs != '[]'  # Prevents running if no directories changed
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -119,6 +126,7 @@ jobs:
 
   push:
     needs: build
+    if: needs.detect-changes.outputs.changed_dirs != '[]'  # Prevents running if no directories changed
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -136,4 +144,3 @@ jobs:
           echo "Pushing Docker image: $IMAGE_NAME:v$VERSION"
           docker push $IMAGE_NAME:v$VERSION
           docker push $IMAGE_NAME:latest
-
