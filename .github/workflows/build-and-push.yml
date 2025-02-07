@@ -11,6 +11,8 @@ on:
   push:
     branches:
       - main
+    paths:
+      - "**/**"  # Detects any changed paths
 
 permissions:
   contents: read
@@ -27,24 +29,29 @@ jobs:
       - name: Convert Repository Owner to Lowercase
         run: echo "OWNER=$(echo ${{ github.repository_owner }} | tr '[:upper:]' '[:lower:]')" >> $GITHUB_ENV
 
-      - name: Get Changed Directories
-        id: changed_dirs
+      - name: Detect Changed Directories
+        id: detect_dirs
         run: |
-          # Extract changed top-level directories (excluding hidden ones)
-          CHANGED_DIRS=$(git diff --name-only HEAD^ HEAD | awk -F/ '{print $1}' | sort -u | grep -v '^\.' || true)
+          # Extract top-level directories from changed files (excluding hidden/system files)
+          CHANGED_DIRS=$(git diff --name-only HEAD^ HEAD | awk -F/ '{print $1}' | sort -u | uniq | grep -v '^\.' || true)
 
-          # Debugging: Print detected directories
+          # Debug output
           echo "Changed directories: $CHANGED_DIRS"
 
-          # Save to GitHub environment
-          echo "CHANGED_DIRS=$CHANGED_DIRS" >> $GITHUB_ENV
+          # Store as GitHub environment variable
+          echo "CHANGED_DIRS=$(echo $CHANGED_DIRS | tr '\n' ' ')" >> $GITHUB_ENV
 
       - name: Log in to GitHub Container Registry
         run: echo "${{ secrets.GHCR_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
 
-      - name: Determine and Increment Version, Build and Push Images
+      - name: Build and Push Docker Images
         run: |
           for dir in ${{ env.CHANGED_DIRS }}; do
+            if [[ ! -d "$dir" ]]; then
+              echo "Skipping non-directory: $dir"
+              continue
+            fi
+
             IMAGE_NAME=ghcr.io/${{ env.OWNER }}/$dir
             echo "Processing directory: $dir"
 
@@ -68,9 +75,12 @@ jobs:
             echo "Latest version detected: $VERSION_TAGS, Incrementing to: v$NEW_VERSION"
             echo "NEW_VERSION=$NEW_VERSION" >> $GITHUB_ENV
 
-            # Build and push Docker image
+            # Build Docker Image
             echo "Building Docker image: v${NEW_VERSION}"
             docker build -t $IMAGE_NAME:v${NEW_VERSION} -t $IMAGE_NAME:latest $dir/
+
+            # Push Docker Image
+            echo "Pushing Docker image: $IMAGE_NAME"
             docker push $IMAGE_NAME:v${NEW_VERSION}
             docker push $IMAGE_NAME:latest
           done
