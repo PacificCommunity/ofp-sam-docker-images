@@ -37,3 +37,6 @@ USER rstudio
 # Expose the default port for RStudio Server
 EXPOSE 8787
 
+
+
+
