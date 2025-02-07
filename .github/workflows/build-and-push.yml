@@ -44,15 +44,15 @@ jobs:
           # Debugging: Print API response
           echo "GHCR API Response: $API_RESPONSE"
 
-          # Extract all version tags (ignoring SHA256 digests)
-          VERSION_TAGS=$(echo "$API_RESPONSE" | jq -r '[.[].metadata.container.tags | select(length > 0) | .[]] | map(select(test("^[0-9]+\\.[0-9]+$"))) | sort | last')
+          # Extract version tags while handling empty tags correctly
+          VERSION_TAGS=$(echo "$API_RESPONSE" | jq -r '[.[].metadata.container.tags? // [] | .[]] | map(select(test("^[0-9]+\\.[0-9]+$"))) | sort | last')
 
           # If no valid version is found, start at 1.0
           if [[ -z "$VERSION_TAGS" || "$VERSION_TAGS" == "null" ]]; then
             echo "No valid versions found. Setting initial version to 1.0"
             NEW_VERSION="1.0"
           else
-            # Increment the minor version (e.g., 1.0 -> 1.1)
+            # Increment minor version (e.g., 1.0 → 1.1)
             NEW_VERSION=$(awk -F. '{print $1 "." $2+1}' <<< "$VERSION_TAGS")
             echo "Latest version detected: $VERSION_TAGS. Incrementing to: $NEW_VERSION"
           fi
@@ -60,7 +60,7 @@ jobs:
           # Save version to GitHub environment
           echo "NEW_VERSION=$NEW_VERSION" >> $GITHUB_ENV
           echo "Final version to be used: $NEW_VERSION"
-
+          
       - name: Log in to GitHub Container Registry
         run: echo "${{ secrets.GHCR_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
 
