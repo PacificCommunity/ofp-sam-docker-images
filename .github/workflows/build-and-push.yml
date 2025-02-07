@@ -88,6 +88,11 @@ jobs:
 
           echo "Directories to process: ${{ env.CHANGED_DIRS }}"
 
+          # We do NOT use ${{ env.OWNER }} here.
+          # Instead, we call GitHub's actual repository_owner as returned (possibly uppercase).
+          REAL_OWNER="${{ github.repository_owner }}"
+
+
           # Check if user provided a custom version
           USER_SPECIFIED_VERSION="${{ github.event.inputs.version }}"
           echo "User-specified version: $USER_SPECIFIED_VERSION (empty = auto)"
@@ -108,7 +113,7 @@ jobs:
               ##################################################################
               # AUTO-INCREMENT LOGIC
               ##################################################################
-              PACKAGE_URL="https://api.github.com/orgs/${{ env.OWNER }}/packages/container/$dir/versions"
+              PACKAGE_URL="https://api.github.com/orgs/$REAL_OWNER/packages/container/$dir/versions"
               echo "Fetching GHCR versions from: $PACKAGE_URL"
 
               API_RESPONSE=$(curl -s \
@@ -162,10 +167,7 @@ jobs:
             ##############################################################################
             # AFTER PUSH: MAKE THE PACKAGE PUBLIC
             ##############################################################################
-            # We do NOT use ${{ env.OWNER }} here.
-            # Instead, we call GitHub's actual repository_owner as returned (possibly uppercase).
-            REAL_OWNER="${{ github.repository_owner }}"
-
+            
             echo "Making the GHCR package '$dir' public under org: $REAL_OWNER"
 
             curl -X PATCH "https://api.github.com/orgs/$REAL_OWNER/packages/container/$dir/visibility" \
