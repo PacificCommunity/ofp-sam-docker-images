@@ -1,31 +1,20 @@
 name: Build and Push Docker Images to GHCR (Auto Versioning)
 
 on:
-  workflow_dispatch:
-    inputs:
-      version:
-        description: "Specify a custom version (e.g., 1.5). Leave empty for auto-increment."
-        required: false
-        default: ""
-
   push:
     branches:
       - main
     paths:
-      - "**/**"
-
-permissions:
-  contents: read
-  packages: write
+      - "**/**"  # Detect changes in any path
 
 jobs:
   ##################################################################
-  # 1) DETECT CHANGES
+  # 1) DETECT CHANGED DIRECTORIES
   ##################################################################
   detect-changes:
     runs-on: ubuntu-latest
 
-    # Job-level output: changed_dirs -> Steps => id: detect => outputs.changed_dirs
+    # Job-level output referencing step 'detect' -> outputs.changed_dirs
     outputs:
       changed_dirs: ${{ steps.detect.outputs.changed_dirs }}
 
@@ -33,49 +22,51 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v3
         with:
-          fetch-depth: 2  # Ensures we have at least one previous commit
+          # Ensure we have at least one previous commit
+          fetch-depth: 2
 
       - name: Detect Changed Directories
         id: detect
+        shell: bash
         run: |
-          # 1) Check if there's a previous commit
+          # If there's a previous commit, detect changed top-level dirs
           if git rev-parse HEAD^ >/dev/null 2>&1; then
-            CHANGED_DIRS=$(git diff --name-only HEAD^ HEAD -- | awk -F/ '{print $1}' | sort -u | uniq | grep -v '^\.' || true)
+            CHANGED_DIRS=$(git diff --name-only HEAD^ HEAD -- | awk -F/ '{print $1}' | sort -u | grep -v '^\.' || true)
           else
-            # 2) If first commit, consider all existing top-level directories
+            # If first commit, consider all existing top-level folders
             CHANGED_DIRS=$(ls -d */ | cut -f1 -d'/' | grep -v '^\.' || true)
           fi
 
-          echo "Detected changed directories: $CHANGED_DIRS"
+          echo "Detected raw changed directories: $CHANGED_DIRS"
 
-          # 3) Convert to JSON array (avoid empty string)
+          # Convert that to a JSON array. If none found, use '[]'
           if [[ -z "$CHANGED_DIRS" ]]; then
             CHANGED_JSON="[]"
           else
             CHANGED_JSON=$(echo "$CHANGED_DIRS" | jq -R -s -c 'split("\n") | map(select(. != ""))')
           fi
-          echo "Final JSON of changed directories: $CHANGED_JSON"
 
-          # 4) Store in step output using GITHUB_OUTPUT
-          #    steps.detect.outputs.changed_dirs -> job outputs.changed_dirs
+          echo "CHANGED_JSON=$CHANGED_JSON"
+
+          # Put the JSON array into this step's output
           echo "changed_dirs=$CHANGED_JSON" >> "$GITHUB_OUTPUT"
 
   ##################################################################
-  # 2) DETERMINE VERSION PER DIRECTORY
+  # 2) DETERMINE VERSIONS FOR EACH CHANGED DIRECTORY
   ##################################################################
   determine-version:
     needs: detect-changes
-    # If no changed dirs => skip
+    # Skip if 'changed_dirs' == '[]'
     if: needs.detect-changes.outputs.changed_dirs != '[]'
     runs-on: ubuntu-latest
 
-    # Convert the JSON array (changed_dirs) into a matrix
+    # Create a matrix from 'changed_dirs' JSON array
     strategy:
       matrix:
         directory: ${{ fromJson(needs.detect-changes.outputs.changed_dirs) }}
 
-    # Make a job-level output for the version, if you need to pass to other jobs
     outputs:
+      # We'll store just one version if you need it, but note each matrix copy might produce a different version
       new_version: ${{ steps.determine.outputs.new_version }}
 
     steps:
@@ -84,6 +75,7 @@ jobs:
 
       - name: Determine Version
         id: determine
+        shell: bash
         run: |
           dir="${{ matrix.directory }}"
           PACKAGE_URL="https://api.github.com/orgs/pacificcommunity/packages/container/$dir/versions"
@@ -91,6 +83,7 @@ jobs:
           echo "Processing directory: $dir"
           echo "Fetching GHCR versions from: $PACKAGE_URL"
 
+          # 1) Fetch existing versions
           API_RESPONSE=$(curl -s \
             -H "Authorization: Bearer ${{ secrets.GHCR_TOKEN }}" \
             -H "Accept: application/vnd.github.v3+json" \
@@ -98,17 +91,17 @@ jobs:
 
           echo "GHCR API Response: $API_RESPONSE"
 
-          # 1) If package not found => start at 1.0
+          # 2) If "Package not found", start at '1.0'
           if echo "$API_RESPONSE" | grep -q '"message": "Package not found."'; then
             NEW_VERSION="1.0"
           else
-            # 2) Check if response is an array
+            # Check if it's an array
             IS_ARRAY=$(echo "$API_RESPONSE" | jq -r 'type' 2>/dev/null || true)
             if [[ "$IS_ARRAY" != "array" ]]; then
-              echo "GHCR response not array. Start version at 1.0"
+              echo "Response not array → start at 1.0"
               NEW_VERSION="1.0"
             else
-              # 3) Extract valid version tags (X.Y) and find the latest
+              # 3) Extract X.Y format version, find the latest, increment minor
               VERSION_TAGS=$(echo "$API_RESPONSE" | jq -r '
                 [.[].metadata.container.tags? // [] | .[]]
                 | map(select(test("^[0-9]+\\.[0-9]+$") and . != "latest"))
@@ -121,14 +114,12 @@ jobs:
               else
                 CLEAN_VERSION=$(echo "$VERSION_TAGS" | sed 's/^v//')
                 NEW_VERSION=$(awk -F. '{print $1 "." $2+1}' <<< "$CLEAN_VERSION")
-                echo "Latest version detected: $CLEAN_VERSION => $NEW_VERSION"
+                echo "Existing version: $CLEAN_VERSION → Next: $NEW_VERSION"
               fi
             fi
           fi
 
           echo "Final version for $dir => $NEW_VERSION"
-
-          # Save as step output
           echo "new_version=$NEW_VERSION" >> "$GITHUB_OUTPUT"
 
   ##################################################################
@@ -136,11 +127,12 @@ jobs:
   ##################################################################
   build:
     needs: determine-version
+    # Skip if no changed dirs
     if: needs.detect-changes.outputs.changed_dirs != '[]'
     runs-on: ubuntu-latest
 
-    # Reuse the same matrix of changed dirs
     strategy:
+      # Reuse the same JSON array for changed dirs
       matrix:
         directory: ${{ fromJson(needs.detect-changes.outputs.changed_dirs) }}
 
@@ -149,14 +141,13 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Build Docker Image
+        shell: bash
         run: |
           dir="${{ matrix.directory }}"
           IMAGE_NAME="ghcr.io/${{ github.repository_owner }}/$dir"
-
-          # If you need the version => read from job output?
           VERSION="${{ needs.determine-version.outputs.new_version }}"
 
-          echo "Building Docker image: $IMAGE_NAME:v$VERSION"
+          echo "Building Docker image for $dir: $IMAGE_NAME:v$VERSION"
           docker build -t "$IMAGE_NAME:v$VERSION" -t "$IMAGE_NAME:latest" "$dir/"
 
   ##################################################################
@@ -167,16 +158,16 @@ jobs:
     if: needs.detect-changes.outputs.changed_dirs != '[]'
     runs-on: ubuntu-latest
 
-    # Reuse the same matrix
     strategy:
       matrix:
         directory: ${{ fromJson(needs.detect-changes.outputs.changed_dirs) }}
 
     steps:
-      - name: Log in to GitHub Container Registry
+      - name: Log in to GHCR
         run: echo "${{ secrets.GHCR_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
 
       - name: Push Docker Image
+        shell: bash
         run: |
           dir="${{ matrix.directory }}"
           IMAGE_NAME="ghcr.io/${{ github.repository_owner }}/$dir"
