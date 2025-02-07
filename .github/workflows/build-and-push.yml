@@ -159,18 +159,22 @@ jobs:
             docker push "$IMAGE_NAME:v$NEW_VERSION"
             docker push "$IMAGE_NAME:latest"
 
-##############################################################################
-# AFTER PUSH: MAKE THE PACKAGE PUBLIC
-##############################################################################
-      - name: Make GHCR Package Public
-        run: |
-          # We do NOT use ${{ env.OWNER }} here.
-          # Instead, we call GitHub's actual repository_owner as returned (possibly uppercase).
-          REAL_OWNER="${{ github.repository_owner }}"
+            ##############################################################################
+            # AFTER PUSH: MAKE THE PACKAGE PUBLIC
+            ##############################################################################
+            # We do NOT use ${{ env.OWNER }} here.
+            # Instead, we call GitHub's actual repository_owner as returned (possibly uppercase).
+            REAL_OWNER="${{ github.repository_owner }}"
 
-          echo "Making the GHCR package '$dir' public under org: $REAL_OWNER"
+            echo "Making the GHCR package '$dir' public under org: $REAL_OWNER"
 
-          curl -X PATCH "https://api.github.com/orgs/$REAL_OWNER/packages/container/$dir/visibility" \
-            -H "Authorization: Bearer ${{ secrets.GHCR_TOKEN }}" \
-            -H "Accept: application/vnd.github.v3+json" \
-            -d '{"visibility":"public"}'          
+            curl -X PATCH "https://api.github.com/orgs/$REAL_OWNER/packages/container/$dir/visibility" \
+                -H "Authorization: Bearer ${{ secrets.GHCR_TOKEN }}" \
+                -H "Accept: application/vnd.github.v3+json" \
+                -d '{"visibility":"public"}'
+
+            echo "=== Done with $dir (version $NEW_VERSION) ==="
+          done
+
+          echo "=== All directories processed ==="
+          
