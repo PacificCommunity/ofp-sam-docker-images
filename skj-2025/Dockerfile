@@ -1,9 +1,6 @@
 # Use the rocker/rstudio base image
 FROM rocker/rstudio:4.3.1
 
-# Switch to root user to install necessary packages
-USER root
-
 # Install required dependencies
 RUN apt-get update && apt-get install -y \
     curl \
@@ -28,12 +25,4 @@ RUN chmod -R 777 /var/lib/rstudio-server && chmod -R 777 /home/rstudio
 
 # Enable GitHub Copilot for RStudio (if applicable)
 RUN echo "copilot-enabled=1" >> /etc/rstudio/rsession.conf
-
-# Revert to the original default user (rstudio)
-USER rstudio
-
-# Expose the default port for RStudio Server
-EXPOSE 8787
-
-
 
