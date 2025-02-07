@@ -12,37 +12,42 @@ on:
     branches:
       - main
     paths:
-      - "**/**"  # Detect any changed paths
+      - "**/**"
 
 permissions:
   contents: read
   packages: write
 
 jobs:
+  ##################################################################
+  # 1) DETECT CHANGED DIRECTORIES
+  ##################################################################
   detect-changes:
     runs-on: ubuntu-latest
+
     outputs:
       changed_dirs: ${{ steps.detect.outputs.changed_dirs }}
+
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v3
         with:
-          fetch-depth: 2  # Ensures at least one previous commit is available
+          fetch-depth: 2  # Ensures we have at least one previous commit
 
       - name: Detect Changed Directories
         id: detect
         run: |
-          # 1) Check if there's a previous commit
+          # If there's a previous commit, detect what's changed
           if git rev-parse HEAD^ >/dev/null 2>&1; then
             CHANGED_DIRS=$(git diff --name-only HEAD^ HEAD -- | awk -F/ '{print $1}' | sort -u | uniq | grep -v '^\.' || true)
           else
-            # 2) If first commit, use all existing top-level directories
+            # If first commit, include all top-level directories
             CHANGED_DIRS=$(ls -d */ | cut -f1 -d'/' | grep -v '^\.' || true)
           fi
 
           echo "Detected changed directories: $CHANGED_DIRS"
 
-          # 3) Convert to JSON array, ensuring it's never empty
+          # Convert to JSON array; if none changed, set it to '[]'
           if [[ -z "$CHANGED_DIRS" ]]; then
             CHANGED_JSON="[]"
           else
@@ -51,71 +56,92 @@ jobs:
 
           echo "Final JSON of changed directories: $CHANGED_JSON"
 
-          # 4) Store as a job output using GITHUB_OUTPUT
+          # Store as job output (no more 'set-output'!)
           echo "changed_dirs=$CHANGED_JSON" >> "$GITHUB_OUTPUT"
 
+  ##################################################################
+  # 2) DETERMINE DOCKER VERSION (PER CHANGED DIRECTORY)
+  ##################################################################
   determine-version:
+    # Only run if we have changed directories
     needs: detect-changes
     if: needs.detect-changes.outputs.changed_dirs != '[]'
     runs-on: ubuntu-latest
 
-    # We create a matrix from the JSON array in changed_dirs
+    # Create a matrix from the JSON array in detect-changes.outputs.changed_dirs
     strategy:
       matrix:
         directory: ${{ fromJson(needs.detect-changes.outputs.changed_dirs) }}
 
     outputs:
-      new_version: ${{ steps.get_version.outputs.new_version }}
+      new_version: ${{ steps.determine.outputs.new_version }}
 
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v3
 
       - name: Determine Version
-        id: get_version
+        id: determine
         run: |
           dir="${{ matrix.directory }}"
           PACKAGE_URL="https://api.github.com/orgs/pacificcommunity/packages/container/$dir/versions"
 
+          echo "Processing directory: $dir"
           echo "Fetching GHCR versions from: $PACKAGE_URL"
 
-          # 1) Fetch GHCR response
-          API_RESPONSE=$(curl -s -H "Authorization: Bearer ${{ secrets.GHCR_TOKEN }}" \
-                             -H "Accept: application/vnd.github.v3+json" \
-                             "$PACKAGE_URL")
+          # Fetch existing versions from GHCR
+          API_RESPONSE=$(curl -s \
+            -H "Authorization: Bearer ${{ secrets.GHCR_TOKEN }}" \
+            -H "Accept: application/vnd.github.v3+json" \
+            "$PACKAGE_URL")
 
           echo "GHCR API Response: $API_RESPONSE"
 
-          # 2) Check if package is 'Not Found'
-          if echo "$API_RESPONSE" | grep -q "Not Found"; then
+          # Check if GHCR says "Package not found." (404)
+          if echo "$API_RESPONSE" | grep -q '"message": "Package not found."'; then
+            echo "Package not found. We'll create it at version 1.0."
             NEW_VERSION="1.0"
           else
-            # 3) Extract valid version tags (X.Y format)
-            VERSION_TAGS=$(echo "$API_RESPONSE" | jq -r '[.[].metadata.container.tags? // [] | .[]] 
-              | map(select(test("^[0-9]+\\.[0-9]+$") and . != "latest")) 
-              | sort 
-              | last')
-
-            # 4) If no valid version found → 1.0
-            if [[ -z "$VERSION_TAGS" || "$VERSION_TAGS" == "null" ]]; then
+            # Extract valid version tags while handling unexpected responses
+            # We'll only parse if the response is a valid array
+            IS_ARRAY=$(echo "$API_RESPONSE" | jq -r 'type' 2>/dev/null || true)
+            if [[ "$IS_ARRAY" != "array" ]]; then
+              echo "GHCR response not an array. Starting version at 1.0."
               NEW_VERSION="1.0"
             else
-              CLEAN_VERSION=$(echo "$VERSION_TAGS" | sed 's/^v//')
-              NEW_VERSION=$(awk -F. '{print $1 "." $2+1}' <<< "$CLEAN_VERSION")
-              echo "Latest version: $CLEAN_VERSION → Incrementing to: $NEW_VERSION"
+              # Now parse for tags matching X.Y format
+              VERSION_TAGS=$(echo "$API_RESPONSE" | jq -r '
+                [.[].metadata.container.tags? // [] | .[]] 
+                | map(select(test("^[0-9]+\\.[0-9]+$") and . != "latest")) 
+                | sort 
+                | last
+              ')
+
+              if [[ -z "$VERSION_TAGS" || "$VERSION_TAGS" == "null" ]]; then
+                echo "No valid versions found. Setting initial version to 1.0"
+                NEW_VERSION="1.0"
+              else
+                CLEAN_VERSION=$(echo "$VERSION_TAGS" | sed 's/^v//')
+                NEW_VERSION=$(awk -F. '{print $1 "." $2+1}' <<< "$CLEAN_VERSION")
+                echo "Latest version detected: $CLEAN_VERSION → Incrementing to: $NEW_VERSION"
+              fi
             fi
           fi
 
-          # 5) Output version as a job output
-          #    Make sure it's in quotes if it's purely numeric
+          echo "Final version to be used: $NEW_VERSION"
+
+          # Save version as a step output
           echo "new_version=$NEW_VERSION" >> "$GITHUB_OUTPUT"
 
+  ##################################################################
+  # 3) BUILD DOCKER IMAGES
+  ##################################################################
   build:
     needs: determine-version
     if: needs.detect-changes.outputs.changed_dirs != '[]'
     runs-on: ubuntu-latest
 
-    # Again, create a matrix from changed_dirs
+    # Use the same changed directories as a matrix
     strategy:
       matrix:
         directory: ${{ fromJson(needs.detect-changes.outputs.changed_dirs) }}
@@ -129,18 +155,21 @@ jobs:
           dir="${{ matrix.directory }}"
           IMAGE_NAME="ghcr.io/${{ github.repository_owner }}/$dir"
 
-          # We read the version from the 'determine-version' job
+          # Access the version from the 'determine-version' job
           VERSION="${{ needs.determine-version.outputs.new_version }}"
-
           echo "Building Docker image: $IMAGE_NAME:v$VERSION"
+
           docker build -t "$IMAGE_NAME:v$VERSION" -t "$IMAGE_NAME:latest" "$dir/"
 
+  ##################################################################
+  # 4) PUSH DOCKER IMAGES
+  ##################################################################
   push:
     needs: build
     if: needs.detect-changes.outputs.changed_dirs != '[]'
     runs-on: ubuntu-latest
 
-    # Same matrix from changed_dirs
+    # Use the same changed directories as a matrix
     strategy:
       matrix:
         directory: ${{ fromJson(needs.detect-changes.outputs.changed_dirs) }}
@@ -154,9 +183,9 @@ jobs:
           dir="${{ matrix.directory }}"
           IMAGE_NAME="ghcr.io/${{ github.repository_owner }}/$dir"
 
-          # Re-use the version from determine-version
+          # Re-use the version from the 'determine-version' job
           VERSION="${{ needs.determine-version.outputs.new_version }}"
-
           echo "Pushing Docker image: $IMAGE_NAME:v$VERSION"
+
           docker push "$IMAGE_NAME:v$VERSION"
           docker push "$IMAGE_NAME:latest"
