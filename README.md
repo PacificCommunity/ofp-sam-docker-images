@@ -2,6 +2,10 @@
 
 For reproducibility, each top-level directory contains a Dockerfile and associated files to build a Docker image. The GitHub Actions workflow automatically builds and pushes these images to GitHub Container Registry (GHCR) under the `PacificCommunity` organisation.
 
+The pushed images are available at:
+
+https://github.com/orgs/PacificCommunity/packages
+
 # Overview
 
 This repository includes a GitHub Actions workflow that:
@@ -22,12 +26,6 @@ This repository includes a GitHub Actions workflow that:
 
 - **Top-level directory detection**:
   - Each changed directory is treated as a separate container image.
-
-- **Lowercase Docker repository owner**:
-  - Avoids Docker’s “repository name must be lowercase” errors.
-
-- **Secure ephemeral Docker config**:
-  - Credentials stored in a temporary directory to avoid leftover unencrypted passwords in the default Docker config.
 
 # Adding or Updating Docker Images
 
