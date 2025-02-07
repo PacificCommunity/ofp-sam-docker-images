@@ -29,7 +29,7 @@ jobs:
       - name: Convert Repository Owner to Lowercase
         run: echo "OWNER=$(echo ${{ github.repository_owner }} | tr '[:upper:]' '[:lower:]')" >> $GITHUB_ENV
 
-            - name: Determine Version
+      - name: Determine Version
         id: get_version
         run: |
           # Define the GHCR API URL
