@@ -1,14 +1,16 @@
 # Use the rocker/rstudio base image
 FROM rocker/rstudio:4.3.1
 
-# Install required dependencies
+# Install required dependencies including OpenSSH client
 RUN apt-get update && apt-get install -y \
     curl \
     gnupg \
     lsb-release \
     libclang-dev \
     libcurl4-openssl-dev \
+    openssh-client \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
+
 
 # Install docker-compose (pinned to version 2.23.0)
 RUN curl -L "https://github.com/docker/compose/releases/download/2.23.0/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose && \
