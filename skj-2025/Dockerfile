@@ -23,7 +23,7 @@ RUN curl -L "https://github.com/docker/compose/releases/download/2.23.0/docker-c
     chmod +x /usr/local/bin/docker-compose
 
 # Install required R packages
-RUN Rscript -e "install.packages(c('ggplot2', 'rmdformats', 'GGally', 'rmarkdown', 'viridis', 'dplyr', 'cowplot', 'parallel', 'tidyr', 'patchwork', 'reshape2', 'iterators', 'remotes', 'tidyverse'), repos='https://cloud.r-project.org/')"
+RUN Rscript -e "install.packages(c('ggplot2', 'rmdformats', 'kableExtra','GGally', 'rmarkdown', 'viridis', 'dplyr', 'cowplot', 'parallel', 'tidyr', 'patchwork', 'reshape2', 'iterators', 'remotes', 'tidyverse'), repos='https://cloud.r-project.org/')"
 RUN Rscript -e "install.packages('FLCore', repos='http://flr-project.org/R')"
 RUN Rscript -e "remotes::install_github('PacificCommunity/ofp-sam-flr4mfcl')"
 RUN Rscript -e "remotes::install_github('PacificCommunity/ofp-sam-CondorBox')"
