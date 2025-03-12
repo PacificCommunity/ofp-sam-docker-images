@@ -1,0 +1,54 @@
+name: Detect Dockerfile Changes in Subdirectories
+
+on:
+  push:
+    paths:
+      - 'ofp-sam-docker-images/**/Dockerfile'
+      - 'ofp-sam-docker-images/**/'
+
+jobs:
+  notify-readme-update:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Identify changed files
+        id: changed-files
+        run: |
+          echo "Checking for Dockerfile changes..."
+          git diff --name-only ${{ github.event.before }} ${{ github.sha }} > changes.txt
+          cat changes.txt
+
+      - name: Check if a new directory was added
+        id: check-new-folder
+        run: |
+          NEW_FOLDERS=$(git diff --name-status ${{ github.event.before }} ${{ github.sha }} | grep "^A" | awk '{print $2}' | grep -E 'ofp-sam-docker-images/[^/]+/$' || true)
+          if [ -n "$NEW_FOLDERS" ]; then
+            echo "🚨 New folder(s) detected: $NEW_FOLDERS"
+            echo "NEW_FOLDER_DETECTED=true" >> $GITHUB_ENV
+          fi
+
+      - name: Create Issue if Dockerfile changed or new folder added
+        uses: actions/github-script@v6
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const { data: issues } = await github.rest.issues.listForRepo({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              state: "open"
+            });
+
+            const issueTitle = "🚨 Update README.md: Dockerfile or Folder Change Detected";
+            const existingIssue = issues.find(issue => issue.title === issueTitle);
+
+            if (!existingIssue) {
+              await github.rest.issues.create({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                title: issueTitle,
+                body: "A `Dockerfile` has been modified or a new folder was added inside `ofp-sam-docker-images/`. Please update the `README.md` accordingly.",
+                labels: ["documentation", "docker"]
+              });
+            }
