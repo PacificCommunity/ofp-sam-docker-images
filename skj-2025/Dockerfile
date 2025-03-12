@@ -40,4 +40,3 @@ COPY mfclo64 /home/mfcl/mfclo64
 # Ensure mfclo64 has execution permissions
 RUN chmod +x /home/mfcl/mfclo64
 
-
