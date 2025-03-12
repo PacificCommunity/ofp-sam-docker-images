@@ -17,7 +17,6 @@ RUN apt-get update && apt-get install -y \
     openssh-client \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
-
 # Install docker-compose (pinned to version 2.23.0)
 RUN curl -L "https://github.com/docker/compose/releases/download/2.23.0/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose && \
     chmod +x /usr/local/bin/docker-compose
@@ -33,4 +32,12 @@ RUN chmod -R 777 /var/lib/rstudio-server && chmod -R 777 /home/rstudio
 
 # Enable GitHub Copilot for RStudio (if applicable)
 RUN echo "copilot-enabled=1" >> /etc/rstudio/rsession.conf
+
+# Create /home/mfcl directory and copy mfclo64 into it
+RUN mkdir -p /home/mfcl
+COPY mfclo64 /home/mfcl/mfclo64
+
+# Ensure mfclo64 has execution permissions
+RUN chmod +x /home/mfcl/mfclo64
+
 
