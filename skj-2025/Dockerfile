@@ -15,6 +15,7 @@ RUN apt-get update && apt-get install -y \
     pandoc \
     make \
     openssh-client \
+    bc \ 
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # Install docker-compose (pinned to version 2.23.0)
