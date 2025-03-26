@@ -136,11 +136,10 @@ jobs:
                 else
                   # Regex allows optional 'v' prefix: ^v?[0-9]+\.[0-9]+$
                   VERSION_TAGS=$(echo "$API_RESPONSE" | jq -r '
-                    [.[].metadata.container.tags? // [] | .[]]
-                    | map(select(test("^v?[0-9]+\\.[0-9]+$") and . != "latest"))
-                    | sort
-                    | last
-                  ')
+                  [.[].metadata.container.tags? // [] | .[]]
+                  | map(select(test("^v?[0-9]+\\.[0-9]+$") and . != "latest"))
+                  | .[]
+                ' | sed 's/^v//' | sort -V | tail -n1)
                   if [ -z "$VERSION_TAGS" ] || [ "$VERSION_TAGS" = "null" ]; then
                     NEW_VERSION="1.0"
                     echo "No valid versions found for '$dir'. Starting at 1.0."
