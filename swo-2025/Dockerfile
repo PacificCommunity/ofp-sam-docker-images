@@ -34,7 +34,7 @@ RUN Rscript -e "remotes::install_github('James-Thorson-NOAA/VAST@3.7.1')"
 RUN Rscript -e "remotes::install_github('James-Thorson-NOAA/FishStatsUtils@2.9.1')"
 
 # (Optional) Install ofp.sam.vast.utils if needed
-RUN Rscript -e "remotes::install_github('PacificCommunity/ofp-sam-vast.utils')"
+RUN Rscript -e "remotes::install_github('PacificCommunity/ofp-sam-vast-utils')"
 
 # Ensure correct permissions for RStudio Server
 RUN chmod -R 777 /var/lib/rstudio-server && chmod -R 777 /home/rstudio
