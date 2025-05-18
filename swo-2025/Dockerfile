@@ -60,6 +60,9 @@ RUN pip3 install -U radian
 # Install R Language Server for VS Code integration
 RUN Rscript -e "install.packages('languageserver', repos='https://cloud.r-project.org/')"
 
+# Install INLA with version compatible to R 4.2.3
+RUN Rscript -e "install.packages('INLA', repos=c(getOption('repos'), INLA='https://inla.r-inla-download.org/R/stable'), dep=TRUE)"
+
 # Install required R packages from CRAN
 RUN Rscript -e "install.packages(c('ggplot2', 'GGally', 'viridis', 'dplyr', 'cowplot', 'parallel', 'tidyr', 'patchwork', 'reshape2', 'iterators', 'remotes', 'data.table', 'magrittr', 'sp', 'raster', 'ggthemes', 'splines', 'rgdal', 'rgeos', 'sf', 'terra'), repos='https://cloud.r-project.org/')"
 
