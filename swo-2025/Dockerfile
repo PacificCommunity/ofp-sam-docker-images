@@ -45,11 +45,7 @@ RUN R -e "install.packages('devtools')"
 RUN R -e "if (!requireNamespace('BiocManager', quietly=TRUE)) install.packages('BiocManager')"
 RUN R -e "BiocManager::install(c('graph', 'Rgraphviz'), ask=FALSE, update=FALSE)"
 
-# Install fmesher from CRAN (required for INLA and VAST)
-RUN R -e "install.packages('fmesher')"
-
-# Install INLA from the official repository
-RUN R -e "install.packages('INLA', repos=c(getOption('repos'), INLA='https://inla.r-inla-download.org/R/stable'), dep=TRUE)"
+RUN R -e "install.packages('https://inla.r-inla-download.org/R/stable/src/contrib/INLA_22.05.07.tar.gz', repos=NULL, type='source')"
 
 # Install core spatial and statistical R packages
 RUN R -e "install.packages(c('TMB', 'RcppArmadillo', 'Matrix', \
