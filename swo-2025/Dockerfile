@@ -24,7 +24,8 @@ RUN apt-get update && \
         librsvg2-bin \
         ghostscript \
         inkscape \
-        ca-certificates && \
+        ca-certificates \
+        gdal-bin && \
     apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # Install Docker CLI (client only, no daemon)
@@ -50,6 +51,10 @@ RUN R -e "install.packages('INLA', repos=c(getOption('repos'), INLA='https://inl
 # Install core spatial and statistical R packages
 RUN R -e "install.packages(c('remotes', 'TMB', 'RcppArmadillo', 'Matrix', \
     'sf', 'terra', 'stars', 'ggplot2', 'dplyr', 'tidyr', 'data.table', 'magrittr'))"
+
+# Install archived rgdal and rgeos for legacy dependencies
+RUN R -e "install.packages('https://cran.r-project.org/src/contrib/Archive/rgdal/rgdal_1.6-7.tar.gz', repos=NULL, type='source')"
+RUN R -e "install.packages('https://cran.r-project.org/src/contrib/Archive/rgeos/rgeos_0.6-4.tar.gz', repos=NULL, type='source')"
 
 # Install VAST 3.7.1 and FishStatsUtils 2.9.1 from GitHub with no staged install
 RUN R -e "remotes::install_github('James-Thorson-NOAA/VAST@3.7.1', INSTALL_opts='--no-staged-install')"
