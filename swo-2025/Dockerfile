@@ -1,5 +1,5 @@
 # Use minimal R 4.3.2 base image for maximum compatibility with modern packages
-FROM rocker/r-ver:4.2.3
+FROM rocker/r-ver:4.3.2
 
 # Install system dependencies and development libraries
 RUN apt-get update && \
@@ -45,11 +45,15 @@ RUN R -e "install.packages('devtools')"
 RUN R -e "if (!requireNamespace('BiocManager', quietly=TRUE)) install.packages('BiocManager')"
 RUN R -e "BiocManager::install(c('graph', 'Rgraphviz'), ask=FALSE, update=FALSE)"
 
-RUN R -e "install.packages('https://inla.r-inla-download.org/R/stable/src/contrib/INLA_22.05.07.tar.gz', repos=NULL, type='source')"
+# Install fmesher from CRAN (required for INLA and VAST)
+RUN R -e "install.packages('fmesher')"
+
+# Install INLA from the official repository
+RUN R -e "install.packages('INLA', repos=c(getOption('repos'), INLA='https://inla.r-inla-download.org/R/stable'), dep=TRUE)"
 
 # Install core spatial and statistical R packages
 RUN R -e "install.packages(c('TMB', 'RcppArmadillo', 'Matrix', \
-    'sf', 'terra', 'stars', 'ggplot2', 'dplyr', 'tidyr', 'data.table', 'magrittr', 'ggthemes'))"
+    'sf', 'sp', 'terra', 'stars', 'ggplot2', 'dplyr', 'tidyr', 'data.table', 'magrittr', 'ggthemes'))"
 
 # Install archived rgdal and rgeos for legacy dependencies
 RUN R -e "install.packages('https://cran.r-project.org/src/contrib/Archive/rgdal/rgdal_1.6-7.tar.gz', repos=NULL, type='source')"
