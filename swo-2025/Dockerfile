@@ -66,10 +66,10 @@ RUN R -e "install.packages('https://cran.r-project.org/src/contrib/Archive/Rando
 RUN R -e "install.packages('https://cran.r-project.org/src/contrib/Archive/plotKML/plotKML_0.7-5.tar.gz', repos=NULL, type='source')"
 
 # Install FishStatsUtils 2.9.1 using devtools (no v in tag)
-RUN R -e "devtools::install_github('James-Thorson-NOAA/FishStatsUtils@2.9.1')"
+RUN R -e "devtools::install_github('James-Thorson-NOAA/FishStatsUtils@2.9.1', dependencies = FALSE)"
 
 # Install VAST 3.7.1 using devtools (no v in tag)
-RUN R -e "devtools::install_github('James-Thorson-NOAA/VAST@3.7.1')"
+RUN R -e "devtools::install_github('James-Thorson-NOAA/VAST@3.7.1', dependencies = FALSE)"
 
 # Install additional utility package for VAST analyses
 RUN R -e "devtools::install_github('PacificCommunity/ofp-sam-vast-utils', dependencies = FALSE)"
