@@ -60,17 +60,17 @@ RUN R -e "install.packages('https://cran.r-project.org/src/contrib/Archive/rgdal
 RUN R -e "install.packages('https://cran.r-project.org/src/contrib/Archive/rgeos/rgeos_0.6-4.tar.gz', repos=NULL, type='source')"
 
 # Install TMBhelper (required for ofp-sam-vast-utils)
-RUN R -e "install.packages('https://cran.r-project.org/src/contrib/Archive/TMBhelper/TMBhelper_1.4.2.tar.gz', repos=NULL, type='source')"
+#RUN R -e "install.packages('https://cran.r-project.org/src/contrib/Archive/TMBhelper/TMBhelper_1.4.2.tar.gz', repos=NULL, type='source')"
 
 
 # Install FishStatsUtils (latest, not 2.9.1)
-RUN R -e "devtools::install_github('James-Thorson-NOAA/FishStatsUtils')"
+RUN R -e "devtools::install_github('James-Thorson-NOAA/FishStatsUtils@3.7.1')"
 
 # Install VAST 3.7.1 using devtools (no v in tag)
-RUN R -e "devtools::install_github('James-Thorson-NOAA/VAST')"
+RUN R -e "devtools::install_github('James-Thorson-NOAA/VAST@2.9.1')"
 
 # Install additional utility package for VAST analyses
-RUN R -e "devtools::install_github('kyuhank/ofp-sam-vast-utils')"
+#RUN R -e "devtools::install_github('kyuhank/ofp-sam-vast-utils')"
 
 # Set working directory for user projects
 WORKDIR /workspace
