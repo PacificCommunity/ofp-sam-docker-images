@@ -70,7 +70,7 @@ RUN R -e "devtools::install_github('James-Thorson-NOAA/FishStatsUtils')"
 RUN R -e "devtools::install_github('James-Thorson-NOAA/VAST@3.7.1')"
 
 # Install additional utility package for VAST analyses
-RUN R -e "devtools::install_github('PacificCommunity/ofp-sam-vast-utils')"
+RUN R -e "devtools::install_github('kyuhank/ofp-sam-vast-utils')"
 
 # Set working directory for user projects
 WORKDIR /workspace
