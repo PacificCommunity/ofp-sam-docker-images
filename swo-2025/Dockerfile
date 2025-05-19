@@ -59,8 +59,8 @@ RUN R -e "install.packages(c('TMB', 'RcppArmadillo', 'Matrix', \
 RUN R -e "install.packages('https://cran.r-project.org/src/contrib/Archive/rgdal/rgdal_1.6-7.tar.gz', repos=NULL, type='source')"
 RUN R -e "install.packages('https://cran.r-project.org/src/contrib/Archive/rgeos/rgeos_0.6-4.tar.gz', repos=NULL, type='source')"
 
-# Install FishStatsUtils 2.9.1 using devtools (no v in tag)
-RUN R -e "devtools::install_github('James-Thorson-NOAA/FishStatsUtils@2.9.1')"
+# Install FishStatsUtils (latest, not 2.9.1)
+RUN R -e "devtools::install_github('James-Thorson-NOAA/FishStatsUtils')"
 
 # Install VAST 3.7.1 using devtools (no v in tag)
 RUN R -e "devtools::install_github('James-Thorson-NOAA/VAST@3.7.1')"
