@@ -38,6 +38,9 @@ RUN pip3 install -U radian
 RUN mkdir -p /etc/R && \
     echo 'options(repos = c(CRAN = "https://cloud.r-project.org"))' >> /etc/R/Rprofile.site
 
+# Install devtools package (for install_github)
+RUN R -e "install.packages('devtools')"
+
 # Install Bioconductor dependencies required for INLA
 RUN R -e "if (!requireNamespace('BiocManager', quietly=TRUE)) install.packages('BiocManager')"
 RUN R -e "BiocManager::install(c('graph', 'Rgraphviz'), ask=FALSE, update=FALSE)"
@@ -49,20 +52,21 @@ RUN R -e "install.packages('fmesher')"
 RUN R -e "install.packages('INLA', repos=c(getOption('repos'), INLA='https://inla.r-inla-download.org/R/stable'), dep=TRUE)"
 
 # Install core spatial and statistical R packages
-RUN R -e "install.packages(c('remotes', 'TMB', 'RcppArmadillo', 'Matrix', \
-    'sf', 'terra', 'stars', 'ggplot2', 'dplyr', 'tidyr', 'data.table', 'magrittr'))"
+RUN R -e "install.packages(c('TMB', 'RcppArmadillo', 'Matrix', \
+    'sf', 'terra', 'stars', 'ggplot2', 'dplyr', 'tidyr', 'data.table', 'magrittr', 'ggthemes'))"
 
 # Install archived rgdal and rgeos for legacy dependencies
 RUN R -e "install.packages('https://cran.r-project.org/src/contrib/Archive/rgdal/rgdal_1.6-7.tar.gz', repos=NULL, type='source')"
 RUN R -e "install.packages('https://cran.r-project.org/src/contrib/Archive/rgeos/rgeos_0.6-4.tar.gz', repos=NULL, type='source')"
 
-# Install VAST 3.7.1 and FishStatsUtils 2.9.1 from GitHub with no staged install
-RUN R -e "remotes::install_github('James-Thorson-NOAA/FishStatsUtils@2.9.1', INSTALL_opts='--no-staged-install')"
-RUN R -e "remotes::install_github('James-Thorson-NOAA/VAST@3.7.1', INSTALL_opts='--no-staged-install')"
+# Install FishStatsUtils 2.9.1 using devtools (no v in tag)
+RUN R -e "devtools::install_github('James-Thorson-NOAA/FishStatsUtils@2.9.1', INSTALL_opts='--no-staged-install')"
 
+# Install VAST 3.7.1 using devtools (no v in tag)
+RUN R -e "devtools::install_github('James-Thorson-NOAA/VAST@3.7.1', INSTALL_opts='--no-staged-install')"
 
 # Install additional utility package for VAST analyses
-RUN R -e "remotes::install_github('PacificCommunity/ofp-sam-vast-utils')"
+RUN R -e "devtools::install_github('PacificCommunity/ofp-sam-vast-utils')"
 
 # Set working directory for user projects
 WORKDIR /workspace
@@ -73,6 +77,5 @@ RUN chmod -R 777 /workspace
 # Create a non-root user for security best practices
 RUN useradd -m -u 1000 -U analyst
 USER analyst
-
 
 
