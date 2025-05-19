@@ -33,8 +33,9 @@ RUN curl -fsSL https://get.docker.com | sh
 # Install radian for a modern R console experience
 RUN pip3 install -U radian
 
-# Set default CRAN repository for R
-RUN echo 'options(repos = c(CRAN = "https://cloud.r-project.org"))' >> /etc/R/Rprofile.site
+# Set default CRAN repository for R (create directory if needed)
+RUN mkdir -p /etc/R && \
+    echo 'options(repos = c(CRAN = "https://cloud.r-project.org"))' >> /etc/R/Rprofile.site
 
 # Install Bioconductor dependencies required for INLA
 RUN R -e "if (!requireNamespace('BiocManager', quietly=TRUE)) install.packages('BiocManager')"
@@ -66,5 +67,6 @@ RUN chmod -R 777 /workspace
 # Create a non-root user for security best practices
 RUN useradd -m -u 1000 -U analyst
 USER analyst
+
 
 
