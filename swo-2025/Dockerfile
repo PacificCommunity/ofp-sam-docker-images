@@ -67,7 +67,7 @@ RUN R -e "install.packages('https://cran.r-project.org/src/contrib/Archive/TMBhe
 RUN R -e "devtools::install_github('James-Thorson-NOAA/FishStatsUtils')"
 
 # Install VAST 3.7.1 using devtools (no v in tag)
-RUN R -e "devtools::install_github('James-Thorson-NOAA/VAST@3.7.1')"
+RUN R -e "devtools::install_github('James-Thorson-NOAA/VAST')"
 
 # Install additional utility package for VAST analyses
 RUN R -e "devtools::install_github('kyuhank/ofp-sam-vast-utils')"
