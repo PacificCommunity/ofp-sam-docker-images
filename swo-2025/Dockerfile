@@ -57,8 +57,9 @@ RUN R -e "install.packages('https://cran.r-project.org/src/contrib/Archive/rgdal
 RUN R -e "install.packages('https://cran.r-project.org/src/contrib/Archive/rgeos/rgeos_0.6-4.tar.gz', repos=NULL, type='source')"
 
 # Install VAST 3.7.1 and FishStatsUtils 2.9.1 from GitHub with no staged install
-RUN R -e "remotes::install_github('James-Thorson-NOAA/VAST@3.7.1', INSTALL_opts='--no-staged-install')"
 RUN R -e "remotes::install_github('James-Thorson-NOAA/FishStatsUtils@2.9.1', INSTALL_opts='--no-staged-install')"
+RUN R -e "remotes::install_github('James-Thorson-NOAA/VAST@3.7.1', INSTALL_opts='--no-staged-install')"
+
 
 # Install additional utility package for VAST analyses
 RUN R -e "remotes::install_github('PacificCommunity/ofp-sam-vast-utils')"
