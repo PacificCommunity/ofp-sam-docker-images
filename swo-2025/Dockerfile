@@ -34,7 +34,7 @@ RUN curl -fsSL https://get.docker.com | sh
 # Install radian for a modern R console experience
 RUN pip3 install -U radian
 
-# Set default CRAN repository for R (create directory if needed)
+# Set default CRAN repository for R
 RUN mkdir -p /etc/R && \
     echo 'options(repos = c(CRAN = "https://cloud.r-project.org"))' >> /etc/R/Rprofile.site
 
@@ -59,6 +59,12 @@ RUN R -e "install.packages(c('TMB', 'RcppArmadillo', 'Matrix', \
 RUN R -e "install.packages('https://cran.r-project.org/src/contrib/Archive/rgdal/rgdal_1.6-7.tar.gz', repos=NULL, type='source')"
 RUN R -e "install.packages('https://cran.r-project.org/src/contrib/Archive/rgeos/rgeos_0.6-4.tar.gz', repos=NULL, type='source')"
 
+# Install legacy dependencies required by FishStatsUtils (not available on CRAN for R >= 4.3)
+RUN R -e "install.packages('https://cran.r-project.org/src/contrib/Archive/maptools/maptools_1.1-8.tar.gz', repos=NULL, type='source')"
+RUN R -e "install.packages('https://cran.r-project.org/src/contrib/Archive/RandomFields/RandomFields_3.3.8.tar.gz', repos=NULL, type='source')"
+RUN R -e "install.packages('https://cran.r-project.org/src/contrib/Archive/RandomFieldsUtils/RandomFieldsUtils_1.1.0.tar.gz', repos=NULL, type='source')"
+RUN R -e "install.packages('https://cran.r-project.org/src/contrib/Archive/plotKML/plotKML_0.7-5.tar.gz', repos=NULL, type='source')"
+
 # Install FishStatsUtils 2.9.1 using devtools (no v in tag)
 RUN R -e "devtools::install_github('James-Thorson-NOAA/FishStatsUtils@2.9.1')"
 
@@ -77,5 +83,3 @@ RUN chmod -R 777 /workspace
 # Create a non-root user for security best practices
 RUN useradd -m -u 1000 -U analyst
 USER analyst
-
-
