@@ -64,10 +64,10 @@ RUN R -e "install.packages('https://cran.r-project.org/src/contrib/Archive/rgeos
 
 
 # Install FishStatsUtils (latest, not 2.9.1)
-RUN R -e "devtools::install_github('James-Thorson-NOAA/FishStatsUtils@3.7.1')"
+RUN R -e "devtools::install_github('James-Thorson-NOAA/FishStatsUtils@2.9.1')"
 
 # Install VAST 3.7.1 using devtools (no v in tag)
-RUN R -e "devtools::install_github('James-Thorson-NOAA/VAST@2.9.1')"
+RUN R -e "devtools::install_github('James-Thorson-NOAA/VAST@3.7.1')"
 
 # Install additional utility package for VAST analyses
 #RUN R -e "devtools::install_github('kyuhank/ofp-sam-vast-utils')"
