@@ -1,5 +1,5 @@
-# Use minimal R 4.3.2 base image for maximum compatibility with modern packages
-FROM rocker/r-ver:4.3.2
+# Use minimal R 4.2.3 base image for legacy spatial/statistical package compatibility
+FROM rocker/r-ver:4.2.3
 
 # Install system dependencies and development libraries
 RUN apt-get update && \
@@ -36,7 +36,7 @@ RUN pip3 install -U radian
 
 # Set default CRAN repository for R
 RUN mkdir -p /etc/R && \
-    echo 'options(repos = c(CRAN = "https://cloud.r-project.org"))' >> /etc/R/Rprofile.site
+    echo 'options(repos = c(CRAN = \"https://cloud.r-project.org\"))' >> /etc/R/Rprofile.site
 
 # Install devtools package (for install_github)
 RUN R -e "install.packages('devtools')"
@@ -48,8 +48,8 @@ RUN R -e "BiocManager::install(c('graph', 'Rgraphviz'), ask=FALSE, update=FALSE)
 # Install fmesher from CRAN (required for INLA and VAST)
 RUN R -e "install.packages('fmesher')"
 
-# Install INLA from the official repository
-RUN R -e "install.packages('INLA', repos=c(getOption('repos'), INLA='https://inla.r-inla-download.org/R/stable'), dep=TRUE)"
+# Install INLA (22.05.07) for VAST 3.7.1 compatibility
+RUN R -e "install.packages('https://inla.r-inla-download.org/R/stable/bin/linux/contrib/4.2/INLA_22.05.07.tar.gz', repos=NULL, type='source')"
 
 # Install core spatial and statistical R packages
 RUN R -e "install.packages(c('TMB', 'RcppArmadillo', 'Matrix', \
@@ -63,7 +63,7 @@ RUN R -e "install.packages('https://cran.r-project.org/src/contrib/Archive/rgeos
 RUN R -e "install.packages('https://cran.r-project.org/src/contrib/Archive/maptools/maptools_1.1-8.tar.gz', repos=NULL, type='source')"
 RUN R -e "install.packages('https://cran.r-project.org/src/contrib/Archive/RandomFields/RandomFields_3.3.8.tar.gz', repos=NULL, type='source')"
 RUN R -e "install.packages('https://cran.r-project.org/src/contrib/Archive/RandomFieldsUtils/RandomFieldsUtils_1.1.0.tar.gz', repos=NULL, type='source')"
-RUN R -e "install.packages('https://cran.r-project.org/src/contrib/Archive/plotKML/plotKML_0.7-5.tar.gz', repos=NULL, type='source')"
+RUN R -e "install.packages('https://cran.r-project.org/src/contrib/Archive/plotKML/plotKML_0.5-9.tar.gz', repos=NULL, type='source')"
 
 # Install FishStatsUtils 2.9.1 using devtools (no v in tag)
 RUN R -e "devtools::install_github('James-Thorson-NOAA/FishStatsUtils@2.9.1', dependencies = FALSE)"
