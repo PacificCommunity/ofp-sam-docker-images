@@ -59,6 +59,10 @@ RUN R -e "install.packages(c('TMB', 'RcppArmadillo', 'Matrix', \
 RUN R -e "install.packages('https://cran.r-project.org/src/contrib/Archive/rgdal/rgdal_1.6-7.tar.gz', repos=NULL, type='source')"
 RUN R -e "install.packages('https://cran.r-project.org/src/contrib/Archive/rgeos/rgeos_0.6-4.tar.gz', repos=NULL, type='source')"
 
+# Install TMBhelper (required for ofp-sam-vast-utils)
+RUN R -e "install.packages('https://cran.r-project.org/src/contrib/Archive/TMBhelper/TMBhelper_1.4.2.tar.gz', repos=NULL, type='source')"
+
+
 # Install FishStatsUtils (latest, not 2.9.1)
 RUN R -e "devtools::install_github('James-Thorson-NOAA/FishStatsUtils')"
 
