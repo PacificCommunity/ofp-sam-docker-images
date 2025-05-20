@@ -1,5 +1,5 @@
-# Use minimal R 4.3.2 base image for maximum compatibility with modern packages
-FROM rocker/r-ver:4.3.2
+# Use R 4.2.3 base image for compatibility with VAST 3.7.1, FishStatsUtils 2.9.1, and legacy spatial packages
+FROM rocker/r-ver:4.2.3
 
 # Install system dependencies and development libraries
 RUN apt-get update && \
@@ -7,6 +7,15 @@ RUN apt-get update && \
         python3-pip \
         git \
         curl \
+        sudo \
+        openssh-server \
+        bash-completion \
+        locales \
+        tzdata \
+        vim \
+        nano \
+        less \
+        python3-venv \
         libcurl4-openssl-dev \
         libssl-dev \
         libxml2-dev \
@@ -28,15 +37,24 @@ RUN apt-get update && \
         gdal-bin && \
     apt-get clean && rm -rf /var/lib/apt/lists/*
 
+# Set locale and timezone for local-like experience
+RUN locale-gen en_US.UTF-8 && \
+    update-locale LANG=en_US.UTF-8 && \
+    ln -fs /usr/share/zoneinfo/Asia/Seoul /etc/localtime && \
+    dpkg-reconfigure -f noninteractive tzdata
+
+ENV LANG en_US.UTF-8
+ENV TZ Asia/Seoul
+
 # Install Docker CLI (client only, no daemon)
 RUN curl -fsSL https://get.docker.com | sh
 
 # Install radian for a modern R console experience
 RUN pip3 install -U radian
 
-# Set default CRAN repository for R (create directory if needed)
+# Set default CRAN repository for R
 RUN mkdir -p /etc/R && \
-    echo 'options(repos = c(CRAN = "https://cloud.r-project.org"))' >> /etc/R/Rprofile.site
+    echo 'options(repos = c(CRAN = \"https://cloud.r-project.org\"))' >> /etc/R/Rprofile.site
 
 # Install devtools package (for install_github)
 RUN R -e "install.packages('devtools')"
@@ -45,44 +63,47 @@ RUN R -e "install.packages('devtools')"
 RUN R -e "if (!requireNamespace('BiocManager', quietly=TRUE)) install.packages('BiocManager')"
 RUN R -e "BiocManager::install(c('graph', 'Rgraphviz'), ask=FALSE, update=FALSE)"
 
-# Install fmesher from CRAN (required for INLA and VAST)
-RUN R -e "install.packages('fmesher')"
-
-# Install INLA from the official repository
-RUN R -e "install.packages('INLA', repos=c(getOption('repos'), INLA='https://inla.r-inla-download.org/R/stable'), dep=TRUE)"
-
-# Install core spatial and statistical R packages
-RUN R -e "install.packages(c('TMB', 'RcppArmadillo', 'Matrix', \
-    'sf', 'sp', 'terra', 'stars', 'ggplot2', 'dplyr', 'tidyr', 'data.table', 'magrittr', 'ggthemes'))"
-
-# Install archived rgdal and rgeos for legacy dependencies
+# Legacy spatial/statistical dependencies (order matters)
+RUN R -e "install.packages('https://cran.r-project.org/src/contrib/Archive/sp/sp_1.6-1.tar.gz', repos=NULL, type='source')" # sp 버전 명시
+RUN R -e "install.packages('https://cran.r-project.org/src/contrib/Archive/raster/raster_3.5-21.tar.gz', repos=NULL, type='source')"
 RUN R -e "install.packages('https://cran.r-project.org/src/contrib/Archive/rgdal/rgdal_1.6-7.tar.gz', repos=NULL, type='source')"
 RUN R -e "install.packages('https://cran.r-project.org/src/contrib/Archive/rgeos/rgeos_0.6-4.tar.gz', repos=NULL, type='source')"
+RUN R -e "install.packages('https://cran.r-project.org/src/contrib/Archive/maptools/maptools_1.1-8.tar.gz', repos=NULL, type='source')"
+RUN R -e "install.packages('https://cran.r-project.org/src/contrib/Archive/plotKML/plotKML_0.5-9.tar.gz', repos=NULL, type='source')"
+RUN R -e "install.packages('https://cran.r-project.org/src/contrib/Archive/RandomFields/RandomFields_3.3.8.tar.gz', repos=NULL, type='source')"
+RUN R -e "install.packages('https://cran.r-project.org/src/contrib/Archive/RandomFieldsUtils/RandomFieldsUtils_1.1.0.tar.gz', repos=NULL, type='source')"
+RUN R -e "install.packages('https://cran.r-project.org/src/contrib/Archive/TMBhelper/TMBhelper_1.4.2.tar.gz', repos=NULL, type='source')"
 
-# Install TMBhelper (required for ofp-sam-vast-utils)
-#RUN R -e "install.packages('https://cran.r-project.org/src/contrib/Archive/TMBhelper/TMBhelper_1.4.2.tar.gz', repos=NULL, type='source')"
+# INLA 22.05.07 (compatible with VAST 3.7.1 and FishStatsUtils 2.9.1)
+RUN R -e "install.packages('https://inla.r-inla-download.org/R/stable/src/contrib/INLA_22.05.07.tar.gz', repos=NULL, type='source')"
 
+# Install core spatial and statistical R packages (compatible versions)
+RUN R -e "install.packages(c('TMB', 'RcppArmadillo', 'Matrix', 'sf', 'terra', 'stars', 'ggplot2', 'dplyr', 'tidyr', 'data.table', 'magrittr', 'ggthemes'))"
 
-# Install FishStatsUtils (latest, not 2.9.1)
-RUN R -e "devtools::install_github('James-Thorson-NOAA/FishStatsUtils@2.9.1')"
+# Install FishStatsUtils 2.9.1 and VAST 3.7.1
+RUN R -e "devtools::install_github('James-Thorson-NOAA/FishStatsUtils@2.9.1', dependencies = TRUE)"
+RUN R -e "devtools::install_github('James-Thorson-NOAA/VAST@3.7.1', dependencies = TRUE)"
 
-# Install VAST 3.7.1 using devtools (no v in tag)
-RUN R -e "devtools::install_github('James-Thorson-NOAA/VAST@3.7.1')"
-
-# Install additional utility package for VAST analyses
-#RUN R -e "devtools::install_github('kyuhank/ofp-sam-vast-utils')"
-
-# Set working directory for user projects
-WORKDIR /workspace
-
-# Set permissions for the workspace directory
-RUN chmod -R 777 /workspace
-
+# Create workspace directory and set permissions
+RUN mkdir -p /workspace && chmod -R 777 /workspace
 RUN chmod -R 777 /usr/local/lib/R/site-library
 
-# Create a non-root user for security best practices
-RUN useradd -m -u 1000 -U analyst
-USER analyst
+# Create analyst user with passwordless sudo for devcontainer
+RUN useradd -m -u 1000 -U -s /bin/bash analyst && \
+    echo "analyst ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
 
+# Set up SSH server for remote access (default password: analyst)
+RUN echo 'analyst:analyst' | chpasswd && \
+    mkdir /var/run/sshd
+
+EXPOSE 22
+
+USER analyst
+WORKDIR /workspace
+
+# Set radian as the default R terminal for analyst
+RUN echo 'if [ -z \"$INSIDE_RADIAN\" ] && [ -z \"$RSTUDIO\" ] && [ \"$TERM_PROGRAM\" != \"vscode\" ]; then exec radian; fi' > /home/analyst/.radian_profile
+
+CMD ["/usr/sbin/sshd", "-D"]
 
 
