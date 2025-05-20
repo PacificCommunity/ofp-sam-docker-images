@@ -23,6 +23,7 @@ RUN apt-get update && \
         libgeos-dev \
         libproj-dev \
         libudunits2-dev \
+        libnetcdf-dev \
         libfontconfig1-dev \
         libharfbuzz-dev \
         libfribidi-dev \
@@ -34,17 +35,19 @@ RUN apt-get update && \
         ghostscript \
         inkscape \
         ca-certificates \
-        gdal-bin && \
+        gdal-bin \
+        libglu1-mesa-dev \
+        libx11-dev && \
     apt-get clean && rm -rf /var/lib/apt/lists/*
 
-# Set locale and timezone for local-like experience
+# Set locale and timezone for New Caledonia (Pacific/Noumea)
 RUN locale-gen en_US.UTF-8 && \
     update-locale LANG=en_US.UTF-8 && \
-    ln -fs /usr/share/zoneinfo/Asia/Seoul /etc/localtime && \
+    ln -fs /usr/share/zoneinfo/Pacific/Noumea /etc/localtime && \
     dpkg-reconfigure -f noninteractive tzdata
 
 ENV LANG en_US.UTF-8
-ENV TZ Asia/Seoul
+ENV TZ Pacific/Noumea
 
 # Install Docker CLI (client only, no daemon)
 RUN curl -fsSL https://get.docker.com | sh
@@ -64,7 +67,7 @@ RUN R -e "if (!requireNamespace('BiocManager', quietly=TRUE)) install.packages('
 RUN R -e "BiocManager::install(c('graph', 'Rgraphviz'), ask=FALSE, update=FALSE)"
 
 # Legacy spatial/statistical dependencies (order matters)
-RUN R -e "install.packages('https://cran.r-project.org/src/contrib/Archive/sp/sp_1.6-1.tar.gz', repos=NULL, type='source')" # sp 버전 명시
+RUN R -e "install.packages('https://cran.r-project.org/src/contrib/Archive/sp/sp_1.6-1.tar.gz', repos=NULL, type='source')"
 RUN R -e "install.packages('https://cran.r-project.org/src/contrib/Archive/raster/raster_3.5-21.tar.gz', repos=NULL, type='source')"
 RUN R -e "install.packages('https://cran.r-project.org/src/contrib/Archive/rgdal/rgdal_1.6-7.tar.gz', repos=NULL, type='source')"
 RUN R -e "install.packages('https://cran.r-project.org/src/contrib/Archive/rgeos/rgeos_0.6-4.tar.gz', repos=NULL, type='source')"
@@ -83,6 +86,13 @@ RUN R -e "install.packages(c('TMB', 'RcppArmadillo', 'Matrix', 'sf', 'terra', 's
 # Install FishStatsUtils 2.9.1 and VAST 3.7.1
 RUN R -e "devtools::install_github('James-Thorson-NOAA/FishStatsUtils@2.9.1', dependencies = TRUE)"
 RUN R -e "devtools::install_github('James-Thorson-NOAA/VAST@3.7.1', dependencies = TRUE)"
+
+# Install oce (latest GitHub version for best compatibility)
+RUN R -e "if (!require('remotes')) install.packages('remotes'); remotes::install_github('dankelley/oce@develop')"
+
+# Install tidyverse and extra spatial/statistical packages
+RUN R -e "install.packages('tidyverse')"
+RUN R -e "install.packages(c('gstat', 'automap', 'geoR', 'fields'))"
 
 # Create workspace directory and set permissions
 RUN mkdir -p /workspace && chmod -R 777 /workspace
@@ -105,5 +115,4 @@ WORKDIR /workspace
 RUN echo 'if [ -z \"$INSIDE_RADIAN\" ] && [ -z \"$RSTUDIO\" ] && [ \"$TERM_PROGRAM\" != \"vscode\" ]; then exec radian; fi' > /home/analyst/.radian_profile
 
 CMD ["/usr/sbin/sshd", "-D"]
-
 
