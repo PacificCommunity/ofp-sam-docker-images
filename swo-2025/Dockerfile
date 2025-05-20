@@ -78,11 +78,11 @@ WORKDIR /workspace
 # Set permissions for the workspace directory
 RUN chmod -R 777 /workspace
 
+RUN chmod -R 777 /usr/local/lib/R/site-library
+
 # Create a non-root user for security best practices
 RUN useradd -m -u 1000 -U analyst
 USER analyst
-
-RUN chmod -R 777 /usr/local/lib/R/site-library/TMB
 
 
 
