@@ -102,6 +102,13 @@ RUN R -e "install.packages('https://cran.r-project.org/src/contrib/Archive/oce/o
 RUN R -e "install.packages('tidyverse')"
 RUN R -e "install.packages(c('gstat', 'automap', 'geoR', 'fields'))"
 
+# Install additional requested packages (cowplot, patchwork, etc.)
+RUN R -e "install.packages(c('cowplot', 'patchwork', 'reshape2', 'kableExtra', 'viridis', 'purrr'))"
+
+# Install Quarto CLI (compatible with R 4.1.2)
+RUN curl -L https://github.com/quarto-dev/quarto-cli/releases/download/v1.2.335/quarto-1.2.335-linux-amd64.deb -o quarto.deb && \
+    dpkg -i quarto.deb && \
+    rm quarto.deb
 
 # Create workspace directory and set permissions
 RUN mkdir -p /workspace && chmod -R 777 /workspace
