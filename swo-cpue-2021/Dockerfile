@@ -94,7 +94,7 @@ RUN R -e "remotes::install_github('PacificCommunity/ofp-sam-vast-utils', depende
 
 # Install oce
 RUN R -e "install.packages(c('gsw', 'sf', 'testthat', 'knitr', 'rmarkdown', 'ncdf4'))"
-RUN R -e "install.packages('https://cran.r-project.org/src/contrib/Archive/oce/oce_1.4-0.tar.gz', repos=NULL, type='source')"
+RUN R -e "install.packages('https://cran.r-project.org/src/contrib/Archive/oce/oce_1.5-0.tar.gz', repos=NULL, type='source')"
 
 
 
