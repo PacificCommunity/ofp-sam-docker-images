@@ -1,5 +1,5 @@
 # Use R 4.3.2 base image for compatibility with VAST 3.7.1, FishStatsUtils 2.9.1, and legacy spatial packages
-FROM rocker/r-ver:4.3.2
+FROM rocker/r-ver:4.2.3
 
 # Install system dependencies and development libraries
 RUN apt-get update && \
@@ -85,7 +85,7 @@ RUN R -e "install.packages(c('TMB', 'RcppArmadillo', 'Matrix', 'sf', 'terra', 's
 
 # Install FishStatsUtils 2.9.1 and VAST 3.7.1
 RUN R -e "devtools::install_github('James-Thorson-NOAA/VAST@3.7.1', dependencies = TRUE, upgrade = FALSE, force=TRUE)"
-RUN R -e "devtools::install_github('James-Thorson-NOAA/FishStatsUtils@2.9.1', dependencies = FALSE, upgrade = FALSE, force=TRUE)"
+RUN R -e "devtools::install_github('James-Thorson-NOAA/FishStatsUtils@2.9.1', dependencies = TRUE, upgrade = FALSE, force=TRUE)"
 
 
 # Install oce (latest GitHub version for best compatibility)
