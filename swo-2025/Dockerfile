@@ -90,8 +90,8 @@ RUN R -e "devtools::install_github('James-Thorson-NOAA/FishStatsUtils@2.9.1', de
 RUN R -e "devtools::install_github('James-Thorson-NOAA/VAST@3.7.1', dependencies = TRUE, upgrade = FALSE, force=TRUE)"
 
 
-# Install oce (latest GitHub version for best compatibility)
-RUN R -e "if (!require('remotes')) install.packages('remotes'); remotes::install_github('dankelley/oce@develop')"
+# Install oce
+RUN R -e "install.packages('https://cran.r-project.org/src/contrib/Archive/oce/oce_1.4-0.tar.gz', repos=NULL, type='source')"
 
 # Install tidyverse and extra spatial/statistical packages
 RUN R -e "install.packages('tidyverse')"
