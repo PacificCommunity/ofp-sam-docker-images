@@ -84,8 +84,9 @@ RUN R -e "install.packages('https://inla.r-inla-download.org/R/stable/src/contri
 RUN R -e "install.packages(c('TMB', 'RcppArmadillo', 'Matrix', 'sf', 'terra', 'stars', 'ggplot2', 'dplyr', 'tidyr', 'data.table', 'magrittr', 'ggthemes'))"
 
 # Install FishStatsUtils 2.9.1 and VAST 3.7.1
-RUN R -e "devtools::install_github('James-Thorson-NOAA/FishStatsUtils@2.9.1', dependencies = TRUE)"
-RUN R -e "devtools::install_github('James-Thorson-NOAA/VAST@3.7.1', dependencies = TRUE)"
+RUN R -e "devtools::install_github('James-Thorson-NOAA/VAST@3.7.1', dependencies = TRUE, upgrade = FALSE, force=TRUE)"
+RUN R -e "devtools::install_github('James-Thorson-NOAA/FishStatsUtils@2.9.1', dependencies = TRUE, upgrade = FALSE, force=TRUE)"
+
 
 # Install oce (latest GitHub version for best compatibility)
 RUN R -e "if (!require('remotes')) install.packages('remotes'); remotes::install_github('dankelley/oce@develop')"
