@@ -91,6 +91,7 @@ RUN R -e "devtools::install_github('James-Thorson-NOAA/VAST@3.7.1', dependencies
 
 
 # Install oce
+RUN R -e "install.packages(c('gsw', 'sf', 'testthat', 'knitr', 'rmarkdown', 'ncdf4'))"
 RUN R -e "install.packages('https://cran.r-project.org/src/contrib/Archive/oce/oce_1.4-0.tar.gz', repos=NULL, type='source')"
 
 # Install tidyverse and extra spatial/statistical packages
