@@ -50,8 +50,16 @@ ENV LANG=en_US.UTF-8
 ENV TZ=Pacific/Noumea
 
 RUN apt-get update && \
-    apt-get install -y texlive-fonts-recommended texlive-fonts-extra && \
-    apt-get clean
+    apt-get install -y \
+        texlive-fonts-recommended \
+        texlive-fonts-extra \
+        lmodern \
+        texlive-latex-extra \
+        texlive-latex-recommended \
+        texlive-base \
+        texlive-binaries && \
+    apt-get clean && rm -rf /var/lib/apt/lists/*
+
 
 # Install Docker CLI (client only, no daemon)
 RUN curl -fsSL https://get.docker.com | sh
