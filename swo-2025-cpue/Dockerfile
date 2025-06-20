@@ -2,11 +2,19 @@
 FROM ubuntu:18.04
 
 RUN apt-get update && \
-    apt-get install -y software-properties-common && \
-    add-apt-repository 'deb https://cloud.r-project.org/bin/linux/ubuntu bionic-cran40/' && \
-    apt-key adv --keyserver keyserver.ubuntu.com --recv-keys E298A3A825C0D65DFD57CBB651716619E084DAB9 && \
-    apt-get update && \
-    apt-get install -y r-base=4.1.2*
+    apt-get install -y \
+        software-properties-common \
+        gnupg2 \
+        curl \
+        wget \
+        ca-certificates && \
+    apt-get clean
+
+RUN wget -qO- https://cloud.r-project.org/bin/linux/ubuntu/marutter_pubkey.asc | apt-key add - && \
+    add-apt-repository "deb https://cloud.r-project.org/bin/linux/ubuntu $(lsb_release -cs)-cran40/" && \
+    apt-get update
+
+RUN apt-get install -y r-base=4.1.2* r-base-dev=4.1.2*
     
 # Install system dependencies and development libraries
 RUN apt-get update && \
