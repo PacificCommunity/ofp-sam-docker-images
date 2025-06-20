@@ -1,28 +1,6 @@
 # Use R 4.1.2 base image for compatibility with VAST 3.7.1, FishStatsUtils 2.9.1, and legacy spatial packages
-FROM ubuntu:18.04
+FROM rocker/r-ver:4.1.2
 
-RUN apt-get update && \
-    apt-get install -y \
-        software-properties-common \
-        gnupg2 \
-        curl \
-        wget \
-        ca-certificates && \
-    apt-get clean
-
-RUN wget -qO- https://cloud.r-project.org/bin/linux/ubuntu/marutter_pubkey.asc | apt-key add - && \
-    add-apt-repository "deb https://cloud.r-project.org/bin/linux/ubuntu $(lsb_release -cs)-cran40/" && \
-    apt-get update
-
-RUN apt-get update && \
-    apt-get install -y --allow-downgrades --allow-remove-essential --allow-change-held-packages \
-        r-base=4.1.2-1.1804.0 \
-        r-base-core=4.1.2-1.1804.0 \
-        r-base-dev=4.1.2-1.1804.0 \
-        r-recommended=4.1.2-1.1804.0 \
-        r-doc-html=4.1.2-1.1804.0
-
-    
 # Install system dependencies and development libraries
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
@@ -161,8 +139,13 @@ EXPOSE 22
 USER analyst
 WORKDIR /workspace
 
-# Set radian as the default R terminal for analyst
-RUN echo 'if [ -z \"$INSIDE_RADIAN\" ] && [ -z \"$RSTUDIO\" ] && [ \"$TERM_PROGRAM\" != \"vscode\" ]; then exec radian; fi' > /home/analyst/.radian_profile
+RUN useradd -m -u 1000 -U -s /bin/bash analyst && \
+    echo "analyst ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
+USER analyst
+WORKDIR /workspace
 
-CMD ["/usr/sbin/sshd", "-D"]
+# Set radian as the default R terminal for analyst
+#RUN echo 'if [ -z \"$INSIDE_RADIAN\" ] && [ -z \"$RSTUDIO\" ] && [ \"$TERM_PROGRAM\" != \"vscode\" ]; then exec radian; fi' > /home/analyst/.radian_profile
+
+CMD ["/bin/bash"]
 
