@@ -14,13 +14,14 @@ RUN wget -qO- https://cloud.r-project.org/bin/linux/ubuntu/marutter_pubkey.asc |
     add-apt-repository "deb https://cloud.r-project.org/bin/linux/ubuntu $(lsb_release -cs)-cran40/" && \
     apt-get update
 
-RUN apt-get install -y \
-    r-base=4.1.2-1.1804.0 \
-    r-base-core=4.1.2-1.1804.0 \
-    r-base-dev=4.1.2-1.1804.0 \
-    r-recommended=4.1.2-1.1804.0 \
-    r-doc-html=4.1.2-1.1804.0 && \
-    apt-mark hold r-base r-base-core r-base-dev r-recommended r-doc-html
+RUN apt-get update && \
+    apt-get install -y --allow-downgrades --allow-remove-essential --allow-change-held-packages \
+        r-base=4.1.2-1.1804.0 \
+        r-base-core=4.1.2-1.1804.0 \
+        r-base-dev=4.1.2-1.1804.0 \
+        r-recommended=4.1.2-1.1804.0 \
+        r-doc-html=4.1.2-1.1804.0
+
     
 # Install system dependencies and development libraries
 RUN apt-get update && \
