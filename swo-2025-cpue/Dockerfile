@@ -53,10 +53,6 @@ RUN cd /tmp/R-4.1.2 && \
     make install && \
     cd / && rm -rf /tmp/R-4.1.2*
 
-# Install Docker CLI (client only) and radian for improved R console
-RUN curl -fsSL https://get.docker.com | sh && \
-    pip3 install -U radian
-
 # Set default CRAN repository
 RUN mkdir -p /etc/R && \
     echo 'options(repos = c(CRAN="https://cloud.r-project.org"))' >> /etc/R/Rprofile.site
