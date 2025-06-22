@@ -57,9 +57,10 @@ RUN cd /tmp/R-4.1.2 && \
 RUN mkdir -p /etc/R && \
     echo 'options(repos = c(CRAN="https://cloud.r-project.org"))' >> /etc/R/Rprofile.site
 
-# Install devtools and BiocManager, then legacy Bioconductor packages
-RUN R -e "install.packages(c('devtools','BiocManager'), dependencies=TRUE)" && \
-    R -e "BiocManager::install(c('graph','Rgraphviz'), ask=FALSE, update=FALSE)" 
+# Install devtools and BiocManager with explicit CRAN mirror
+RUN R -e "install.packages(c('devtools','BiocManager'), dependencies=TRUE, repos='https://cloud.r-project.org')" && \
+    R -e "BiocManager::install(c('graph','Rgraphviz'), ask=FALSE, update=FALSE)"
+
 
 # Install legacy spatial packages required by VAST ecosystem
 RUN R -e "install.packages(c( \
