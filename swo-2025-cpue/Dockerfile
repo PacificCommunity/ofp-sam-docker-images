@@ -139,10 +139,6 @@ EXPOSE 22
 USER analyst
 WORKDIR /workspace
 
-RUN useradd -m -u 1000 -U -s /bin/bash analyst && \
-    echo "analyst ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
-USER analyst
-WORKDIR /workspace
 
 # Set radian as the default R terminal for analyst
 #RUN echo 'if [ -z \"$INSIDE_RADIAN\" ] && [ -z \"$RSTUDIO\" ] && [ \"$TERM_PROGRAM\" != \"vscode\" ]; then exec radian; fi' > /home/analyst/.radian_profile
