@@ -15,6 +15,11 @@ ARG MAKE_FLAGS=-j4
 ###############################################################################
 RUN apt-get update && apt-get install -y --no-install-recommends \
     build-essential gfortran rsync \
+    cmake \
+    libmagick++-dev \
+    tcl-dev tk-dev \
+    cargo rustc \
+    libabsl-dev \
     libreadline-dev libbz2-dev liblzma-dev libpcre2-dev zlib1g-dev \
     libcurl4-openssl-dev libssl-dev libxml2-dev libicu-dev \
     libpng-dev libjpeg-dev libcairo2-dev libtiff5-dev libfreetype6-dev \
