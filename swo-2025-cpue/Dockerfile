@@ -1,43 +1,22 @@
-# Use R 4.0.5 base image for compatibility with VAST 3.7.1, FishStatsUtils 2.9.1, and legacy spatial packages
-FROM rocker/rstudio:4.0.5
+# Use the rocker/rstudio base image
+FROM rocker/rstudio:4.3.1
 
-# Install system dependencies and development libraries
-RUN apt-get update && \
-    apt-get install -y --no-install-recommends \
-        git \
-        curl \
-        sudo \
-        openssh-server \
-        bash-completion \
-        locales \
-        tzdata \
-        vim \
-        nano \
-        less \
-        python3-venv \
-        libcurl4-openssl-dev \
-        libssl-dev \
-        libxml2-dev \
-        libgdal-dev \
-        libgeos-dev \
-        libproj-dev \
-        libudunits2-dev \
-        libnetcdf-dev \
-        libfontconfig1-dev \
-        libharfbuzz-dev \
-        libfribidi-dev \
-        pkg-config \
-        texlive-latex-extra \
-        pandoc \
-        pandoc-citeproc \
-        librsvg2-bin \
-        ghostscript \
-        inkscape \
-        ca-certificates \
-        gdal-bin \
-        libglu1-mesa-dev \
-        libx11-dev && \
-    apt-get clean && rm -rf /var/lib/apt/lists/*
+# Install required dependencies
+RUN apt-get update && apt-get install -y \
+    curl \
+    gnupg \
+    lsb-release \
+    libclang-dev \
+    libcurl4-openssl-dev \
+    libxml2-dev \
+    texlive-xetex \
+    texlive-latex-extra \
+    texlive-fonts-recommended \
+    pandoc \
+    make \
+    openssh-client \
+    bc \ 
+    && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # Set locale and timezone for New Caledonia (Pacific/Noumea)
 RUN locale-gen en_US.UTF-8 && \
