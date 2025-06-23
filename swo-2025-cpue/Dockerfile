@@ -106,7 +106,9 @@ WORKDIR /tmp
 RUN curl -fsSL https://cran.r-project.org/src/base/R-4/R-${R_VERSION}.tar.gz -o R-${R_VERSION}.tar.gz && \
     tar -xzf R-${R_VERSION}.tar.gz && \
     cd R-${R_VERSION} && \
-    # Configure R build with explicit paths and options
+    # Download recommended packages first
+    ./tools/rsync-recommended && \
+    # Configure with recommended packages enabled
     ./configure \
         --prefix=/usr/local \
         --enable-R-shlib \
@@ -121,15 +123,12 @@ RUN curl -fsSL https://cran.r-project.org/src/base/R-4/R-${R_VERSION}.tar.gz -o 
         --with-libpng \
         --with-jpeglib \
         --with-libtiff && \
-    # Compile using multiple cores for faster build
+    # Build and install
     make -j${NPROC} && \
-    # Install R system-wide
     make install && \
-    # CRITICAL: Install recommended packages separately to ensure they're available
-    make install-recommended && \
-    # Clean up source files
     cd /tmp && \
     rm -rf R-${R_VERSION}*
+
 
 # Verify R installation has essential packages
 RUN echo "=== R Version Check ===" && \
