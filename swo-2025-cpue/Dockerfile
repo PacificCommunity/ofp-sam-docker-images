@@ -122,9 +122,7 @@ RUN curl -fsSL https://cran.r-project.org/src/base/R-4/R-${R_VERSION}.tar.gz -o 
     make install && \
     # Clean up source files
     cd /tmp && \
-    rm -rf R-${R_VERSION}* && \
-    # Strip binaries to reduce size
-    strip /usr/local/bin/R /usr/local/lib/R/bin/exec/R
+    rm -rf R-${R_VERSION}*
 
 # Verify R installation and check glibc version
 RUN echo "=== R Version Check ===" && \
