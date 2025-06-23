@@ -168,3 +168,5 @@ EXPOSE 22
 USER analyst
 WORKDIR /workspace
 CMD ["/bin/bash"]
+
+
