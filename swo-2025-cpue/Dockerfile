@@ -115,26 +115,8 @@ RUN curl -L https://github.com/quarto-dev/quarto-cli/releases/download/v1.2.335/
     dpkg -i quarto.deb && \
     rm quarto.deb
 
-# Create workspace directory and set permissions
-RUN mkdir -p /workspace && chmod -R 777 /workspace
-RUN chmod -R 777 /usr/local/lib/R/site-library
+# Ensure correct permissions for RStudio Server
+RUN chmod -R 777 /var/lib/rstudio-server && chmod -R 777 /home/rstudio
 
-# Create analyst user with passwordless sudo for devcontainer
-RUN useradd -m -u 1000 -U -s /bin/bash analyst && \
-    echo "analyst ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
-
-# Set up SSH server for remote access (default password: analyst)
-RUN echo 'analyst:analyst' | chpasswd && \
-    mkdir /var/run/sshd
-
-EXPOSE 22
-
-USER analyst
-WORKDIR /workspace
-
-
-# Set radian as the default R terminal for analyst
-#RUN echo 'if [ -z \"$INSIDE_RADIAN\" ] && [ -z \"$RSTUDIO\" ] && [ \"$TERM_PROGRAM\" != \"vscode\" ]; then exec radian; fi' > /home/analyst/.radian_profile
-
-CMD ["/bin/bash"]
-
+# Enable GitHub Copilot for RStudio (if applicable)
+RUN echo "copilot-enabled=1" >> /etc/rstudio/rsession.conf
