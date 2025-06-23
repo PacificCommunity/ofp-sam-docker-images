@@ -128,9 +128,7 @@ RUN curl -fsSL https://cran.r-project.org/src/base/R-4/R-${R_VERSION}.tar.gz -o 
 RUN echo "=== R Version Check ===" && \
     R --version | head -1 && \
     echo "=== glibc Version Check ===" && \
-    ldd --version | head -1 && \
-    echo "=== R Configuration ===" && \
-    R -e "sessionInfo()"
+    ldd --version | head -1
 
 ###############################################################################
 # 3. System locale and timezone configuration
@@ -158,25 +156,36 @@ RUN curl -fsSL https://get.docker.com | sh
 RUN pip3 install --no-cache-dir radian==0.6.4
 
 ###############################################################################
-# 5. Configure R environment
+# 5. Configure R environment (FIXED: Multiple approaches for CRAN mirror)
 ###############################################################################
 
-# Set default CRAN repository and increase timeout for large packages
-RUN mkdir -p /etc/R && \
-    echo 'options(repos = c(CRAN = "https://cloud.r-project.org"))' >> /etc/R/Rprofile.site && \
+# Create R configuration directories and set CRAN mirror in multiple locations
+RUN mkdir -p /etc/R /usr/local/lib/R/etc && \
+    # Set in system-wide Rprofile.site
+    echo 'local({r <- getOption("repos"); r["CRAN"] <- "https://cloud.r-project.org"; options(repos=r)})' > /etc/R/Rprofile.site && \
     echo 'options(timeout = 300)' >> /etc/R/Rprofile.site && \
     echo 'options(download.file.method = "libcurl")' >> /etc/R/Rprofile.site && \
-    echo 'options(Ncpus = 4)' >> /etc/R/Rprofile.site
+    echo 'options(Ncpus = 4)' >> /etc/R/Rprofile.site && \
+    # Also set in R installation directory
+    cp /etc/R/Rprofile.site /usr/local/lib/R/etc/Rprofile.site && \
+    # Create Renviron file for additional configuration
+    echo 'R_LIBS_USER=/usr/local/lib/R/site-library' > /etc/R/Renviron && \
+    cp /etc/R/Renviron /usr/local/lib/R/etc/Renviron
+
+# Test R configuration
+RUN echo "=== Testing R Configuration ===" && \
+    R --slave -e "cat('CRAN repo:', getOption('repos')['CRAN'], '\n')"
 
 ###############################################################################
-# 6. Install essential R packages
+# 6. Install essential R packages (FIXED: Explicit CRAN mirror specification)
 ###############################################################################
 
 # Install development tools first (required for GitHub packages)
-RUN R -e "install.packages(c('devtools', 'remotes'), dependencies = TRUE)"
+# Use explicit repos parameter as backup in case Rprofile.site doesn't load
+RUN R -e "install.packages(c('devtools', 'remotes'), dependencies = TRUE, repos = 'https://cloud.r-project.org')"
 
 # Install Bioconductor and required packages for INLA
-RUN R -e "if (!requireNamespace('BiocManager', quietly=TRUE)) install.packages('BiocManager')" && \
+RUN R -e "if (!requireNamespace('BiocManager', quietly=TRUE)) install.packages('BiocManager', repos = 'https://cloud.r-project.org')" && \
     R -e "BiocManager::install(c('graph', 'Rgraphviz'), ask=FALSE, update=FALSE)"
 
 ###############################################################################
@@ -192,7 +201,7 @@ RUN R -e "install.packages('https://cran.r-project.org/src/contrib/Archive/sp/sp
     R -e "install.packages('https://cran.r-project.org/src/contrib/Archive/maptools/maptools_1.1-8.tar.gz', repos=NULL, type='source')"
 
 # Install supporting spatial and statistical packages
-RUN R -e "install.packages(c('XML', 'spacetime', 'colorspace', 'plotrix', 'dismo', 'aqp', 'pixmap', 'plyr', 'colorRamps', 'scales', 'gstat', 'zoo', 'RColorBrewer', 'RSAGA', 'classInt'), dependencies=TRUE)"
+RUN R -e "install.packages(c('XML', 'spacetime', 'colorspace', 'plotrix', 'dismo', 'aqp', 'pixmap', 'plyr', 'colorRamps', 'scales', 'gstat', 'zoo', 'RColorBrewer', 'RSAGA', 'classInt'), dependencies=TRUE, repos = 'https://cloud.r-project.org')"
 
 # Install additional archived packages required for VAST ecosystem
 RUN R -e "install.packages('https://cran.r-project.org/src/contrib/Archive/plotKML/plotKML_0.5-9.tar.gz', repos=NULL, type='source')" && \
@@ -212,13 +221,13 @@ RUN R -e "install.packages('https://inla.r-inla-download.org/R/stable/src/contri
 ###############################################################################
 
 # Core packages for spatial analysis and statistics
-RUN R -e "install.packages(c('TMB', 'RcppArmadillo', 'Matrix', 'sf', 'terra', 'stars'), dependencies=TRUE)"
+RUN R -e "install.packages(c('TMB', 'RcppArmadillo', 'Matrix', 'sf', 'terra', 'stars'), dependencies=TRUE, repos = 'https://cloud.r-project.org')"
 
 # Data manipulation and visualization packages
-RUN R -e "install.packages(c('ggplot2', 'dplyr', 'tidyr', 'data.table', 'magrittr', 'ggthemes', 'rmdformats', 'purrr', 'reshape2', 'cowplot', 'patchwork', 'kableExtra', 'viridis'), dependencies=TRUE)"
+RUN R -e "install.packages(c('ggplot2', 'dplyr', 'tidyr', 'data.table', 'magrittr', 'ggthemes', 'rmdformats', 'purrr', 'reshape2', 'cowplot', 'patchwork', 'kableExtra', 'viridis'), dependencies=TRUE, repos = 'https://cloud.r-project.org')"
 
 # Install tidyverse meta-package
-RUN R -e "install.packages('tidyverse', dependencies=TRUE)"
+RUN R -e "install.packages('tidyverse', dependencies=TRUE, repos = 'https://cloud.r-project.org')"
 
 ###############################################################################
 # 10. Install VAST ecosystem (CRITICAL: exact versions for reproducibility)
@@ -236,11 +245,11 @@ RUN R -e "remotes::install_github('PacificCommunity/ofp-sam-vast-utils', depende
 ###############################################################################
 
 # Oceanographic analysis packages
-RUN R -e "install.packages(c('gsw', 'testthat', 'knitr', 'rmarkdown', 'ncdf4'), dependencies=TRUE)" && \
+RUN R -e "install.packages(c('gsw', 'testthat', 'knitr', 'rmarkdown', 'ncdf4'), dependencies=TRUE, repos = 'https://cloud.r-project.org')" && \
     R -e "install.packages('https://cran.r-project.org/src/contrib/Archive/oce/oce_1.5-0.tar.gz', repos=NULL, type='source')"
 
 # Additional spatial analysis packages
-RUN R -e "install.packages(c('gstat', 'automap', 'geoR', 'fields'), dependencies=TRUE)"
+RUN R -e "install.packages(c('gstat', 'automap', 'geoR', 'fields'), dependencies=TRUE, repos = 'https://cloud.r-project.org')"
 
 ###############################################################################
 # 12. Install Quarto CLI for document generation
