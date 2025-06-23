@@ -1,10 +1,9 @@
 # Use R 4.0.5 base image for compatibility with VAST 3.7.1, FishStatsUtils 2.9.1, and legacy spatial packages
-FROM rocker/r-ver:4.0.5
+FROM rocker/rstudio:4.0.5
 
 # Install system dependencies and development libraries
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
-        python3-pip \
         git \
         curl \
         sudo \
@@ -60,12 +59,6 @@ RUN apt-get update && \
         texlive-binaries && \
     apt-get clean && rm -rf /var/lib/apt/lists/*
 
-
-# Install Docker CLI (client only, no daemon)
-RUN curl -fsSL https://get.docker.com | sh
-
-# Install radian for a modern R console experience
-RUN pip3 install -U radian
 
 # Set default CRAN repository for R
 RUN mkdir -p /etc/R && \
