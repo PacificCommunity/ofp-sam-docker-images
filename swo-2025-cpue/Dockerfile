@@ -13,12 +13,12 @@ RUN apt-get update && \
         gfortran \
         libblas-dev \
         liblapack-dev \
-        # R and development tools
-        r-base \
-        r-base-dev \
-        # Python and utilities
-        python3-pip \
-        python3-dev \
+        # System tools for R installation
+        software-properties-common \
+        dirmngr \
+        apt-transport-https \
+        ca-certificates \
+        gnupg2 \
         git \
         curl \
         wget \
@@ -30,6 +30,11 @@ RUN apt-get update && \
         vim \
         nano \
         less \
+        # Python and development tools
+        python3-pip \
+        python3-dev \
+        python3-setuptools \
+        python3-wheel \
         python3-venv \
         # R package dependencies (critical for compilation)
         libcurl4-openssl-dev \
@@ -62,7 +67,6 @@ RUN apt-get update && \
         ghostscript \
         inkscape \
         # Additional system libraries
-        ca-certificates \
         gdal-bin \
         libglu1-mesa-dev \
         libx11-dev \
@@ -72,6 +76,26 @@ RUN apt-get update && \
     # Clean up to reduce image size
     apt-get clean && \
     rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+
+# Add CRAN repository for R 4.1.2 installation
+# Import CRAN GPG key and add repository for Ubuntu 18.04
+RUN apt-key adv --keyserver keyserver.ubuntu.com --recv-keys E298A3A825C0D65DFD57CBB651716619E084DAB9 && \
+    add-apt-repository 'deb https://cloud.r-project.org/bin/linux/ubuntu bionic-cran40/' && \
+    apt-get update
+
+# Install R 4.1.2 specifically and hold the version
+# This ensures compatibility with VAST 3.7.1 and FishStatsUtils 2.9.1
+RUN apt-get install -y --no-install-recommends \
+        r-base=4.1.2-1.1804.0 \
+        r-base-core=4.1.2-1.1804.0 \
+        r-base-dev=4.1.2-1.1804.0 \
+        r-recommended=4.1.2-1.1804.0 && \
+    apt-mark hold r-base r-base-core r-base-dev r-recommended && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
+
+# Verify R version installation
+RUN R --version | head -1
 
 # Set locale and timezone for New Caledonia
 RUN locale-gen en_US.UTF-8 && \
@@ -84,7 +108,7 @@ ENV LC_ALL=en_US.UTF-8
 ENV TZ=Pacific/Noumea
 
 # Install radian for better R console experience
-# Pin version to avoid compatibility issues
+# setuptools and wheel are now available from system packages
 RUN pip3 install --no-cache-dir radian==0.6.4
 
 # Configure R repository and basic settings
@@ -170,7 +194,8 @@ RUN useradd -m -u 1000 -U -s /bin/bash analyst && \
     mkdir -p /var/run/sshd
 
 # Verify critical installations
-RUN R -e "if (!require('VAST')) stop('VAST installation failed')" && \
+RUN R --version && \
+    R -e "if (!require('VAST')) stop('VAST installation failed')" && \
     R -e "if (!require('FishStatsUtils')) stop('FishStatsUtils installation failed')" && \
     ldd --version
 
@@ -178,4 +203,3 @@ EXPOSE 22
 
 USER analyst
 WORKDIR /workspace
-
