@@ -1,7 +1,6 @@
 # Use R 4.1.2 base image for compatibility with VAST 3.7.1, FishStatsUtils 2.9.1, and legacy spatial packages
 FROM rocker/r-ver:4.1.2
 
-# Python과 glibc 빌드에 필요한 의존성 설치
 RUN apt-get update && apt-get install -y \
     python3 \
     python3-pip \
@@ -14,7 +13,6 @@ RUN apt-get update && apt-get install -y \
     build-essential \
     libc6-dev
 
-# glibc 2.35 수동 설치
 RUN wget -c https://ftp.gnu.org/gnu/glibc/glibc-2.35.tar.gz && \
     tar -zxvf glibc-2.35.tar.gz && \
     cd glibc-2.35 && \
