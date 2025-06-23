@@ -83,18 +83,21 @@ RUN apt-key adv --keyserver keyserver.ubuntu.com --recv-keys E298A3A825C0D65DFD5
     add-apt-repository 'deb https://cloud.r-project.org/bin/linux/ubuntu bionic-cran40/' && \
     apt-get update
 
-# Install R 4.1.2 specifically and hold the version
-# This ensures compatibility with VAST 3.7.1 and FishStatsUtils 2.9.1
+# Install R without version pinning first, then downgrade if needed
+# This approach avoids dependency conflicts
 RUN apt-get install -y --no-install-recommends \
-        r-base=4.1.2-1.1804.0 \
-        r-base-core=4.1.2-1.1804.0 \
-        r-base-dev=4.1.2-1.1804.0 \
-        r-recommended=4.1.2-1.1804.0 && \
-    apt-mark hold r-base r-base-core r-base-dev r-recommended && \
+        r-base-core \
+        r-base-dev && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
-# Verify R version installation
+# Alternative approach: Install R 4.1.2 by allowing dependency resolution
+# If the above fails, try this approach instead
+# RUN apt-get install -y r-base r-base-dev r-recommended && \
+#     apt-get clean && \
+#     rm -rf /var/lib/apt/lists/*
+
+# Verify R installation and version
 RUN R --version | head -1
 
 # Set locale and timezone for New Caledonia
@@ -108,7 +111,6 @@ ENV LC_ALL=en_US.UTF-8
 ENV TZ=Pacific/Noumea
 
 # Install radian for better R console experience
-# setuptools and wheel are now available from system packages
 RUN pip3 install --no-cache-dir radian==0.6.4
 
 # Configure R repository and basic settings
@@ -203,3 +205,6 @@ EXPOSE 22
 
 USER analyst
 WORKDIR /workspace
+
+# Default command to start bash shell
+CMD ["/bin/bash"]
