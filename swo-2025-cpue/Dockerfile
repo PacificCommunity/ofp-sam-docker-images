@@ -97,16 +97,16 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
 ###############################################################################
-# 2. Compile and install R 4.1.2 from source
+# 2. Compile and install R 4.1.2 from source (FIXED: Better configuration)
 ###############################################################################
 
 WORKDIR /tmp
 
-# Download, compile, and install R 4.1.2
+# Download, compile, and install R 4.1.2 with proper recommended packages
 RUN curl -fsSL https://cran.r-project.org/src/base/R-4/R-${R_VERSION}.tar.gz -o R-${R_VERSION}.tar.gz && \
     tar -xzf R-${R_VERSION}.tar.gz && \
     cd R-${R_VERSION} && \
-    # Configure R build with optimizations and shared library support
+    # Configure R build with explicit paths and options
     ./configure \
         --prefix=/usr/local \
         --enable-R-shlib \
@@ -114,21 +114,34 @@ RUN curl -fsSL https://cran.r-project.org/src/base/R-4/R-${R_VERSION}.tar.gz -o 
         --with-blas \
         --with-lapack \
         --with-readline \
-        --with-recommended-packages \
-        --enable-byte-compiled-packages && \
+        --with-recommended-packages=yes \
+        --enable-byte-compiled-packages \
+        --with-x \
+        --with-cairo \
+        --with-libpng \
+        --with-jpeglib \
+        --with-libtiff && \
     # Compile using multiple cores for faster build
     make -j${NPROC} && \
     # Install R system-wide
     make install && \
+    # CRITICAL: Install recommended packages separately to ensure they're available
+    make install-recommended && \
     # Clean up source files
     cd /tmp && \
     rm -rf R-${R_VERSION}*
 
-# Verify R installation and check glibc version
+# Verify R installation has essential packages
 RUN echo "=== R Version Check ===" && \
     R --version | head -1 && \
     echo "=== glibc Version Check ===" && \
-    ldd --version | head -1
+    ldd --version | head -1 && \
+    echo "=== R Base Packages Check ===" && \
+    R --slave -e "cat('Base packages available:', length(.packages(all.available=TRUE)), '\n')" && \
+    R --slave -e "if(!require('utils', quietly=TRUE)) stop('utils package missing')" && \
+    R --slave -e "if(!require('stats', quietly=TRUE)) stop('stats package missing')" && \
+    echo "=== R Library Paths ===" && \
+    R --slave -e "cat(.libPaths(), sep='\n')"
 
 ###############################################################################
 # 3. System locale and timezone configuration
@@ -156,10 +169,10 @@ RUN curl -fsSL https://get.docker.com | sh
 RUN pip3 install --no-cache-dir radian==0.6.4
 
 ###############################################################################
-# 5. Configure R environment (FIXED: Multiple approaches for CRAN mirror)
+# 5. Configure R environment
 ###############################################################################
 
-# Create R configuration directories and set CRAN mirror in multiple locations
+# Create R configuration directories and set CRAN mirror
 RUN mkdir -p /etc/R /usr/local/lib/R/etc && \
     # Set in system-wide Rprofile.site
     echo 'local({r <- getOption("repos"); r["CRAN"] <- "https://cloud.r-project.org"; options(repos=r)})' > /etc/R/Rprofile.site && \
@@ -167,21 +180,20 @@ RUN mkdir -p /etc/R /usr/local/lib/R/etc && \
     echo 'options(download.file.method = "libcurl")' >> /etc/R/Rprofile.site && \
     echo 'options(Ncpus = 4)' >> /etc/R/Rprofile.site && \
     # Also set in R installation directory
-    cp /etc/R/Rprofile.site /usr/local/lib/R/etc/Rprofile.site && \
-    # Create Renviron file for additional configuration
-    echo 'R_LIBS_USER=/usr/local/lib/R/site-library' > /etc/R/Renviron && \
-    cp /etc/R/Renviron /usr/local/lib/R/etc/Renviron
+    cp /etc/R/Rprofile.site /usr/local/lib/R/etc/Rprofile.site
 
-# Test R configuration
+# Test R configuration and package installation capability
 RUN echo "=== Testing R Configuration ===" && \
-    R --slave -e "cat('CRAN repo:', getOption('repos')['CRAN'], '\n')"
+    R --slave -e "cat('CRAN repo:', getOption('repos')['CRAN'], '\n')" && \
+    echo "=== Testing install.packages function ===" && \
+    R --slave -e "if(!exists('install.packages')) stop('install.packages function not found')" && \
+    echo "=== R configuration test passed ==="
 
 ###############################################################################
-# 6. Install essential R packages (FIXED: Explicit CRAN mirror specification)
+# 6. Install essential R packages
 ###############################################################################
 
 # Install development tools first (required for GitHub packages)
-# Use explicit repos parameter as backup in case Rprofile.site doesn't load
 RUN R -e "install.packages(c('devtools', 'remotes'), dependencies = TRUE, repos = 'https://cloud.r-project.org')"
 
 # Install Bioconductor and required packages for INLA
