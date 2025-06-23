@@ -1,5 +1,5 @@
 # Use R 4.1.2 base image for compatibility with VAST 3.7.1, FishStatsUtils 2.9.1, and legacy spatial packages
-FROM rocker/r-ver:4.1.2-jammy 
+FROM rocker/r-ver:4.2.0-jammy
 
 # Install system dependencies and development libraries
 RUN apt-get update && \
