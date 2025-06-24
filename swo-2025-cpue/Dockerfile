@@ -1,24 +1,42 @@
 FROM ubuntu:22.04
 
+# Set environment variables
 ENV DEBIAN_FRONTEND=noninteractive
 ENV TZ=Pacific/Noumea
-ENV LANG=en_US.UTF-8
 
-# Install basic system dependencies first
-RUN apt-get update && apt-get install -y \
+# Configure timezone first
+RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
+
+# Install system dependencies in one layer
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    # Basic tools
     curl \
+    wget \
+    git \
+    sudo \
+    vim \
+    nano \
+    less \
+    # Build tools
     build-essential \
+    gfortran \
+    pkg-config \
+    # Python
     python3 \
     python3-pip \
+    python3-venv \
+    # Locale support
+    locales \
+    # System libraries
     software-properties-common \
     dirmngr \
     ca-certificates \
     gnupg \
-    lsb-release
-
-RUN apt-get update && apt-get install -y \
-    build-essential \
-    gfortran \
+    lsb-release \
+    openssh-server \
+    bash-completion \
+    tzdata \
+    # R compilation dependencies
     libreadline-dev \
     libx11-dev \
     libxt-dev \
@@ -31,133 +49,135 @@ RUN apt-get update && apt-get install -y \
     liblzma-dev \
     libpcre2-dev \
     libcurl4-openssl-dev \
-    wget
+    # Spatial libraries
+    libgdal-dev \
+    libgeos-dev \
+    libproj-dev \
+    libudunits2-dev \
+    libnetcdf-dev \
+    gdal-bin \
+    # Graphics libraries
+    libfontconfig1-dev \
+    libharfbuzz-dev \
+    libfribidi-dev \
+    libglu1-mesa-dev \
+    # Document processing
+    texlive-latex-extra \
+    texlive-fonts-recommended \
+    texlive-fonts-extra \
+    texlive-latex-recommended \
+    texlive-base \
+    texlive-binaries \
+    lmodern \
+    pandoc \
+    librsvg2-bin \
+    ghostscript \
+    inkscape && \
+    apt-get clean && rm -rf /var/lib/apt/lists/*
 
+# Configure locale properly
+RUN echo "en_US.UTF-8 UTF-8" > /etc/locale.gen && \
+    locale-gen en_US.UTF-8 && \
+    update-locale LANG=en_US.UTF-8 && \
+    dpkg-reconfigure -f noninteractive locales
+
+# Set locale environment variables
+ENV LANG=en_US.UTF-8
+ENV LANGUAGE=en_US.UTF-8
+ENV LC_ALL=en_US.UTF-8
+
+# Compile and install R 4.1.2 from source
 RUN cd /tmp && \
     wget https://cran.r-project.org/src/base/R-4/R-4.1.2.tar.gz && \
     tar -xzf R-4.1.2.tar.gz && \
     cd R-4.1.2 && \
     ./configure --enable-R-shlib --with-blas --with-lapack && \
     make && \
-    make install
+    make install && \
+    rm -rf /tmp/R-4.1.2*
 
-
-# Install comprehensive system dependencies and development libraries
-RUN apt-get update && \
-    apt-get install -y --no-install-recommends \
-        git \
-        sudo \
-        openssh-server \
-        bash-completion \
-        locales \
-        tzdata \
-        vim \
-        nano \
-        less \
-        python3-venv \
-        libcurl4-openssl-dev \
-        libssl-dev \
-        libxml2-dev \
-        libgdal-dev \
-        libgeos-dev \
-        libproj-dev \
-        libudunits2-dev \
-        libnetcdf-dev \
-        libfontconfig1-dev \
-        libharfbuzz-dev \
-        libfribidi-dev \
-        pkg-config \
-        texlive-latex-extra \
-        pandoc \
-        librsvg2-bin \
-        ghostscript \
-        inkscape \
-        gdal-bin \
-        libglu1-mesa-dev \
-        libx11-dev && \
-    apt-get clean && rm -rf /var/lib/apt/lists/*
-
-# Install Docker CLI (client only, no daemon)More actions
+# Install Docker CLI (client only)
 RUN curl -fsSL https://get.docker.com | sh
 
-# Install radian for a modern R console experience
+# Install radian for enhanced R console
 RUN pip3 install -U radian
 
-# Set default CRAN repository for R
+# Configure CRAN repository for R with proper syntax
 RUN mkdir -p /etc/R && \
-    echo 'options(repos = c(CRAN = \"https://cloud.r-project.org\"))' >> /etc/R/Rprofile.site
+    echo 'local({' > /etc/R/Rprofile.site && \
+    echo '  r <- getOption("repos")' >> /etc/R/Rprofile.site && \
+    echo '  r["CRAN"] <- "https://cloud.r-project.org"' >> /etc/R/Rprofile.site && \
+    echo '  options(repos = r)' >> /etc/R/Rprofile.site && \
+    echo '})' >> /etc/R/Rprofile.site
 
-# Install devtools package (for install_github)
-RUN R -e "install.packages('devtools')"
+# Install devtools with explicit repos setting
+RUN R -e "install.packages('devtools', repos='https://cloud.r-project.org')"
 
-# Install Bioconductor dependencies required for INLA
-RUN R -e "if (!requireNamespace('BiocManager', quietly=TRUE)) install.packages('BiocManager')"
-RUN R -e "BiocManager::install(c('graph', 'Rgraphviz'), ask=FALSE, update=FALSE)"
+# Install Bioconductor and dependencies
+RUN R -e "if (!requireNamespace('BiocManager', quietly=TRUE)) install.packages('BiocManager', repos='https://cloud.r-project.org')" && \
+    R -e "BiocManager::install(c('graph', 'Rgraphviz'), ask=FALSE, update=FALSE)"
 
-# Legacy spatial/statistical dependencies (order matters)
-RUN R -e "install.packages('https://cran.r-project.org/src/contrib/Archive/sp/sp_1.4-5.tar.gz', repos=NULL, type='source')"
-RUN R -e "install.packages('https://cran.r-project.org/src/contrib/Archive/raster/raster_3.4-5.tar.gz', repos=NULL, type='source')"
-RUN R -e "install.packages('https://cran.r-project.org/src/contrib/Archive/rgdal/rgdal_1.5-23.tar.gz', repos=NULL, type='source')"
-RUN R -e "install.packages('https://cran.r-project.org/src/contrib/Archive/rgeos/rgeos_0.5-9.tar.gz', repos=NULL, type='source')"
-RUN R -e "install.packages('https://cran.r-project.org/src/contrib/Archive/maptools/maptools_1.1-8.tar.gz', repos=NULL, type='source')"
-RUN R -e "install.packages(c('XML', 'spacetime', 'colorspace', 'plotrix', 'dismo', 'aqp', 'pixmap', 'plyr', 'colorRamps', 'scales', 'gstat', 'zoo', 'RColorBrewer', 'RSAGA', 'classInt'))"
-RUN R -e "install.packages('https://cran.r-project.org/src/contrib/Archive/plotKML/plotKML_0.5-9.tar.gz', repos=NULL, type='source')"
-RUN R -e "install.packages('https://cran.r-project.org/src/contrib/Archive/units/units_0.7-2.tar.gz', repos=NULL, type='source')"
-RUN R -e "install.packages('https://cran.r-project.org/src/contrib/Archive/RandomFieldsUtils/RandomFieldsUtils_0.5.3.tar.gz', repos=NULL, type='source')"
-RUN R -e "install.packages('https://cran.r-project.org/src/contrib/Archive/RandomFields/RandomFields_3.3.8.tar.gz', repos=NULL, type='source')"
-RUN R -e "install.packages('https://cran.r-project.org/src/contrib/Archive/TMBhelper/TMBhelper_1.4.2.tar.gz', repos=NULL, type='source')"
+# Install legacy spatial packages (order matters for dependencies)
+RUN R -e "install.packages('https://cran.r-project.org/src/contrib/Archive/sp/sp_1.4-5.tar.gz', repos=NULL, type='source')" && \
+    R -e "install.packages('https://cran.r-project.org/src/contrib/Archive/raster/raster_3.4-5.tar.gz', repos=NULL, type='source')" && \
+    R -e "install.packages('https://cran.r-project.org/src/contrib/Archive/rgdal/rgdal_1.5-23.tar.gz', repos=NULL, type='source')" && \
+    R -e "install.packages('https://cran.r-project.org/src/contrib/Archive/rgeos/rgeos_0.5-9.tar.gz', repos=NULL, type='source')" && \
+    R -e "install.packages('https://cran.r-project.org/src/contrib/Archive/maptools/maptools_1.1-8.tar.gz', repos=NULL, type='source')"
 
-# INLA 22.05.07 (compatible with VAST 3.7.1 and FishStatsUtils 2.9.1)
+# Install supporting spatial and statistical packages
+RUN R -e "install.packages(c('XML', 'spacetime', 'colorspace', 'plotrix', 'dismo', 'aqp', 'pixmap', 'plyr', 'colorRamps', 'scales', 'gstat', 'zoo', 'RColorBrewer', 'RSAGA', 'classInt'), repos='https://cloud.r-project.org')"
+
+# Install additional legacy packages from archives
+RUN R -e "install.packages('https://cran.r-project.org/src/contrib/Archive/plotKML/plotKML_0.5-9.tar.gz', repos=NULL, type='source')" && \
+    R -e "install.packages('https://cran.r-project.org/src/contrib/Archive/units/units_0.7-2.tar.gz', repos=NULL, type='source')" && \
+    R -e "install.packages('https://cran.r-project.org/src/contrib/Archive/RandomFieldsUtils/RandomFieldsUtils_0.5.3.tar.gz', repos=NULL, type='source')" && \
+    R -e "install.packages('https://cran.r-project.org/src/contrib/Archive/RandomFields/RandomFields_3.3.8.tar.gz', repos=NULL, type='source')" && \
+    R -e "install.packages('https://cran.r-project.org/src/contrib/Archive/TMBhelper/TMBhelper_1.4.2.tar.gz', repos=NULL, type='source')"
+
+# Install INLA (compatible with VAST 3.7.1 and FishStatsUtils 2.9.1)
 RUN R -e "install.packages('https://inla.r-inla-download.org/R/stable/src/contrib/INLA_22.05.07.tar.gz', repos=NULL, type='source')"
 
-# Install core spatial and statistical R packages (compatible versions)
-RUN R -e "install.packages(c('TMB', 'RcppArmadillo', 'Matrix', 'sf', 'terra', 'stars', 'ggplot2', 'dplyr', 'tidyr', 'data.table', 'magrittr', 'ggthemes', 'rmdformats', 'tidyverse', 'purrr', 'reshape2', 'cowplot', 'patchwork'))"
+# Install core modern packages
+RUN R -e "install.packages(c('TMB', 'RcppArmadillo', 'Matrix', 'sf', 'terra', 'stars'), repos='https://cloud.r-project.org')"
 
-# Install FishStatsUtils 2.9.1 and VAST 3.7.1
-RUN R -e "devtools::install_github('James-Thorson-NOAA/FishStatsUtils@2.9.1', dependencies = TRUE, upgrade = FALSE, force=TRUE)"
-RUN R -e "devtools::install_github('James-Thorson-NOAA/VAST@3.7.1', dependencies = TRUE, upgrade = FALSE, force=TRUE)"
+# Install data science and visualization packages
+RUN R -e "install.packages(c('tidyverse', 'ggplot2', 'dplyr', 'tidyr', 'data.table', 'magrittr', 'purrr'), repos='https://cloud.r-project.org')" && \
+    R -e "install.packages(c('reshape2', 'cowplot', 'patchwork', 'kableExtra', 'viridis', 'ggthemes', 'rmdformats'), repos='https://cloud.r-project.org')"
 
-# Install additional packages for VAST
-RUN R -e "remotes::install_github('PacificCommunity/ofp-sam-vast-utils', dependencies = FALSE)"
+# Install oceanographic and additional spatial packages
+RUN R -e "install.packages(c('gsw', 'testthat', 'knitr', 'rmarkdown', 'ncdf4', 'automap', 'geoR', 'fields'), repos='https://cloud.r-project.org')" && \
+    R -e "install.packages('https://cran.r-project.org/src/contrib/Archive/oce/oce_1.5-0.tar.gz', repos=NULL, type='source')"
 
-# Install oce
-RUN R -e "install.packages(c('gsw', 'sf', 'testthat', 'knitr', 'rmarkdown', 'ncdf4'))"
-RUN R -e "install.packages('https://cran.r-project.org/src/contrib/Archive/oce/oce_1.5-0.tar.gz', repos=NULL, type='source')"
+# Install VAST ecosystem packages
+RUN R -e "devtools::install_github('James-Thorson-NOAA/FishStatsUtils@2.9.1', dependencies = TRUE, upgrade = FALSE, force=TRUE)" && \
+    R -e "devtools::install_github('James-Thorson-NOAA/VAST@3.7.1', dependencies = TRUE, upgrade = FALSE, force=TRUE)"
 
+# Install additional VAST utilities
+RUN R -e "if (!requireNamespace('remotes', quietly=TRUE)) install.packages('remotes', repos='https://cloud.r-project.org')" && \
+    R -e "remotes::install_github('PacificCommunity/ofp-sam-vast-utils', dependencies = FALSE)"
 
-
-# Install tidyverse and extra spatial/statistical packages
-RUN R -e "install.packages('tidyverse')"
-RUN R -e "install.packages(c('gstat', 'automap', 'geoR', 'fields'))"
-
-# Install additional requested packages (cowplot, patchwork, etc.)
-RUN R -e "install.packages(c('cowplot', 'patchwork', 'reshape2', 'kableExtra', 'viridis', 'purrr'))"
-
-# Install Quarto CLI (compatible with R 4.1.2)
+# Install Quarto CLI
 RUN curl -L https://github.com/quarto-dev/quarto-cli/releases/download/v1.2.335/quarto-1.2.335-linux-amd64.deb -o quarto.deb && \
     dpkg -i quarto.deb && \
     rm quarto.deb
 
-# Create workspace directory and set permissions
-RUN mkdir -p /workspace && chmod -R 777 /workspace
-RUN chmod -R 777 /usr/local/lib/R/site-library
+# Set up workspace and permissions
+RUN mkdir -p /workspace && chmod -R 777 /workspace && \
+    chmod -R 777 /usr/local/lib/R/site-library
 
-# Create analyst user with passwordless sudo for devcontainer
+# Create analyst user with sudo privileges
 RUN useradd -m -u 1000 -U -s /bin/bash analyst && \
-    echo "analyst ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
+    echo "analyst ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers && \
+    echo 'analyst:analyst' | chpasswd && \
+    mkdir -p /var/run/sshd
 
-# Set up SSH server for remote access (default password: analyst)
-RUN echo 'analyst:analyst' | chpasswd && \
-    mkdir /var/run/sshd
-
-EXPOSE 22
-
+# Switch to analyst user
 USER analyst
 WORKDIR /workspace
 
+# Configure radian as default R terminal
+RUN echo 'if [ -z "$INSIDE_RADIAN" ] && [ -z "$RSTUDIO" ] && [ "$TERM_PROGRAM" != "vscode" ]; then exec radian; fi' > /home/analyst/.radian_profile
 
-
-# Set radian as the default R terminal for analyst
-RUN echo 'if [ -z \"$INSIDE_RADIAN\" ] && [ -z \"$RSTUDIO\" ] && [ \"$TERM_PROGRAM\" != \"vscode\" ]; then exec radian; fi' > /home/analyst/.radian_profile
+EXPOSE 22
 
 CMD ["/bin/bash"]
