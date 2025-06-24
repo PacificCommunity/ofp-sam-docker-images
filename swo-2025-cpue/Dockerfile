@@ -3,6 +3,18 @@ FROM ubuntu:22.04
 ENV DEBIAN_FRONTEND=noninteractive
 ENV TZ=Pacific/Noumea
 
+# Install basic system dependencies first
+RUN apt-get update && apt-get install -y \
+    curl \
+    build-essential \
+    python3 \
+    python3-pip \
+    software-properties-common \
+    dirmngr \
+    ca-certificates \
+    gnupg \
+    lsb-release
+
 RUN apt-get update && apt-get install -y \
     build-essential \
     gfortran \
