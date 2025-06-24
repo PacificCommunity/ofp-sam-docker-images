@@ -108,33 +108,31 @@ RUN R -e "install.packages(c('XML', 'spacetime', 'colorspace', 'plotrix', 'dismo
 RUN R -e "install.packages('https://cran.r-project.org/src/contrib/Archive/plotKML/plotKML_0.5-9.tar.gz', repos=NULL, type='source')" && \
     R -e "install.packages('https://cran.r-project.org/src/contrib/Archive/units/units_0.7-2.tar.gz', repos=NULL, type='source')" && \
     R -e "install.packages('https://cran.r-project.org/src/contrib/Archive/RandomFieldsUtils/RandomFieldsUtils_0.5.3.tar.gz', repos=NULL, type='source')" && \
-    R -e "install.packages('https://cran.r-project.org/src/contrib/Archive/RandomFields/RandomFields_3.3.8.tar.gz', repos=NULL, type='source')" && \
-    R -e "install.packages('https://cran.r-project.org/src/contrib/Archive/TMBhelper/TMBhelper_1.4.2.tar.gz', repos=NULL, type='source')"
+    R -e "install.packages('https://cran.r-project.org/src/contrib/Archive/RandomFields/RandomFields_3.3.8.tar.gz', repos=NULL, type='source')" 
 
 # Install INLA
 RUN R -e "install.packages('https://inla.r-inla-download.org/R/stable/src/contrib/INLA_22.05.07.tar.gz', repos=NULL, type='source')"
 
-# Install core packages with Matrix compatibility fix
-RUN R -e "install.packages(c('TMB', 'RcppArmadillo'), repos='https://cloud.r-project.org')" && \
-    R -e "install.packages('https://cran.r-project.org/src/contrib/Archive/Matrix/Matrix_1.3-4.tar.gz', repos=NULL, type='source')" && \
-    R -e "install.packages(c('sf', 'terra', 'stars'), repos='https://cloud.r-project.org')"
-
-# Install data science packages
-RUN R -e "install.packages(c('tidyverse', 'ggplot2', 'dplyr', 'tidyr', 'data.table', 'magrittr', 'purrr'), repos='https://cloud.r-project.org')" && \
-    R -e "install.packages(c('reshape2', 'cowplot', 'patchwork', 'kableExtra', 'viridis', 'ggthemes', 'rmdformats'), repos='https://cloud.r-project.org')"
-
-# Install oceanographic packages
-RUN R -e "install.packages(c('gsw', 'testthat', 'knitr', 'rmarkdown', 'ncdf4', 'automap', 'geoR', 'fields', 'DHARMa'), repos='https://cloud.r-project.org')" && \
-    R -e "install.packages('https://cran.r-project.org/src/contrib/Archive/oce/oce_1.5-0.tar.gz', repos=NULL, type='source')"
+# Install core spatial and statistical R packages (compatible versions)
+RUN R -e "install.packages(c('RcppArmadillo', 'sf', 'terra', 'stars', 'ggplot2', 'dplyr', 'tidyr', 'data.table', 'magrittr', 'ggthemes', 'rmdformats', 'tidyverse', 'purrr', 'reshape2', 'cowplot', 'patchwork'))"
 
 # Install VAST ecosystem
 RUN --mount=type=secret,id=github_token,env=GITHUB_PAT \
-    R -e "install.packages(c('sp', 'sf'), repos='https://cran.rstudio.com/')" && \
-    R -e "remotes::install_version('Matrix', version = '1.5-4', repos = 'https://cran.rstudio.com/')" && \
-    R -e "install.packages('TMB', type = 'source', repos='https://cran.rstudio.com/')" && \
     R -e "devtools::install_github('James-Thorson-NOAA/FishStatsUtils@2.9.1', dependencies = TRUE, upgrade = FALSE, force=TRUE)" && \
     R -e "devtools::install_github('James-Thorson-NOAA/VAST@3.7.1', dependencies = TRUE, upgrade = FALSE, force=TRUE)" && \
     R -e "devtools::install_github('PacificCommunity/ofp-sam-vast-utils', dependencies = FALSE)"
+
+# Install oce
+RUN R -e "install.packages(c('gsw', 'sf', 'testthat', 'knitr', 'rmarkdown', 'ncdf4'))"More actions
+RUN R -e "install.packages('https://cran.r-project.org/src/contrib/Archive/oce/oce_1.5-0.tar.gz', repos=NULL, type='source')"
+
+# Install tidyverse and extra spatial/statistical packages
+RUN R -e "install.packages('tidyverse')"
+RUN R -e "install.packages(c('gstat', 'automap', 'geoR', 'fields'))"
+
+# Install additional requested packages (cowplot, patchwork, etc.)
+RUN R -e "install.packages(c('cowplot', 'patchwork', 'reshape2', 'kableExtra', 'viridis', 'purrr'))"
+
 
 # Install Quarto CLI
 RUN curl -L https://github.com/quarto-dev/quarto-cli/releases/download/v1.2.335/quarto-1.2.335-linux-amd64.deb -o quarto.deb && \
