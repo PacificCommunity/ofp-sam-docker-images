@@ -128,12 +128,10 @@ RUN R -e "install.packages(c('gsw', 'testthat', 'knitr', 'rmarkdown', 'ncdf4', '
     R -e "install.packages('https://cran.r-project.org/src/contrib/Archive/oce/oce_1.5-0.tar.gz', repos=NULL, type='source')"
 
 # Install VAST ecosystem
-RUN R -e "devtools::install_github('James-Thorson-NOAA/FishStatsUtils@2.9.1', dependencies = TRUE, upgrade = FALSE, force=TRUE)" && \
-    R -e "devtools::install_github('James-Thorson-NOAA/VAST@3.7.1', dependencies = TRUE, upgrade = FALSE, force=TRUE)"
-
-# Install additional VAST utilities
-RUN R -e "if (!requireNamespace('remotes', quietly=TRUE)) install.packages('remotes', repos='https://cloud.r-project.org')" && \
-    R -e "remotes::install_github('PacificCommunity/ofp-sam-vast-utils', dependencies = FALSE)"
+RUN --mount=type=secret,id=github_token,env=GITHUB_PAT \
+    R -e "devtools::install_github('James-Thorson-NOAA/FishStatsUtils@2.9.1', dependencies = TRUE, upgrade = FALSE, force=TRUE)" && \
+    R -e "devtools::install_github('James-Thorson-NOAA/VAST@3.7.1', dependencies = TRUE, upgrade = FALSE, force=TRUE)" && \
+    R -e "devtools::install_github('PacificCommunity/ofp-sam-vast-utils', dependencies = FALSE)"
 
 # Install Quarto CLI
 RUN curl -L https://github.com/quarto-dev/quarto-cli/releases/download/v1.2.335/quarto-1.2.335-linux-amd64.deb -o quarto.deb && \
