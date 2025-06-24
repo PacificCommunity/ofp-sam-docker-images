@@ -1,6 +1,10 @@
 FROM ubuntu:22.04
 
-# 시스템 의존성 설치
+ENV DEBIAN_FRONTEND=noninteractive
+ENV TZ=Pacific/Noumea
+
+RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
+
 RUN apt-get update && apt-get install -y \
     curl \
     wget \
@@ -8,7 +12,6 @@ RUN apt-get update && apt-get install -y \
     python3 \
     python3-pip
 
-# r-glibc 4.1.2 설치
 RUN R_VERSION=4.1.2 && \
     curl -LO https://github.com/r-hub/R/releases/download/v${R_VERSION}/r-${R_VERSION}-glibc_1_$(dpkg --print-architecture).deb && \
     dpkg -i r-${R_VERSION}-glibc_1_$(dpkg --print-architecture).deb && \
