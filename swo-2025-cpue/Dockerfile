@@ -1,28 +1,20 @@
-# Use R 4.1.2 base image for compatibility with VAST 3.7.1, FishStatsUtils 2.9.1, and legacy spatial packages
-FROM rocker/r-ver:4.1.2
+FROM ubuntu:22.04
 
+# 시스템 의존성 설치
 RUN apt-get update && apt-get install -y \
-    python3 \
-    python3-pip \
-    gawk \
-    bison \
-    gcc \
-    make \
+    curl \
     wget \
-    tar \
     build-essential \
-    libc6-dev
+    python3 \
+    python3-pip
 
-RUN wget -c https://ftp.gnu.org/gnu/glibc/glibc-2.35.tar.gz && \
-    tar -zxvf glibc-2.35.tar.gz && \
-    cd glibc-2.35 && \
-    mkdir glibc-build && \
-    cd glibc-build && \
-    ../configure --prefix=/opt/glibc && \
-    make && \
-    make install
+# r-glibc 4.1.2 설치
+RUN R_VERSION=4.1.2 && \
+    curl -LO https://github.com/r-hub/R/releases/download/v${R_VERSION}/r-${R_VERSION}-glibc_1_$(dpkg --print-architecture).deb && \
+    dpkg -i r-${R_VERSION}-glibc_1_$(dpkg --print-architecture).deb && \
+    ln -s /opt/R/${R_VERSION}-glibc/bin/R /usr/local/bin/R && \
+    ln -s /opt/R/${R_VERSION}-glibc/bin/Rscript /usr/local/bin/Rscript
 
-ENV LD_LIBRARY_PATH=/opt/glibc/lib${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}
 
 # Install system dependencies and development libraries
 RUN apt-get update && \
