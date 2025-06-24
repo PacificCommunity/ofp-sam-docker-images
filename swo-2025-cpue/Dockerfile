@@ -130,8 +130,8 @@ RUN R -e "install.packages(c('gsw', 'testthat', 'knitr', 'rmarkdown', 'ncdf4', '
 # Install VAST ecosystem
 RUN --mount=type=secret,id=github_token,env=GITHUB_PAT \
     R -e "install.packages(c('sp', 'sf'), repos='https://cran.rstudio.com/')" && \
-    R -e "remotes::install_version('Matrix', version = '1.5-4')" && \
-    R -e "install.packages('TMB', type = 'source')" && \
+    R -e "remotes::install_version('Matrix', version = '1.5-4', repos = 'https://cran.rstudio.com/')" && \
+    R -e "install.packages('TMB', type = 'source', repos='https://cran.rstudio.com/')" && \
     R -e "devtools::install_github('James-Thorson-NOAA/FishStatsUtils@2.9.1', dependencies = TRUE, upgrade = FALSE, force=TRUE)" && \
     R -e "devtools::install_github('James-Thorson-NOAA/VAST@3.7.1', dependencies = TRUE, upgrade = FALSE, force=TRUE)" && \
     R -e "devtools::install_github('PacificCommunity/ofp-sam-vast-utils', dependencies = FALSE)"
