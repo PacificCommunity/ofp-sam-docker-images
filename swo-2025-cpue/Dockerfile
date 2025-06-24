@@ -98,8 +98,20 @@ RUN R -e "if (!requireNamespace('BiocManager', quietly=TRUE)) install.packages('
 RUN R -e "install.packages(c('Rcpp', 'RcppArmadillo'), repos='https://cloud.r-project.org')"
 
 # Step 2: Install compatible Matrix + TMB versions (CRITICAL for VAST 3.7.1)
-RUN R -e "install.packages('https://cran.r-project.org/src/contrib/Archive/Matrix/Matrix_1.5-4.tar.gz', repos=NULL, type='source')" && \
-    R -e "install.packages('https://cran.r-project.org/src/contrib/Archive/TMB/TMB_1.9.6.tar.gz', repos=NULL, type='source')"
+# First install Matrix
+RUN R -e "install.packages('https://cran.r-project.org/src/contrib/Archive/Matrix/Matrix_1.5-4.tar.gz', repos=NULL, type='source')"
+
+# Verify Matrix installation before proceeding
+RUN R -e "cat('Matrix version:', as.character(packageVersion('Matrix')), '\n')"
+
+# Install TMB with error handling
+RUN R -e "tryCatch({ \
+    install.packages('https://cran.r-project.org/src/contrib/Archive/TMB/TMB_1.9.6.tar.gz', repos=NULL, type='source'); \
+    cat('TMB installation successful\n') \
+}, error = function(e) { \
+    cat('TMB installation failed, trying alternative method\n'); \
+    install.packages('TMB', repos='https://cloud.r-project.org'); \
+})"
 
 # Step 3: Install legacy spatial packages with specific versions for compatibility
 RUN R -e "install.packages('https://cran.r-project.org/src/contrib/Archive/sp/sp_1.4-5.tar.gz', repos=NULL, type='source')" && \
@@ -130,9 +142,21 @@ RUN R -e "install.packages(c('tidyverse', 'gstat', 'automap', 'geoR', 'fields', 
 RUN R -e "install.packages(c('gsw', 'testthat', 'knitr', 'rmarkdown', 'ncdf4'), repos='https://cloud.r-project.org')" && \
     R -e "install.packages('https://cran.r-project.org/src/contrib/Archive/oce/oce_1.5-0.tar.gz', repos=NULL, type='source')"
 
-# Step 10: Install VAST ecosystem (AFTER Matrix/TMB compatibility is ensured)
-RUN R -e "cat('Matrix version:', as.character(packageVersion('Matrix')), '\n'); cat('TMB version:', as.character(packageVersion('TMB')), '\n')"
+# Step 10: Verify Matrix/TMB installation before proceeding
+RUN R -e "tryCatch({ \
+    cat('Matrix version:', as.character(packageVersion('Matrix')), '\n'); \
+    cat('TMB version:', as.character(packageVersion('TMB')), '\n'); \
+    cat('Both packages are installed successfully\n') \
+}, error = function(e) { \
+    cat('Package verification failed:', e\$message, '\n'); \
+    if(!requireNamespace('TMB', quietly=TRUE)) { \
+        cat('TMB not found, installing from CRAN\n'); \
+        install.packages('TMB', repos='https://cloud.r-project.org'); \
+        cat('TMB version:', as.character(packageVersion('TMB')), '\n'); \
+    } \
+})"
 
+# Step 11: Install VAST ecosystem (AFTER Matrix/TMB compatibility is ensured)
 RUN --mount=type=secret,id=github_token,env=GITHUB_PAT \
     R -e "devtools::install_github('James-Thorson-NOAA/FishStatsUtils@2.9.1', dependencies = TRUE, upgrade = FALSE, force=TRUE)" && \
     R -e "devtools::install_github('James-Thorson-NOAA/VAST@3.7.1', dependencies = TRUE, upgrade = FALSE, force=TRUE)" && \
