@@ -87,52 +87,60 @@ RUN mkdir -p /etc/R && \
     echo '  options(repos = r)' >> /etc/R/Rprofile.site && \
     echo '})' >> /etc/R/Rprofile.site
 
-# Install R packages with compatibility fixes
-RUN R -e "install.packages('devtools', repos='https://cloud.r-project.org')"
+# Install basic R packages
+RUN R -e "install.packages(c('devtools', 'remotes'), repos='https://cloud.r-project.org')"
 
 # Install Bioconductor
 RUN R -e "if (!requireNamespace('BiocManager', quietly=TRUE)) install.packages('BiocManager', repos='https://cloud.r-project.org')" && \
     R -e "BiocManager::install(c('graph', 'Rgraphviz'), ask=FALSE, update=FALSE)"
 
-# Install legacy spatial packages with specific versions for compatibility
+# Step 1: Install basic compilation dependencies
+RUN R -e "install.packages(c('Rcpp', 'RcppArmadillo'), repos='https://cloud.r-project.org')"
+
+# Step 2: Install compatible Matrix + TMB versions (CRITICAL for VAST 3.7.1)
+RUN R -e "install.packages('https://cran.r-project.org/src/contrib/Archive/Matrix/Matrix_1.5-4.tar.gz', repos=NULL, type='source')" && \
+    R -e "install.packages('https://cran.r-project.org/src/contrib/Archive/TMB/TMB_1.9.6.tar.gz', repos=NULL, type='source')"
+
+# Step 3: Install legacy spatial packages with specific versions for compatibility
 RUN R -e "install.packages('https://cran.r-project.org/src/contrib/Archive/sp/sp_1.4-5.tar.gz', repos=NULL, type='source')" && \
     R -e "install.packages('https://cran.r-project.org/src/contrib/Archive/raster/raster_3.4-5.tar.gz', repos=NULL, type='source')" && \
     R -e "install.packages('https://cran.r-project.org/src/contrib/Archive/rgdal/rgdal_1.5-23.tar.gz', repos=NULL, type='source')" && \
     R -e "install.packages('https://cran.r-project.org/src/contrib/Archive/rgeos/rgeos_0.5-9.tar.gz', repos=NULL, type='source')" && \
     R -e "install.packages('https://cran.r-project.org/src/contrib/Archive/maptools/maptools_1.1-8.tar.gz', repos=NULL, type='source')"
 
-# Install supporting packages
+# Step 4: Install supporting packages
 RUN R -e "install.packages(c('XML', 'spacetime', 'colorspace', 'plotrix', 'dismo', 'aqp', 'pixmap', 'plyr', 'colorRamps', 'scales', 'gstat', 'zoo', 'RColorBrewer', 'RSAGA', 'classInt'), repos='https://cloud.r-project.org')"
 
-# Install legacy packages from archives
+# Step 5: Install legacy packages from archives
 RUN R -e "install.packages('https://cran.r-project.org/src/contrib/Archive/plotKML/plotKML_0.5-9.tar.gz', repos=NULL, type='source')" && \
     R -e "install.packages('https://cran.r-project.org/src/contrib/Archive/units/units_0.7-2.tar.gz', repos=NULL, type='source')" && \
     R -e "install.packages('https://cran.r-project.org/src/contrib/Archive/RandomFieldsUtils/RandomFieldsUtils_0.5.3.tar.gz', repos=NULL, type='source')" && \
     R -e "install.packages('https://cran.r-project.org/src/contrib/Archive/RandomFields/RandomFields_3.3.8.tar.gz', repos=NULL, type='source')" 
 
-# Install INLA
+# Step 6: Install INLA
 RUN R -e "install.packages('https://inla.r-inla-download.org/R/stable/src/contrib/INLA_22.05.07.tar.gz', repos=NULL, type='source')"
 
-# Install core spatial and statistical R packages (compatible versions)
-RUN R -e "install.packages(c('RcppArmadillo', 'sf', 'terra', 'stars', 'ggplot2', 'dplyr', 'tidyr', 'data.table', 'magrittr', 'ggthemes', 'rmdformats', 'tidyverse', 'purrr', 'reshape2', 'cowplot', 'patchwork'))"
+# Step 7: Install core spatial and statistical R packages (compatible versions)
+RUN R -e "install.packages(c('sf', 'terra', 'stars', 'ggplot2', 'dplyr', 'tidyr', 'data.table', 'magrittr', 'ggthemes', 'rmdformats', 'purrr', 'reshape2', 'cowplot', 'patchwork'), repos='https://cloud.r-project.org')"
 
-# Install VAST ecosystem
+# Step 8: Install tidyverse and extra packages
+RUN R -e "install.packages(c('tidyverse', 'gstat', 'automap', 'geoR', 'fields', 'kableExtra', 'viridis'), repos='https://cloud.r-project.org')"
+
+# Step 9: Install oce dependencies and oce
+RUN R -e "install.packages(c('gsw', 'testthat', 'knitr', 'rmarkdown', 'ncdf4'), repos='https://cloud.r-project.org')" && \
+    R -e "install.packages('https://cran.r-project.org/src/contrib/Archive/oce/oce_1.5-0.tar.gz', repos=NULL, type='source')"
+
+# Step 10: Install VAST ecosystem (AFTER Matrix/TMB compatibility is ensured)
 RUN --mount=type=secret,id=github_token,env=GITHUB_PAT \
-    R -e "devtools::install_github('James-Thorson-NOAA/FishStatsUtils@2.9.1', dependencies = TRUE, upgrade = FALSE, force=TRUE)" && \
-    R -e "devtools::install_github('James-Thorson-NOAA/VAST@3.7.1', dependencies = TRUE, upgrade = FALSE, force=TRUE)" && \
-    R -e "devtools::install_github('PacificCommunity/ofp-sam-vast-utils', dependencies = FALSE)"
-
-# Install oce
-RUN R -e "install.packages(c('gsw', 'sf', 'testthat', 'knitr', 'rmarkdown', 'ncdf4'))"More actions
-RUN R -e "install.packages('https://cran.r-project.org/src/contrib/Archive/oce/oce_1.5-0.tar.gz', repos=NULL, type='source')"
-
-# Install tidyverse and extra spatial/statistical packages
-RUN R -e "install.packages('tidyverse')"
-RUN R -e "install.packages(c('gstat', 'automap', 'geoR', 'fields'))"
-
-# Install additional requested packages (cowplot, patchwork, etc.)
-RUN R -e "install.packages(c('cowplot', 'patchwork', 'reshape2', 'kableExtra', 'viridis', 'purrr'))"
-
+    R -e "
+    # Verify Matrix/TMB compatibility
+    cat('Matrix version:', as.character(packageVersion('Matrix')), '\n')
+    cat('TMB version:', as.character(packageVersion('TMB')), '\n')
+    # Install VAST ecosystem
+    devtools::install_github('James-Thorson-NOAA/FishStatsUtils@2.9.1', dependencies = TRUE, upgrade = FALSE, force=TRUE)
+    devtools::install_github('James-Thorson-NOAA/VAST@3.7.1', dependencies = TRUE, upgrade = FALSE, force=TRUE)
+    devtools::install_github('PacificCommunity/ofp-sam-vast-utils', dependencies = FALSE)
+    "
 
 # Install Quarto CLI
 RUN curl -L https://github.com/quarto-dev/quarto-cli/releases/download/v1.2.335/quarto-1.2.335-linux-amd64.deb -o quarto.deb && \
