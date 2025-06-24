@@ -1,30 +1,33 @@
 FROM ubuntu:22.04
 
-# Set non-interactive mode and timezone
 ENV DEBIAN_FRONTEND=noninteractive
 ENV TZ=Pacific/Noumea
 
-# Configure timezone
-RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
-
-# Install basic system dependencies
 RUN apt-get update && apt-get install -y \
-    curl \
-    wget \
     build-essential \
-    python3 \
-    python3-pip \
-    software-properties-common \
-    dirmngr \
-    ca-certificates \
-    gnupg \
-    lsb-release
+    gfortran \
+    libreadline-dev \
+    libx11-dev \
+    libxt-dev \
+    libpng-dev \
+    libjpeg-dev \
+    libcairo2-dev \
+    libssl-dev \
+    libxml2-dev \
+    libbz2-dev \
+    liblzma-dev \
+    libpcre2-dev \
+    libcurl4-openssl-dev \
+    wget
 
-# Install R 4.1.2 from official repository (more reliable than r-hub)
-RUN wget -qO- https://cloud.r-project.org/bin/linux/ubuntu/marutter_pubkey.asc | tee -a /etc/apt/trusted.gpg.d/cran_ubuntu_key.asc && \
-    add-apt-repository "deb https://cloud.r-project.org/bin/linux/ubuntu $(lsb_release -cs)-cran40/" && \
-    apt-get update && \
-    apt-get install -y r-base=4.1.2* r-base-dev=4.1.2*
+RUN cd /tmp && \
+    wget https://cran.r-project.org/src/base/R-4/R-4.1.2.tar.gz && \
+    tar -xzf R-4.1.2.tar.gz && \
+    cd R-4.1.2 && \
+    ./configure --enable-R-shlib --with-blas --with-lapack && \
+    make && \
+    make install
+
 
 # Install comprehensive system dependencies and development libraries
 RUN apt-get update && \
