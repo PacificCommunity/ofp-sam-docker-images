@@ -159,3 +159,4 @@ RUN echo 'if [ -z "$INSIDE_RADIAN" ] && [ -z "$RSTUDIO" ] && [ "$TERM_PROGRAM" !
 EXPOSE 22
 
 CMD ["/bin/bash"]
+
