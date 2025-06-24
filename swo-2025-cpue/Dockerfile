@@ -4,7 +4,7 @@ FROM ubuntu:22.04
 ENV DEBIAN_FRONTEND=noninteractive
 ENV TZ=Pacific/Noumea
 
-# Configure timezone first
+# Configure timezone
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
 # Install system dependencies in one layer
@@ -21,6 +21,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     build-essential \
     gfortran \
     pkg-config \
+    cmake \
     # Python
     python3 \
     python3-pip \
@@ -102,7 +103,7 @@ RUN curl -fsSL https://get.docker.com | sh
 # Install radian for enhanced R console
 RUN pip3 install -U radian
 
-# Configure CRAN repository for R with proper syntax
+# Configure CRAN repository for R
 RUN mkdir -p /etc/R && \
     echo 'local({' > /etc/R/Rprofile.site && \
     echo '  r <- getOption("repos")' >> /etc/R/Rprofile.site && \
@@ -110,7 +111,7 @@ RUN mkdir -p /etc/R && \
     echo '  options(repos = r)' >> /etc/R/Rprofile.site && \
     echo '})' >> /etc/R/Rprofile.site
 
-# Install devtools with explicit repos setting
+# Install essential R packages with correct Matrix version
 RUN R -e "install.packages('devtools', repos='https://cloud.r-project.org')"
 
 # Install Bioconductor and dependencies
@@ -137,15 +138,17 @@ RUN R -e "install.packages('https://cran.r-project.org/src/contrib/Archive/plotK
 # Install INLA (compatible with VAST 3.7.1 and FishStatsUtils 2.9.1)
 RUN R -e "install.packages('https://inla.r-inla-download.org/R/stable/src/contrib/INLA_22.05.07.tar.gz', repos=NULL, type='source')"
 
-# Install core modern packages
-RUN R -e "install.packages(c('TMB', 'RcppArmadillo', 'Matrix', 'sf', 'terra', 'stars'), repos='https://cloud.r-project.org')"
+# Install core modern packages with compatible Matrix version
+RUN R -e "install.packages(c('TMB', 'RcppArmadillo'), repos='https://cloud.r-project.org')" && \
+    R -e "install.packages('https://cran.r-project.org/src/contrib/Archive/Matrix/Matrix_1.6-5.tar.gz', repos=NULL, type='source')" && \
+    R -e "install.packages(c('sf', 'terra', 'stars'), repos='https://cloud.r-project.org')"
 
 # Install data science and visualization packages
 RUN R -e "install.packages(c('tidyverse', 'ggplot2', 'dplyr', 'tidyr', 'data.table', 'magrittr', 'purrr'), repos='https://cloud.r-project.org')" && \
     R -e "install.packages(c('reshape2', 'cowplot', 'patchwork', 'kableExtra', 'viridis', 'ggthemes', 'rmdformats'), repos='https://cloud.r-project.org')"
 
 # Install oceanographic and additional spatial packages
-RUN R -e "install.packages(c('gsw', 'testthat', 'knitr', 'rmarkdown', 'ncdf4', 'automap', 'geoR', 'fields'), repos='https://cloud.r-project.org')" && \
+RUN R -e "install.packages(c('gsw', 'testthat', 'knitr', 'rmarkdown', 'ncdf4', 'automap', 'geoR', 'fields', 'DHARMa'), repos='https://cloud.r-project.org')" && \
     R -e "install.packages('https://cran.r-project.org/src/contrib/Archive/oce/oce_1.5-0.tar.gz', repos=NULL, type='source')"
 
 # Install VAST ecosystem packages
@@ -161,9 +164,9 @@ RUN curl -L https://github.com/quarto-dev/quarto-cli/releases/download/v1.2.335/
     dpkg -i quarto.deb && \
     rm quarto.deb
 
-# Set up workspace and permissions
+# Set up workspace and permissions (correct R library path for source installation)
 RUN mkdir -p /workspace && chmod -R 777 /workspace && \
-    chmod -R 777 /usr/local/lib/R/site-library
+    mkdir -p /usr/local/lib/R/library && chmod -R 777 /usr/local/lib/R/library
 
 # Create analyst user with sudo privileges
 RUN useradd -m -u 1000 -U -s /bin/bash analyst && \
