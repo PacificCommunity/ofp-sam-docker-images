@@ -143,8 +143,6 @@ RUN useradd -m -u 1001 -U -s /bin/bash analyst && \
 RUN echo 'analyst:analyst' | chpasswd && \
     mkdir /var/run/sshd
 
-ENTRYPOINT ["/usr/local/bin/glibc-compat-wrapper.sh"]
-
 EXPOSE 22
 
 USER analyst
