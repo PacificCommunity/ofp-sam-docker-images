@@ -1,5 +1,11 @@
-# Use R 4.1.2 base image for compatibility with VAST 3.7.1, FishStatsUtils 2.9.1, and legacy spatial packagesMore actions
+# Use R 4.1.2 base image for compatibility with VAST 3.7.1, FishStatsUtils 2.9.1, and legacy spatial packages
 FROM rocker/r-ver:4.1.2
+
+# Set environment variables early
+ENV DEBIAN_FRONTEND=noninteractive
+ENV TZ=Pacific/Noumea
+ENV LANG=en_US.UTF-8
+ENV LC_ALL=en_US.UTF-8
 
 # Install system dependencies and development libraries
 RUN apt-get update && \
@@ -37,37 +43,35 @@ RUN apt-get update && \
         ca-certificates \
         gdal-bin \
         libglu1-mesa-dev \
-        libx11-dev && \
+        libx11-dev \
+        gawk \
+        bison \
+        gcc \
+        make \
+        wget \
+        tar \
+        build-essential && \
     apt-get clean && rm -rf /var/lib/apt/lists/*
-    
-    
-RUN apt-get update && \
-    apt-get install -y gawk bison gcc make wget tar build-essential && \
-    apt-get clean && rm -rf /var/lib/apt/lists/*
 
-RUN cd /tmp && \
-    wget -c https://ftp.gnu.org/gnu/glibc/glibc-2.35.tar.gz && \
-    tar -zxvf glibc-2.35.tar.gz && \
-    cd glibc-2.35 && \
-    mkdir glibc-build && \
-    cd glibc-build && \
-    ../configure --prefix=/opt/glibc && \
-    make && \
-    make install && \
-    cd / && \
-    rm -rf /tmp/glibc-2.35*
+RUN mkdir -p /lib64 && \
+    ln -sf /lib/x86_64-linux-gnu/libc.so.6 /lib64/libc.so.6 && \
+    ln -sf /lib/x86_64-linux-gnu/ld-linux-x86-64.so.2 /lib64/ld-linux-x86-64.so.2 && \
+    ln -sf /usr/lib/x86_64-linux-gnu/libstdc++.so.6 /lib64/libstdc++.so.6
 
-ENV LD_LIBRARY_PATH="/opt/glibc/lib:${LD_LIBRARY_PATH}"
-ENV PATH="/opt/glibc/bin:${PATH}"
+RUN cat > /usr/local/bin/glibc-compat-wrapper.sh << 'EOF'
+#!/bin/bash
+export LD_LIBRARY_PATH="/lib/x86_64-linux-gnu:/usr/lib/x86_64-linux-gnu:/lib64:$LD_LIBRARY_PATH"
+export GLIBC_TUNABLES=glibc.rtld.optional_static_tls=2048
+exec "$@"
+EOF
 
-# Set locale and timezone for New Caledonia (Pacific/Noumea)
-RUN locale-gen en_US.UTF-8 && \
+RUN chmod +x /usr/local/bin/glibc-compat-wrapper.sh
+
+RUN echo "en_US.UTF-8 UTF-8" > /etc/locale.gen && \
+    locale-gen en_US.UTF-8 && \
     update-locale LANG=en_US.UTF-8 && \
     ln -fs /usr/share/zoneinfo/Pacific/Noumea /etc/localtime && \
     dpkg-reconfigure -f noninteractive tzdata
-
-ENV LANG=en_US.UTF-8
-ENV TZ=Pacific/Noumea
 
 RUN apt-get update && \
     apt-get install -y \
@@ -80,7 +84,6 @@ RUN apt-get update && \
         texlive-binaries && \
     apt-get clean && rm -rf /var/lib/apt/lists/*
 
-
 # Install Docker CLI (client only, no daemon)
 RUN curl -fsSL https://get.docker.com | sh
 
@@ -89,7 +92,7 @@ RUN pip3 install -U radian
 
 # Set default CRAN repository for R
 RUN mkdir -p /etc/R && \
-    echo 'options(repos = c(CRAN = \"https://cloud.r-project.org\"))' >> /etc/R/Rprofile.site
+    echo 'options(repos = c(CRAN = "https://cloud.r-project.org"))' >> /etc/R/Rprofile.site
 
 # Install devtools package (for install_github)
 RUN R -e "install.packages('devtools')"
@@ -128,8 +131,6 @@ RUN R -e "remotes::install_github('PacificCommunity/ofp-sam-vast-utils', depende
 RUN R -e "install.packages(c('gsw', 'sf', 'testthat', 'knitr', 'rmarkdown', 'ncdf4'))"
 RUN R -e "install.packages('https://cran.r-project.org/src/contrib/Archive/oce/oce_1.5-0.tar.gz', repos=NULL, type='source')"
 
-
-
 # Install tidyverse and extra spatial/statistical packages
 RUN R -e "install.packages('tidyverse')"
 RUN R -e "install.packages(c('gstat', 'automap', 'geoR', 'fields'))"
@@ -154,17 +155,11 @@ RUN useradd -m -u 1000 -U -s /bin/bash analyst && \
 RUN echo 'analyst:analyst' | chpasswd && \
     mkdir /var/run/sshd
 
+ENTRYPOINT ["/usr/local/bin/glibc-compat-wrapper.sh"]
+
 EXPOSE 22
 
 USER analyst
 WORKDIR /workspace
-
-
-
-
-
-
-# Set radian as the default R terminal for analyst
-#RUN echo 'if [ -z \"$INSIDE_RADIAN\" ] && [ -z \"$RSTUDIO\" ] && [ \"$TERM_PROGRAM\" != \"vscode\" ]; then exec radian; fi' > /home/analyst/.radian_profile
 
 CMD ["/bin/bash"]
