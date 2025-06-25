@@ -34,6 +34,10 @@ RUN apt-get update && \
         texlive-latex-recommended \
         texlive-base \
         texlive-binaries \
+        texlive-science \
+        texlive-pictures \
+        texlive-plain-generic \
+        texlive-formats-extra \
         pandoc \
         pandoc-citeproc \
         librsvg2-bin \
