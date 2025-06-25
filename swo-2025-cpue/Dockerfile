@@ -1,5 +1,11 @@
 # Use R 4.1.2 base image for compatibility with VAST 3.7.1, FishStatsUtils 2.9.1, and legacy spatial packages
+FROM ubuntu:22.04 as glibc-provider
+RUN apt-get update && apt-get install -y libc6
+
 FROM rocker/r-ver:4.1.2
+COPY --from=glibc-provider /lib/x86_64-linux-gnu/libc.so.6 /lib/x86_64-linux-gnu/
+COPY --from=glibc-provider /lib/x86_64-linux-gnu/ld-linux-x86-64.so.2 /lib/x86_64-linux-gnu/
+RUN ldconfig
 
 # Set environment variables early
 ENV DEBIAN_FRONTEND=noninteractive
@@ -58,7 +64,6 @@ RUN mkdir -p /lib64 && \
     ln -sf /lib/x86_64-linux-gnu/ld-linux-x86-64.so.2 /lib64/ld-linux-x86-64.so.2 && \
     ln -sf /usr/lib/x86_64-linux-gnu/libstdc++.so.6 /lib64/libstdc++.so.6
 
-# glibc 호환성 래퍼 스크립트 생성 (대안 방법)
 RUN echo '#!/bin/bash' > /usr/local/bin/glibc-compat-wrapper.sh && \
     echo 'export LD_LIBRARY_PATH="/lib/x86_64-linux-gnu:/usr/lib/x86_64-linux-gnu:/lib64:$LD_LIBRARY_PATH"' >> /usr/local/bin/glibc-compat-wrapper.sh && \
     echo 'export GLIBC_TUNABLES=glibc.rtld.optional_static_tls=2048' >> /usr/local/bin/glibc-compat-wrapper.sh && \
