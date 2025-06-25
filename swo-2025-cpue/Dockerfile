@@ -1,4 +1,4 @@
-FROM rocker/rstudio:4.3.0
+FROM rocker/rstudio:4.3.1
 
 # Set environment variables early
 ENV DEBIAN_FRONTEND=noninteractive
@@ -51,8 +51,6 @@ RUN apt-get update && \
         tar \
         build-essential && \
     apt-get clean && rm -rf /var/lib/apt/lists/*
-
-
 
 RUN echo "en_US.UTF-8 UTF-8" > /etc/locale.gen && \
     locale-gen en_US.UTF-8 && \
@@ -107,12 +105,14 @@ RUN R -e "install.packages('https://inla.r-inla-download.org/R/stable/src/contri
 # Install core spatial and statistical R packages (compatible versions)
 RUN R -e "install.packages(c('TMB', 'RcppArmadillo', 'Matrix', 'sf', 'terra', 'stars', 'ggplot2', 'dplyr', 'tidyr', 'data.table', 'magrittr', 'ggthemes', 'rmdformats', 'tidyverse', 'purrr', 'reshape2', 'cowplot', 'patchwork'))"
 
-RUN --mount=type=secret,id=github_token \
-    export GITHUB_PAT=$(cat /run/secrets/github_token) && \
-    R -e "devtools::install_github('James-Thorson-NOAA/FishStatsUtils@2.9.1', dependencies=TRUE, upgrade=FALSE, force=TRUE)" && \
+# Accept GITHUB_PAT as build argument for authenticated GitHub API requests
+ARG GITHUB_PAT
+ENV GITHUB_PAT=${GITHUB_PAT}
+
+# Install GitHub packages with authentication
+RUN R -e "devtools::install_github('James-Thorson-NOAA/FishStatsUtils@2.9.1', dependencies=TRUE, upgrade=FALSE, force=TRUE)" && \
     R -e "devtools::install_github('James-Thorson-NOAA/VAST@3.7.1', dependencies=TRUE, upgrade=FALSE, force=TRUE)" && \
     R -e "devtools::install_github('PacificCommunity/ofp-sam-vast-utils', dependencies=FALSE)"
-    
     
 # Install oce
 RUN R -e "install.packages(c('gsw', 'sf', 'testthat', 'knitr', 'rmarkdown', 'ncdf4'))"
@@ -125,19 +125,27 @@ RUN R -e "install.packages(c('gstat', 'automap', 'geoR', 'fields'))"
 # Install additional requested packages (cowplot, patchwork, etc.)
 RUN R -e "install.packages(c('cowplot', 'patchwork', 'reshape2', 'kableExtra', 'viridis', 'purrr'))"
 
-# Install Quarto CLI (compatible with R 4.1.2)
+# Install Quarto CLI (compatible with R 4.3.0)
 RUN curl -L https://github.com/quarto-dev/quarto-cli/releases/download/v1.2.335/quarto-1.2.335-linux-amd64.deb -o quarto.deb && \
     dpkg -i quarto.deb && \
     rm quarto.deb
 
-# Create workspace directory and set permissions
-RUN mkdir -p /workspace && chmod -R 777 /workspace
-RUN chmod -R 777 /usr/local/lib/R/site-library
-
-# Create analyst user with a different UID
+# Create analyst user with UID 1001 (avoiding conflict with existing rstudio user)
 RUN useradd -m -u 1001 -U -s /bin/bash analyst && \
     echo "analyst ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
 
+# Create workspace directory and set proper ownership and permissions
+RUN mkdir -p /workspace && \
+    chown -R analyst:analyst /workspace && \
+    chmod -R 755 /workspace
+
+# Create analysis directory structure with proper permissions for data processing
+RUN mkdir -p /workspace/analysis/eu/data/processed && \
+    chown -R analyst:analyst /workspace/analysis && \
+    chmod -R 755 /workspace/analysis
+
+# Set R library permissions for package installation
+RUN chmod -R 777 /usr/local/lib/R/site-library
 
 # Set up SSH server for remote access (default password: analyst)
 RUN echo 'analyst:analyst' | chpasswd && \
@@ -145,6 +153,7 @@ RUN echo 'analyst:analyst' | chpasswd && \
 
 EXPOSE 22
 
+# Switch to analyst user and set working directory
 USER analyst
 WORKDIR /workspace
 
