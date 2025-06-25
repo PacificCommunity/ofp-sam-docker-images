@@ -1,11 +1,13 @@
-# Use R 4.1.2 base image for compatibility with VAST 3.7.1, FishStatsUtils 2.9.1, and legacy spatial packages
 FROM ubuntu:22.04 as glibc-provider
 RUN apt-get update && apt-get install -y libc6
 
 FROM rocker/r-ver:4.1.2
-COPY --from=glibc-provider /lib/x86_64-linux-gnu/libc.so.6 /lib/x86_64-linux-gnu/
-COPY --from=glibc-provider /lib/x86_64-linux-gnu/ld-linux-x86-64.so.2 /lib/x86_64-linux-gnu/
-RUN ldconfig
+
+COPY --from=glibc-provider /lib/x86_64-linux-gnu/ /lib/x86_64-linux-gnu/
+COPY --from=glibc-provider /usr/lib/x86_64-linux-gnu/ /usr/lib/x86_64-linux-gnu/
+
+ENV LD_LIBRARY_PATH="/lib/x86_64-linux-gnu:/usr/lib/x86_64-linux-gnu:$LD_LIBRARY_PATH"
+
 
 # Set environment variables early
 ENV DEBIAN_FRONTEND=noninteractive
