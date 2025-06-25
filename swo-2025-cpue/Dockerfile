@@ -1,4 +1,4 @@
-# Use R 4.2.3 base image for compatibility with VAST 3.7.1, FishStatsUtils 2.9.1, and legacy spatial packagesMore actions
+# Use R 4.2.3 base image for compatibility with VAST 3.7.1, FishStatsUtils 2.9.1, and legacy spatial packages
 FROM rocker/r-ver:4.2.3
 
 # Install system dependencies and development libraries
@@ -29,6 +29,11 @@ RUN apt-get update && \
         libfribidi-dev \
         pkg-config \
         texlive-latex-extra \
+        texlive-fonts-recommended \
+        texlive-fonts-extra \
+        texlive-latex-recommended \
+        texlive-base \
+        texlive-binaries \
         pandoc \
         pandoc-citeproc \
         librsvg2-bin \
@@ -37,7 +42,8 @@ RUN apt-get update && \
         ca-certificates \
         gdal-bin \
         libglu1-mesa-dev \
-        libx11-dev && \
+        libx11-dev \
+        lmodern && \
     apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # Set locale and timezone for New Caledonia (Pacific/Noumea)
@@ -49,17 +55,9 @@ RUN locale-gen en_US.UTF-8 && \
 ENV LANG=en_US.UTF-8
 ENV TZ=Pacific/Noumea
 
-RUN apt-get update && \
-    apt-get install -y \
-        texlive-fonts-recommended \
-        texlive-fonts-extra \
-        lmodern \
-        texlive-latex-extra \
-        texlive-latex-recommended \
-        texlive-base \
-        texlive-binaries && \
-    apt-get clean && rm -rf /var/lib/apt/lists/*
-
+# Install additional LaTeX packages via tlmgr
+RUN tlmgr update --self && \
+    tlmgr install soul ulem xcolor colortbl array booktabs longtable multirow tabulary threeparttable threeparttablex environ trimspaces footnotehyper || true
 
 # Install Docker CLI (client only, no daemon)
 RUN curl -fsSL https://get.docker.com | sh
@@ -108,8 +106,6 @@ RUN R -e "remotes::install_github('PacificCommunity/ofp-sam-vast-utils', depende
 RUN R -e "install.packages(c('gsw', 'sf', 'testthat', 'knitr', 'rmarkdown', 'ncdf4'))"
 RUN R -e "install.packages('https://cran.r-project.org/src/contrib/Archive/oce/oce_1.5-0.tar.gz', repos=NULL, type='source')"
 
-
-
 # Install tidyverse and extra spatial/statistical packages
 RUN R -e "install.packages('tidyverse')"
 RUN R -e "install.packages(c('gstat', 'automap', 'geoR', 'fields'))"
@@ -128,7 +124,7 @@ RUN chmod -R 777 /usr/local/lib/R/site-library
 
 # Create analyst user with passwordless sudo for devcontainer
 RUN useradd -m -u 1000 -U -s /bin/bash analyst && \
-    echo "analyst ALL=(ALL) NOPASSWD:ALL" 
+    echo "analyst ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
     
 # Set up SSH server for remote access (default password: analyst)
 RUN echo 'analyst:analyst' | chpasswd && \
