@@ -92,7 +92,6 @@ jobs:
           # Instead, we call GitHub's actual repository_owner as returned (possibly uppercase).
           REAL_OWNER="${{ github.repository_owner }}"
 
-
           # Check if user provided a custom version
           USER_SPECIFIED_VERSION="${{ github.event.inputs.version }}"
           echo "User-specified version: $USER_SPECIFIED_VERSION (empty = auto)"
@@ -170,7 +169,11 @@ jobs:
             echo "Docker Image Name: $IMAGE_NAME"
             echo "=== Building Docker image: $IMAGE_NAME:v$NEW_VERSION ==="
 
-            docker build -t "$IMAGE_NAME:v$NEW_VERSION" -t "$IMAGE_NAME:latest" "$dir/"
+            docker build \
+              --build-arg GITHUB_PAT=${{ secrets.GITHUB_TOKEN }} \
+              -t "$IMAGE_NAME:v$NEW_VERSION" \
+              -t "$IMAGE_NAME:latest" \
+              "$dir/"
             docker push "$IMAGE_NAME:v$NEW_VERSION"
             docker push "$IMAGE_NAME:latest"
             
