@@ -58,14 +58,13 @@ RUN mkdir -p /lib64 && \
     ln -sf /lib/x86_64-linux-gnu/ld-linux-x86-64.so.2 /lib64/ld-linux-x86-64.so.2 && \
     ln -sf /usr/lib/x86_64-linux-gnu/libstdc++.so.6 /lib64/libstdc++.so.6
 
-RUN cat > /usr/local/bin/glibc-compat-wrapper.sh << 'EOF'
-#!/bin/bash
-export LD_LIBRARY_PATH="/lib/x86_64-linux-gnu:/usr/lib/x86_64-linux-gnu:/lib64:$LD_LIBRARY_PATH"
-export GLIBC_TUNABLES=glibc.rtld.optional_static_tls=2048
-exec "$@"
-EOF
+# glibc 호환성 래퍼 스크립트 생성 (대안 방법)
+RUN echo '#!/bin/bash' > /usr/local/bin/glibc-compat-wrapper.sh && \
+    echo 'export LD_LIBRARY_PATH="/lib/x86_64-linux-gnu:/usr/lib/x86_64-linux-gnu:/lib64:$LD_LIBRARY_PATH"' >> /usr/local/bin/glibc-compat-wrapper.sh && \
+    echo 'export GLIBC_TUNABLES=glibc.rtld.optional_static_tls=2048' >> /usr/local/bin/glibc-compat-wrapper.sh && \
+    echo 'exec "$@"' >> /usr/local/bin/glibc-compat-wrapper.sh && \
+    chmod +x /usr/local/bin/glibc-compat-wrapper.sh
 
-RUN chmod +x /usr/local/bin/glibc-compat-wrapper.sh
 
 
 RUN echo "en_US.UTF-8 UTF-8" > /etc/locale.gen && \
