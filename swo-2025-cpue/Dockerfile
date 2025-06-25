@@ -55,10 +55,6 @@ RUN locale-gen en_US.UTF-8 && \
 ENV LANG=en_US.UTF-8
 ENV TZ=Pacific/Noumea
 
-# Install additional LaTeX packages via tlmgr
-RUN tlmgr update --self && \
-    tlmgr install soul ulem xcolor colortbl array booktabs longtable multirow tabulary threeparttable threeparttablex environ trimspaces footnotehyper || true
-
 # Install Docker CLI (client only, no daemon)
 RUN curl -fsSL https://get.docker.com | sh
 
@@ -113,8 +109,8 @@ RUN R -e "install.packages(c('gstat', 'automap', 'geoR', 'fields'))"
 # Install additional requested packages (cowplot, patchwork, etc.)
 RUN R -e "install.packages(c('cowplot', 'patchwork', 'reshape2', 'kableExtra', 'viridis', 'purrr'))"
 
-# Install Quarto CLI (compatible with R 4.1.2)
-RUN curl -L https://github.com/quarto-dev/quarto-cli/releases/download/v1.2.335/quarto-1.2.335-linux-amd64.deb -o quarto.deb && \
+# Install Quarto CLI 1.7.31 (compatible with R 4.2.3)
+RUN curl -L https://github.com/quarto-dev/quarto-cli/releases/download/v1.7.31/quarto-1.7.31-linux-amd64.deb -o quarto.deb && \
     dpkg -i quarto.deb && \
     rm quarto.deb
 
