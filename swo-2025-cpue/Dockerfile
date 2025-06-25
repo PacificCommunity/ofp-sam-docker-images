@@ -1,4 +1,4 @@
-FROM rocker/rstudio:4.2.0
+FROM rocker/rstudio:4.2.1
 
 # Set environment variables early
 ENV DEBIAN_FRONTEND=noninteractive
@@ -51,17 +51,6 @@ RUN apt-get update && \
         tar \
         build-essential && \
     apt-get clean && rm -rf /var/lib/apt/lists/*
-
-RUN mkdir -p /lib64 && \
-    ln -sf /lib/x86_64-linux-gnu/libc.so.6 /lib64/libc.so.6 && \
-    ln -sf /lib/x86_64-linux-gnu/ld-linux-x86-64.so.2 /lib64/ld-linux-x86-64.so.2 && \
-    ln -sf /usr/lib/x86_64-linux-gnu/libstdc++.so.6 /lib64/libstdc++.so.6
-
-RUN echo '#!/bin/bash' > /usr/local/bin/glibc-compat-wrapper.sh && \
-    echo 'export LD_LIBRARY_PATH="/lib/x86_64-linux-gnu:/usr/lib/x86_64-linux-gnu:/lib64:$LD_LIBRARY_PATH"' >> /usr/local/bin/glibc-compat-wrapper.sh && \
-    echo 'export GLIBC_TUNABLES=glibc.rtld.optional_static_tls=2048' >> /usr/local/bin/glibc-compat-wrapper.sh && \
-    echo 'exec "$@"' >> /usr/local/bin/glibc-compat-wrapper.sh && \
-    chmod +x /usr/local/bin/glibc-compat-wrapper.sh
 
 
 
@@ -117,7 +106,6 @@ RUN R -e "install.packages('https://inla.r-inla-download.org/R/stable/src/contri
 
 # Install core spatial and statistical R packages (compatible versions)
 RUN R -e "install.packages(c('TMB', 'RcppArmadillo', 'Matrix', 'sf', 'terra', 'stars', 'ggplot2', 'dplyr', 'tidyr', 'data.table', 'magrittr', 'ggthemes', 'rmdformats', 'tidyverse', 'purrr', 'reshape2', 'cowplot', 'patchwork'))"
-
 
 RUN --mount=type=secret,id=github_token,env=GITHUB_PAT \
     R -e "devtools::install_github('James-Thorson-NOAA/FishStatsUtils@2.9.1', dependencies = TRUE, upgrade = FALSE, force=TRUE)" && \
