@@ -1,12 +1,9 @@
-FROM ubuntu:22.04 as glibc-provider
-RUN apt-get update && apt-get install -y libc6
-
 FROM rocker/r-ver:4.1.2
 
-COPY --from=glibc-provider /lib/x86_64-linux-gnu/ /lib/x86_64-linux-gnu/
-COPY --from=glibc-provider /usr/lib/x86_64-linux-gnu/ /usr/lib/x86_64-linux-gnu/
-
-ENV LD_LIBRARY_PATH="/lib/x86_64-linux-gnu:/usr/lib/x86_64-linux-gnu:$LD_LIBRARY_PATH"
+RUN echo "deb http://deb.debian.org/debian bullseye main" >> /etc/apt/sources.list && \
+    apt-get update && \
+    apt-get install -y -t bullseye libc6 && \
+    apt-get clean && rm -rf /var/lib/apt/lists/*
 
 
 # Set environment variables early
