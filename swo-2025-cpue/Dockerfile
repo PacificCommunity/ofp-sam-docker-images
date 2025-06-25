@@ -1,10 +1,4 @@
-FROM rocker/r-ver:4.1.2
-
-RUN echo "deb http://deb.debian.org/debian bullseye main" >> /etc/apt/sources.list && \
-    apt-get update && \
-    apt-get install -y -t bullseye libc6 && \
-    apt-get clean && rm -rf /var/lib/apt/lists/*
-
+FROM rocker/r-ver:4.2.0
 
 # Set environment variables early
 ENV DEBIAN_FRONTEND=noninteractive
