@@ -1,4 +1,4 @@
-FROM rocker/r-ver:4.2.0
+FROM rocker/rstudio:4.2.0
 
 # Set environment variables early
 ENV DEBIAN_FRONTEND=noninteractive
