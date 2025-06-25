@@ -121,7 +121,7 @@ RUN R -e "install.packages(c('TMB', 'RcppArmadillo', 'Matrix', 'sf', 'terra', 's
 
 RUN --mount=type=secret,id=github_token,env=GITHUB_PAT \
     R -e "devtools::install_github('James-Thorson-NOAA/FishStatsUtils@2.9.1', dependencies = TRUE, upgrade = FALSE, force=TRUE)" && \
-    R -e "devtools::install_github('James-Thorson-NOAA/VAST@3.7.1', dependencies = TRUE, upgrade = FALSE, force=TRUE)" && \Add commentMore actions
+    R -e "devtools::install_github('James-Thorson-NOAA/VAST@3.7.1', dependencies = TRUE, upgrade = FALSE, force=TRUE)" && \
     R -e "devtools::install_github('PacificCommunity/ofp-sam-vast-utils', dependencies = FALSE)"
 
 # Install oce
