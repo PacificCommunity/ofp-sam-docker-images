@@ -134,9 +134,10 @@ RUN curl -L https://github.com/quarto-dev/quarto-cli/releases/download/v1.2.335/
 RUN mkdir -p /workspace && chmod -R 777 /workspace
 RUN chmod -R 777 /usr/local/lib/R/site-library
 
-# Create analyst user with passwordless sudo for devcontainer
-RUN useradd -m -u 1000 -U -s /bin/bash analyst && \
+# Create analyst user with a different UID
+RUN useradd -m -u 1001 -U -s /bin/bash analyst && \
     echo "analyst ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
+
 
 # Set up SSH server for remote access (default password: analyst)
 RUN echo 'analyst:analyst' | chpasswd && \
