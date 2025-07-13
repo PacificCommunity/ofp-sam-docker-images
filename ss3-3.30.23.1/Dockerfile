@@ -1,33 +1,36 @@
 FROM ubuntu:22.04
+ENV DEBIAN_FRONTEND=noninteractive TZ=Pacific/Noumea
 
-# Disable interactive prompts and set Noumea timezone
-ENV DEBIAN_FRONTEND=noninteractive
-ENV TZ=Pacific/Noumea
-
-# 1. Add CRAN key and repository for R 4.5.0
+# 1. System deps required for R-build
 RUN apt-get update && apt-get install -y --no-install-recommends \
-      wget \
-      software-properties-common \
-      dirmngr \
-  && wget -qO- https://cloud.r-project.org/bin/linux/ubuntu/marutter_pubkey.asc \
-       | tee /etc/apt/trusted.gpg.d/cran_ubuntu_key.asc \
-  && add-apt-repository "deb https://cloud.r-project.org/bin/linux/ubuntu jammy-cran40/" \
+     build-essential \
+     gfortran \
+     libreadline-dev \
+     libx11-dev \
+     libxt-dev \
+     libpng-dev \
+     libjpeg-dev \
+     libcairo2-dev \
+     libbz2-dev \
+     liblzma-dev \
+     libpcre2-dev \
+     libcurl4-openssl-dev \
+     libxml2-dev \
+     libssl-dev \
+     pkg-config \
+     wget \
+     git \
   && rm -rf /var/lib/apt/lists/*
 
-# 2. Install system libraries and R 4.5.0
-RUN apt-get update && apt-get install -y --no-install-recommends \
-      build-essential \
-      gfortran \
-      liblapack-dev \
-      libblas-dev \
-      libcurl4-openssl-dev \
-      libxml2-dev \
-      libssl-dev \
-      pkg-config \
-      r-base=4.5.0-* \
-      r-base-dev=4.5.0-* \
-      git \
-  && rm -rf /var/lib/apt/lists/*
+# 2. Download and compile R 4.5.0
+RUN wget -qO R-4.5.0.tar.gz https://cran.r-project.org/src/base/R-4/R-4.5.0.tar.gz \
+  && tar -xf R-4.5.0.tar.gz \
+  && cd R-4.5.0 \
+  && ./configure --enable-R-shlib --with-blas --with-lapack \
+  && make -j$(nproc) \
+  && make install \
+  && cd .. \
+  && rm -rf R-4.5.0 R-4.5.0.tar.gz
 
 # 3. Download and install the optimized SS3 binary
 RUN wget -q -O ss3_opt_linux \
