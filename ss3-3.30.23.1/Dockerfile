@@ -11,10 +11,10 @@ RUN apt-get update && apt-get install -y \
     gfortran \
     liblapack-dev \
     libblas-dev \
-    libcurl4-openssl-dev \      # for curl (dplyr dependency)
-    libxml2-dev \               # for xml2 (here may suggest rprojroot)
-    libssl-dev \                # for openssl
-    pkg-config \                # helper for configuration
+    libcurl4-openssl-dev \
+    libxml2-dev \
+    libssl-dev \
+    pkg-config \
     r-base \
     r-base-dev \
     git \
