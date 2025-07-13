@@ -16,17 +16,17 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 
 # 2. Install system libraries and R 4.5.0
 RUN apt-get update && apt-get install -y --no-install-recommends \
-      build-essential \        # compilers and build tools
-      gfortran \               # Fortran compiler needed by SS3
-      liblapack-dev \          # Linear algebra library
-      libblas-dev \            # Basic linear algebra library
-      libcurl4-openssl-dev \   # libcurl for R packages
-      libxml2-dev \            # libxml2 for XML support in R
-      libssl-dev \             # OpenSSL headers for HTTPS
-      pkg-config \             # pkg-config for library detection
-      r-base=4.5.0-* \         # R interpreter (version 4.5.0)
-      r-base-dev=4.5.0-* \     # R development headers
-      git \                    # Version control
+      build-essential \
+      gfortran \
+      liblapack-dev \
+      libblas-dev \
+      libcurl4-openssl-dev \
+      libxml2-dev \
+      libssl-dev \
+      pkg-config \
+      r-base=4.5.0-* \
+      r-base-dev=4.5.0-* \
+      git \
   && rm -rf /var/lib/apt/lists/*
 
 # 3. Download and install the optimized SS3 binary
