@@ -23,9 +23,10 @@ RUN wget -q -O ss3_opt_linux \
   && chmod +x ss3_opt_linux \
   && mv ss3_opt_linux /usr/local/bin/ss3
 
-# 4. Install R packages from CRAN
-RUN R -e "install.packages(c('devtools','remotes'), repos='https://cloud.r-project.org')" \
- && R -e "install.packages(c('r4ss','here','dplyr'), dependencies=TRUE, repos='https://cloud.r-project.org')"
+# 4. Install R packages from CRAN and GitHub
+RUN R -e "install.packages(c('devtools','remotes','pak'), repos='https://cloud.r-project.org')" \
+ && R -e "install.packages(c('here','dplyr'), dependencies=TRUE, repos='https://cloud.r-project.org')" \
+ && R -e "pak::pkg_install('r4ss/r4ss')"
 
 # 5. Set working directory for your model files
 WORKDIR /workspace
