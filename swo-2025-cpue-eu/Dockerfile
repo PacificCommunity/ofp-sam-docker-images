@@ -32,9 +32,9 @@ RUN wget -qO- https://quarto.org/download/latest/quarto-linux-amd64.deb > quarto
 RUN install2.r --error --skipinstalled \
     data.table magrittr dplyr tidyr purrr splines sp sf units oce
 
-# 5. Install latest R packages from CRAN and GitHub using pak
-RUN Rscript -e "install.packages('pak', repos='https://cloud.r-project.org')" \
-    && Rscript -e "pak::pak(c( 'VAST', 'FishStatsUtils', 'fmesher', 'fishfollower/tinyVAST', 'pbs-assess/sdmTMB'))"
+# 5. Install latest R packages from CRAN and GitHub
+RUN Rscript -e "install.packages(c('ggplot2','sp', 'splines', 'purrr', 'data.table', 'magrittr', 'ggthemes', 'rmdformats', 'oce', 'sf', 'units', 'sdmTMB', 'tinyVAST', 'kableExtra','GGally', 'rmarkdown', 'viridis', 'dplyr', 'cowplot', 'parallel', 'tidyr', 'patchwork', 'reshape2', 'iterators', 'remotes', 'tidyverse'), repos='https://cloud.r-project.org/')"
+RUN Rscript -e "remotes::install_github('james-thorson/VAST@main', INSTALL_opts='--no-staged-install')"
 
 # 6. Set working directory
 WORKDIR /workspace
