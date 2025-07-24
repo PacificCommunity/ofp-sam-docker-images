@@ -36,10 +36,12 @@ RUN install2.r --error --skipinstalled \
     data.table magrittr dplyr tidyr purrr splines sp sf units oce
 
 # 5. Install latest R packages from CRAN and GitHub
-RUN Rscript -e "install.packages(c('ggplot2','sp', 'TMB', 'splines', 'purrr', 'data.table', 'magrittr', 'ggthemes', 'rmdformats', 'oce', 'sf', 'units', 'sdmTMB', 'tinyVAST', 'kableExtra','GGally', 'rmarkdown', 'viridis', 'dplyr', 'cowplot', 'parallel', 'tidyr', 'patchwork', 'reshape2', 'iterators', 'remotes', 'tidyverse'), repos='https://cloud.r-project.org/')"
+RUN Rscript -e "install.packages(c('ggplot2','sp', 'TMB', 'splines', 'purrr', 'data.table', 'magrittr', 'ggthemes', 'rmdformats', 'oce', 'sf', 'units', 'sdmTMB', 'kableExtra','GGally', 'rmarkdown', 'viridis', 'dplyr', 'cowplot', 'parallel', 'tidyr', 'patchwork', 'reshape2', 'iterators', 'remotes', 'tidyverse'), repos='https://cloud.r-project.org/')"
 RUN Rscript -e "remotes::install_github('james-thorson/VAST@main', INSTALL_opts='--no-staged-install')"
 RUN Rscript -e "remotes::install_github('james-thorson/FishStatsUtils@main', INSTALL_opts='--no-staged-install')"
+RUN Rscript -e "remotes::install_github('vast-lib/tinyVAST', dependencies = TRUE)"
 RUN Rscript -e "install.packages('INLA', repos=c(getOption('repos'), INLA='https://inla.r-inla-download.org/R/stable'), dep=TRUE)"
+
 
 
 # 6. Set working directory
