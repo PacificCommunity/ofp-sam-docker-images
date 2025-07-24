@@ -34,13 +34,7 @@ RUN install2.r --error --skipinstalled \
 
 # 5. Install latest R packages from CRAN and GitHub using pak
 RUN Rscript -e "install.packages('pak', repos='https://cloud.r-project.org')" \
-    && Rscript -e "pak::pak(c(
-        'VAST',
-        'FishStatsUtils',
-        'fmesher',
-        'fishfollower/tinyVAST',
-        'pbs-assess/sdmTMB'
-    ))"
+    && Rscript -e "pak::pak(c( 'VAST', 'FishStatsUtils', 'fmesher', 'fishfollower/tinyVAST', 'pbs-assess/sdmTMB'))"
 
 # 6. Set working directory
 WORKDIR /workspace
