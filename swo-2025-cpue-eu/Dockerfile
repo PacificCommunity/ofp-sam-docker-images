@@ -23,7 +23,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libproj-dev \
     libv8-dev \
     libnetcdf-dev \
-    libglpk-dev \              # Fixes igraph GLPK error
+    libglpk-dev \         
     fonts-dejavu \
     fonts-liberation \
     libfreetype6-dev \
