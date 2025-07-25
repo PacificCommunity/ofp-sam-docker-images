@@ -78,6 +78,8 @@ RUN quarto install tinytex
 # 7. Set working directory
 WORKDIR /workspace
 
+RUN mkdir -p /home/publicdir && chmod 777 /home/publicdir 
+
 # 8. (Optional) Expose a port for apps or servers if needed
 EXPOSE 8080
 
