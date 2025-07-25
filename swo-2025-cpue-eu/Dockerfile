@@ -42,6 +42,8 @@ RUN Rscript -e "remotes::install_github('james-thorson/FishStatsUtils@main', INS
 RUN Rscript -e "remotes::install_github('vast-lib/tinyVAST', dependencies = TRUE)"
 RUN Rscript -e "install.packages('INLA', repos=c(getOption('repos'), INLA='https://inla.r-inla-download.org/R/stable'), dep=TRUE)"
 
+# Install the TinyTeX LaTeX distribution for PDF output support
+RUN quarto install tinytex
 
 
 # 6. Set working directory
