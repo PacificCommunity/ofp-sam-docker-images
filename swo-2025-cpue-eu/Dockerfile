@@ -69,8 +69,8 @@ RUN install2.r --error --skipinstalled \
 RUN Rscript -e "remotes::install_github('james-thorson/VAST@main', INSTALL_opts='--no-staged-install')" \
     && Rscript -e "remotes::install_github('james-thorson/FishStatsUtils@main', INSTALL_opts='--no-staged-install')" \
     && Rscript -e "remotes::install_github('vast-lib/tinyVAST', dependencies=TRUE)" \
-    && Rscript -e \"remotes::install_github('pbs-assess/sdmTMB')\" \
-    && Rscript -e \"install.packages('INLA', repos=c(getOption('repos'), INLA='https://inla.r-inla-download.org/R/stable'), dependencies=TRUE)\"
+    && Rscript -e "remotes::install_github('pbs-assess/sdmTMB')" \
+    && Rscript -e "install.packages('INLA', repos=c(getOption('repos'), INLA='https://inla.r-inla-download.org/R/stable'), dependencies=TRUE)"
 
 # 6. Install the TinyTeX LaTeX distribution for PDF output support
 RUN quarto install tinytex
