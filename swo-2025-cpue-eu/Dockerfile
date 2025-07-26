@@ -75,15 +75,22 @@ RUN Rscript -e "remotes::install_github('james-thorson/VAST@main', INSTALL_opts=
 # 6. Install the TinyTeX LaTeX distribution for PDF output support
 RUN quarto install tinytex
 
-# 7. Set working directory
+# Create workspace directory and set permissions
+RUN mkdir -p /workspace && chmod -R 777 /workspace
+RUN chmod -R 777 /usr/local/lib/R/site-library
+
+# Create analyst user with passwordless sudo for devcontainer
+RUN useradd -m -u 1000 -U -s /bin/bash analyst && \
+    echo "analyst ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
+
+# Set up SSH server for remote access (default password: analyst)
+RUN echo 'analyst:analyst' | chpasswd && \
+    mkdir /var/run/sshd
+
+EXPOSE 22
+
+USER analyst
 WORKDIR /workspace
-
-RUN mkdir -p /home/publicdir && chmod 777 /home/publicdir 
-
-ENV HOME=/home/publicdir
-
-# 8. (Optional) Expose a port for apps or servers if needed
-EXPOSE 8080
 
 # 9. Set default entrypoint
 CMD ["bash"]
