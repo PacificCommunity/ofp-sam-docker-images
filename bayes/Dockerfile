@@ -15,19 +15,36 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     pkg-config \
     wget \
     git \
+    libfontconfig1-dev \
+    libfreetype6-dev \
+    libpng-dev \
+    libtiff5-dev \
+    libjpeg-dev \
+    libharfbuzz-dev \
+    libfribidi-dev \
   && rm -rf /var/lib/apt/lists/*
 
-# 3. Install R packages from CRAN and GitHub
-RUN R -e "install.packages(c('devtools','remotes','ggplot2','patchwork','stringr','progressr'), repos='https://cloud.r-project.org')" \
- && R -e "install.packages(c('here','dplyr','bayesplot','posterior'), dependencies=TRUE, repos='https://cloud.r-project.org')" \
- && R -e "install.packages('cmdstanr', repos=c('https://stan-dev.r-universe.dev', getOption('repos')))" \ 
+# 3. Install R packages in stages to handle dependencies properly
+# 3a. Install basic dependencies first
+RUN R -e "install.packages(c('miniUI', 'pkgdown'), repos='https://cloud.r-project.org', dependencies=TRUE)"
+
+# 3b. Install font/graphics related packages
+RUN R -e "install.packages(c('systemfonts', 'textshaping', 'ragg'), repos='https://cloud.r-project.org', dependencies=TRUE)"
+
+# 3c. Install main packages
+RUN R -e "install.packages(c('devtools','remotes','ggplot2','patchwork','stringr','progressr'), repos='https://cloud.r-project.org', dependencies=TRUE)" \
+ && R -e "install.packages(c('here','dplyr','bayesplot','posterior'), dependencies=TRUE, repos='https://cloud.r-project.org')"
+
+# 3d. Install cmdstanr and GitHub packages
+RUN R -e "install.packages('cmdstanr', repos=c('https://stan-dev.r-universe.dev', getOption('repos')))" \ 
  && R -e "devtools::install_github('hyunjimoon/SBC')"
 
 # 4. Set working directory for your model files
 WORKDIR /workspace
 
-# 6. Expose a port if you plan to run any web interfaces
+# 5. Expose a port if you plan to run any web interfaces
 EXPOSE 8080
 
-# 7. Default entrypoint
+# 6. Default entrypoint
 CMD ["bash"]
+
