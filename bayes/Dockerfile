@@ -38,12 +38,10 @@ RUN R -e "install.packages(c('devtools','remotes','ggplot2','patchwork','stringr
 # 3d. Install cmdstanr
 RUN R -e "install.packages('cmdstanr', repos=c('https://stan-dev.r-universe.dev', getOption('repos')), dependencies=TRUE)"
 
-# 4. Install CmdStan in the Docker image
-# Set HOME environment and install CmdStan
-ENV HOME=/opt/cmdstan
-RUN mkdir -p /opt/cmdstan \
- && R -e "cmdstanr::install_cmdstan(cores = parallel::detectCores())" \
- && echo "CMDSTAN=/opt/cmdstan/.cmdstan/cmdstan-$(R -e 'cat(cmdstanr::cmdstan_version())')" >> /etc/environment
+# 4. Install CmdStan in /tmp/cmdstan using your specified R code
+RUN R -e "dir.create('/tmp/cmdstan', recursive = TRUE, showWarnings = FALSE); \
+    cmdstanr::install_cmdstan(dir = '/tmp/cmdstan', cores = 2, overwrite = TRUE)" \
+ && echo "CMDSTAN=/tmp/cmdstan/.cmdstan/cmdstan-$(R -e 'cat(cmdstanr::cmdstan_version())')" >> /etc/environment
 
 # 5. Install SBC package from GitHub
 RUN R -e "devtools::install_github('hyunjimoon/SBC')"
@@ -56,4 +54,5 @@ EXPOSE 8080
 
 # 8. Default entrypoint
 CMD ["bash"]
+
 
