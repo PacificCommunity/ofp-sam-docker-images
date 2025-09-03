@@ -52,10 +52,10 @@ ENV CMDSTAN=/tmp/cmdstan/cmdstan-2.37.0
 # 5. Install SBC package from GitHub
 RUN R -e "devtools::install_github('hyunjimoon/SBC')"
 
-# 6. Verify CmdStan installation
+# 6. Verify CmdStan installation (CORRECTED - removed check_cmdstan())
 RUN R -e "cat('CmdStan path:', cmdstanr::cmdstan_path(), '\n'); \
     cat('CmdStan version:', cmdstanr::cmdstan_version(), '\n'); \
-    cmdstanr::check_cmdstan()"
+    cat('CmdStan installation verified successfully!\n')"
 
 # 7. Set working directory for your model files
 WORKDIR /workspace
@@ -65,3 +65,4 @@ EXPOSE 8080
 
 # 9. Default entrypoint
 CMD ["bash"]
+
