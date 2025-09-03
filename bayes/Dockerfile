@@ -38,21 +38,30 @@ RUN R -e "install.packages(c('devtools','remotes','ggplot2','patchwork','stringr
 # 3d. Install cmdstanr
 RUN R -e "install.packages('cmdstanr', repos=c('https://stan-dev.r-universe.dev', getOption('repos')), dependencies=TRUE)"
 
-# 4. Install CmdStan in /tmp/cmdstan using your specified R code
+# 4. Install CmdStan and set environment variables properly
 RUN R -e "dir.create('/tmp/cmdstan', recursive = TRUE, showWarnings = FALSE); \
-    cmdstanr::install_cmdstan(dir = '/tmp/cmdstan', cores = 2, overwrite = TRUE)" \
- && echo "CMDSTAN=/tmp/cmdstan/.cmdstan/cmdstan-$(R -e 'cat(cmdstanr::cmdstan_version())')" >> /etc/environment
+    cmdstanr::install_cmdstan(dir = '/tmp/cmdstan', cores = 2, overwrite = TRUE)" && \
+    CMDSTAN_PATH=$(find /tmp/cmdstan -name 'cmdstan-*' -type d | head -1) && \
+    echo "CMDSTAN=$CMDSTAN_PATH" >> /etc/environment && \
+    echo "export CMDSTAN=$CMDSTAN_PATH" >> /etc/bash.bashrc && \
+    R -e "cmdstanr::set_cmdstan_path('$CMDSTAN_PATH')"
+
+# 4b. Set environment variable for current Docker build and runtime
+ENV CMDSTAN=/tmp/cmdstan/cmdstan-2.37.0
 
 # 5. Install SBC package from GitHub
 RUN R -e "devtools::install_github('hyunjimoon/SBC')"
 
-# 6. Set working directory for your model files
+# 6. Verify CmdStan installation
+RUN R -e "cat('CmdStan path:', cmdstanr::cmdstan_path(), '\n'); \
+    cat('CmdStan version:', cmdstanr::cmdstan_version(), '\n'); \
+    cmdstanr::check_cmdstan()"
+
+# 7. Set working directory for your model files
 WORKDIR /workspace
 
-# 7. Expose a port if you plan to run any web interfaces
+# 8. Expose a port if you plan to run any web interfaces
 EXPOSE 8080
 
-# 8. Default entrypoint
+# 9. Default entrypoint
 CMD ["bash"]
-
-
