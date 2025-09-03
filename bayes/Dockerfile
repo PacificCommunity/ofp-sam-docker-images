@@ -32,7 +32,7 @@ RUN R -e "install.packages(c('miniUI', 'pkgdown'), repos='https://cloud.r-projec
 RUN R -e "install.packages(c('systemfonts', 'textshaping', 'ragg'), repos='https://cloud.r-project.org', dependencies=TRUE)"
 
 # 3c. Install main packages including cowplot and tidyr
-RUN R -e "install.packages(c('devtools','remotes','ggplot2','patchwork','stringr','progressr'), repos='https://cloud.r-project.org', dependencies=TRUE)" \
+RUN R -e "install.packages(c('devtools','remotes','ggplot2','patchwork','stringr','progressr','GGally','reshape2'), repos='https://cloud.r-project.org', dependencies=TRUE)" \
  && R -e "install.packages(c('here','dplyr','bayesplot','posterior','cowplot','tidyr'), dependencies=TRUE, repos='https://cloud.r-project.org')"
 
 # 3d. Install cmdstanr
