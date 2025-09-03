@@ -38,16 +38,17 @@ RUN R -e "install.packages(c('devtools','remotes','ggplot2','patchwork','stringr
 # 3d. Install cmdstanr
 RUN R -e "install.packages('cmdstanr', repos=c('https://stan-dev.r-universe.dev', getOption('repos')), dependencies=TRUE)"
 
-# 4. Install CmdStan and set environment variables properly
-RUN R -e "dir.create('/tmp/cmdstan', recursive = TRUE, showWarnings = FALSE); \
-    cmdstanr::install_cmdstan(dir = '/tmp/cmdstan', cores = 2, overwrite = TRUE)" && \
-    CMDSTAN_PATH=$(find /tmp/cmdstan -name 'cmdstan-*' -type d | head -1) && \
+# 4. Install CmdStan to /usr/local instead of /tmp
+RUN R -e "dir.create('/usr/local/cmdstan', recursive = TRUE, showWarnings = FALSE); \
+    cmdstanr::install_cmdstan(dir = '/usr/local/cmdstan', cores = 2, overwrite = TRUE)" && \
+    CMDSTAN_PATH=$(find /usr/local/cmdstan -name 'cmdstan-*' -type d | head -1) && \
     echo "CMDSTAN=$CMDSTAN_PATH" >> /etc/environment && \
-    echo "export CMDSTAN=$CMDSTAN_PATH" >> /etc/bash.bashrc && \
-    R -e "cmdstanr::set_cmdstan_path('$CMDSTAN_PATH')"
+    echo "export CMDSTAN=$CMDSTAN_PATH" >> /etc/bash.bashrc
 
-# 4b. Set environment variable for current Docker build and runtime
-ENV CMDSTAN=/tmp/cmdstan/cmdstan-2.37.0
+ENV CMDSTAN=/usr/local/cmdstan/cmdstan-2.37.0
+
+RUN ls -la /usr/local/cmdstan/
+
 
 # 5. Install SBC package from GitHub
 RUN R -e "devtools::install_github('hyunjimoon/SBC')"
