@@ -28,11 +28,12 @@ RUN curl -L "https://github.com/docker/compose/releases/download/2.23.0/docker-c
     chmod +x /usr/local/bin/docker-compose
 
 # Install required R packages in proper order
-RUN Rscript -e "install.packages(c('svglite','ggplot2','rmdformats','kableExtra','GGally','rmarkdown','viridis','dplyr','cowplot','parallel','tidyr','patchwork','reshape2','iterators','remotes','tidyverse'), repos='https://cloud.r-project.org/')"
+RUN Rscript -e "install.packages(c('svglite','ggplot2','rmdformats','kableExtra','GGally','rmarkdown','viridis','dplyr','cowplot','parallel','tidyr','patchwork','reshape2','iterators','remotes','tidyverse', 'data.table'), repos='https://cloud.r-project.org/')"
 
 RUN Rscript -e "install.packages('FLCore', repos = c('https://flr.r-universe.dev', 'https://cloud.r-project.org'))"
 RUN Rscript -e "remotes::install_github('PacificCommunity/ofp-sam-flr4mfcl')"
 RUN Rscript -e "remotes::install_github('PacificCommunity/ofp-sam-CondorBox')"
+RUN Rscript -e "remotes::install_github('PacificCommunity/tandoori')"
 
 # Ensure correct permissions for RStudio Server
 RUN chmod -R 777 /var/lib/rstudio-server && chmod -R 777 /home/rstudio
