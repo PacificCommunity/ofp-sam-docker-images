@@ -39,7 +39,7 @@ RUN chmod -R 777 /var/lib/rstudio-server && chmod -R 777 /home/rstudio
 
 # Create /home/mfcl directory and copy mfclo64 into it
 RUN mkdir -p /home/mfcl
-COPY --chmod=0755 mfclo64 /home/mfcl/mfclo64
+COPY --chmod=777 mfclo64 /home/mfcl/mfclo64
 
 # Enable GitHub Copilot for RStudio (if applicable)
 RUN echo "copilot-enabled=1" >> /etc/rstudio/rsession.conf
