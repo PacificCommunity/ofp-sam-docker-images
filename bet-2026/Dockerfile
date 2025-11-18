@@ -38,5 +38,10 @@ RUN Rscript -e "remotes::install_github('PacificCommunity/tandoori')"
 # Ensure correct permissions for RStudio Server
 RUN chmod -R 777 /var/lib/rstudio-server && chmod -R 777 /home/rstudio
 
+# Create /home/mfcl directory and copy mfclo64
+RUN mkdir -p /home/mfcl
+COPY mfclo64_lin /home/mfcl/mfclo64
+RUN chmod 0755 /home/mfcl/mfclo64
+
 # Enable GitHub Copilot for RStudio (if applicable)
 RUN echo "copilot-enabled=1" >> /etc/rstudio/rsession.conf
