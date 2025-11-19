@@ -33,7 +33,11 @@ RUN apt-get update && apt-get install -y \
 RUN curl -L "https://github.com/docker/compose/releases/download/2.23.0/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose && \
     chmod +x /usr/local/bin/docker-compose
 
-# Install required R packages in proper order
+    # Set default CRAN repository for R
+RUN mkdir -p /etc/R && \
+    echo 'options(repos = c(CRAN = \"https://cloud.r-project.org\"))' >> /etc/R/Rprofile.site
+
+    # Install required R packages in proper order
 RUN Rscript -e "install.packages(c('iterators','remotes','tidyverse','magrittr','data.table','sp','sf','randomForest','sdmTMB'), repos='https://cloud.r-project.org/')"
 RUN Rscript -e  "remotes::install_github('flr/FLCore')"
 RUN Rscript -e "remotes::install_github('PacificCommunity/ofp-sam-flr4mfcl')"
