@@ -44,6 +44,7 @@ RUN Rscript -e "remotes::install_github('PacificCommunity/ofp-sam-flr4mfcl')"
 RUN Rscript -e "remotes::install_github('PacificCommunity/ofp-sam-frqit')"
 RUN Rscript -e "remotes::install_github('pbs-assess/sdmTMBextra')"
 RUN Rscript -e "install.packages('INLA', repos=c(getOption('repos'), INLA='https://inla.r-inla-download.org/R/stable'), dependencies=TRUE)"
+RUN Rscript -e "install.packages('tidyverse', repos = 'https://cloud.r-project.org', dependencies = TRUE)"
 
 # Ensure correct permissions for RStudio Server
 RUN chmod -R 777 /var/lib/rstudio-server && chmod -R 777 /home/rstudio
