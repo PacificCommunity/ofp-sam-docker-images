@@ -33,7 +33,8 @@ RUN Rscript -e "install.packages(c('svglite','ggplot2','rmdformats','kableExtra'
 RUN Rscript -e "install.packages('FLCore', repos = c('https://flr.r-universe.dev', 'https://cloud.r-project.org'))"
 RUN Rscript -e "remotes::install_github('PacificCommunity/ofp-sam-flr4mfcl')"
 RUN Rscript -e "remotes::install_github('PacificCommunity/ofp-sam-CondorBox')"
-RUN Rscript -e "remotes::install_github('PacificCommunity/tandoori')"
+# Adding a comment to trigger a rebuild
+RUN Rscript -e "remotes::install_github('PacificCommunity/tandoori')" 
 
 # Ensure correct permissions for RStudio Server
 RUN chmod -R 777 /var/lib/rstudio-server && chmod -R 777 /home/rstudio
