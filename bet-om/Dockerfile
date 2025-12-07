@@ -33,7 +33,9 @@ RUN Rscript -e "install.packages(c('svglite','ggplot2','rmdformats','kableExtra'
 RUN Rscript -e "install.packages('FLCore', repos = c('https://flr.r-universe.dev', 'https://cloud.r-project.org'))"
 RUN Rscript -e "remotes::install_github('PacificCommunity/ofp-sam-flr4mfcl')"
 RUN Rscript -e "remotes::install_github('PacificCommunity/ofp-sam-CondorBox')"
-RUN Rscript -e "remotes::install_github('PacificCommunity/tandoori')"
+
+# Clone tandoori
+RUN git clone https://github.com/PacificCommunity/tandoori.git /data/app
 
 # Ensure correct permissions for RStudio Server
 RUN chmod -R 777 /var/lib/rstudio-server && chmod -R 777 /home/rstudio
