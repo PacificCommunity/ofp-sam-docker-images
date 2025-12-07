@@ -34,7 +34,7 @@ RUN Rscript -e "install.packages('FLCore', repos = c('https://flr.r-universe.dev
 RUN Rscript -e "remotes::install_github('PacificCommunity/ofp-sam-flr4mfcl')"
 RUN Rscript -e "remotes::install_github('PacificCommunity/ofp-sam-CondorBox')"
 
-# Clone tandoori
+# Clone tandoori - trigger rebuild
 RUN git clone https://github.com/PacificCommunity/tandoori.git /data/app
 
 # Ensure correct permissions for RStudio Server
