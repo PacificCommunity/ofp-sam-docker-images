@@ -34,15 +34,16 @@ RUN Rscript -e "install.packages('FLCore', repos = c('https://flr.r-universe.dev
 RUN Rscript -e "remotes::install_github('PacificCommunity/ofp-sam-flr4mfcl')"
 RUN Rscript -e "remotes::install_github('PacificCommunity/ofp-sam-CondorBox')"
 
-# Clone tandoori - trigger rebuild
-RUN git clone https://github.com/PacificCommunity/tandoori.git /packages/tandoori
-
 # Ensure correct permissions for RStudio Server
 RUN chmod -R 777 /var/lib/rstudio-server && chmod -R 777 /home/rstudio
 
 # Create /home/mfcl directory and copy mfclo64 into it
 RUN mkdir -p /home/mfcl
 COPY --chmod=0777 mfclo64_2023 /home/mfcl/mfclo64
+
+# Copy and install tandoori into the image
+COPY tandoori_0.1.0.tar.gz /packages/tandoori.tar.gz
+RUN R -e "install.packages('/packages/tandoori.tar.gz', repos = NULL, type = 'source')"
 
 # Enable GitHub Copilot for RStudio (if applicable)
 RUN echo "copilot-enabled=1" >> /etc/rstudio/rsession.conf
