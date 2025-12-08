@@ -42,7 +42,7 @@ RUN mkdir -p /home/mfcl
 COPY --chmod=0777 mfclo64_2023 /home/mfcl/mfclo64
 
 # Copy and install tandoori into the image
-COPY tandoori_0.1.0.tar.gz /packages/tandoori.tar.gz
+COPY tandoori_0.1.tar.gz /packages/tandoori.tar.gz
 RUN R -e "install.packages('/packages/tandoori.tar.gz', repos = NULL, type = 'source')"
 
 # Enable GitHub Copilot for RStudio (if applicable)
