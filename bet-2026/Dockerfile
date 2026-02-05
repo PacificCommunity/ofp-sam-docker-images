@@ -1,5 +1,5 @@
 # Use the rocker/rstudio base image
-FROM rocker/rstudio:4.5.1
+FROM rocker/rstudio:4.5.2
 
 # Install required system dependencies
 RUN apt-get update && apt-get install -y \
