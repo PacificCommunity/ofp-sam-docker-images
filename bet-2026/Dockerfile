@@ -40,16 +40,9 @@ RUN curl -L "https://github.com/docker/compose/releases/download/2.23.0/docker-c
     chmod +x /usr/local/bin/docker-compose
 
 # Install required R packages
-RUN Rscript -e "install.packages( \
-  c( \
-    'svglite','ggplot2','rmdformats','kableExtra','GGally','rmarkdown', \
-    'viridis','dplyr','cowplot','parallel','tidyr','patchwork','reshape2', \
-    'iterators','remotes','tidyverse','data.table','here', \
-    'shiny','shinyjs','shinydashboard','shinyWidgets','shinyFiles', \
-    'DT','plotly','future','promises','later','htmltools','stringr', \
-    'purrr','tibble','scales','MASS','rstudioapi' \
-  ), repos='https://cloud.r-project.org/' \
-)"
+RUN Rscript -e "install.packages(c('fs','cachem','memoise','mime','sass','base64enc','digest','fastmap','jquerylib','fontawesome','yaml','evaluate','xfun','highr','knitr','bslib'), repos='https://cloud.r-project.org/', dependencies=TRUE)"
+
+RUN Rscript -e "install.packages(c('rmarkdown','shiny','shinyjs','shinydashboard','shinyWidgets','shinyFiles','DT','plotly','future','promises','later','htmltools','stringr','purrr','tibble','scales','MASS','rstudioapi','svglite','ggplot2','rmdformats','kableExtra','GGally','viridis','dplyr','cowplot','tidyr','patchwork','reshape2','iterators','remotes','tidyverse','data.table','here'), repos='https://cloud.r-project.org/', dependencies=TRUE)"
 
 
 RUN Rscript -e "install.packages('FLCore', repos = c('https://flr.r-universe.dev', 'https://cloud.r-project.org'))"
