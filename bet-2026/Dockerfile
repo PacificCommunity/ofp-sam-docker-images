@@ -6,26 +6,6 @@ RUN apt-get update && apt-get install -y \
     curl \
     gnupg \
     lsb-release \
-    libclang-dev \
-    libcurl4-openssl-dev \
-    libxml2-dev \
-    libcairo2-dev \
-    libpng-dev \
-    libjpeg-dev \
-    libtiff5-dev \
-    libgtk2.0-dev \
-    libssl-dev \
-    libssh2-1-dev \
-    libgit2-dev \
-    libfontconfig1-dev \
-    libfreetype6-dev \
-    libfribidi-dev \
-    libharfbuzz-dev \
-    zlib1g-dev \
-    texlive-xetex \
-    texlive-latex-extra \
-    texlive-fonts-recommended \
-    pandoc \
     make \
     openssh-client \
     git \
@@ -33,18 +13,61 @@ RUN apt-get update && apt-get install -y \
     tar \
     procps \
     bc \
+    pandoc \
+    default-jdk \
+    gdal-bin \
+    libclang-dev \
+    libcairo2-dev \
+    libcurl4-openssl-dev \
+    libfontconfig1-dev \
+    libfreetype6-dev \
+    libfribidi-dev \
+    libgdal-dev \
+    libgeos-dev \
+    libgit2-dev \
+    libgtk2.0-dev \
+    libharfbuzz-dev \
+    libjpeg-dev \
+    libmagick++-dev \
+    libpng-dev \
+    libproj-dev \
+    librsvg2-dev \
+    libssh2-1-dev \
+    libssl-dev \
+    libtiff5-dev \
+    libudunits2-dev \
+    libwebp-dev \
+    libxml2-dev \
+    zlib1g-dev \
+    texlive-xetex \
+    texlive-latex-extra \
+    texlive-fonts-recommended \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # Install docker-compose
 RUN curl -L "https://github.com/docker/compose/releases/download/2.23.0/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose && \
     chmod +x /usr/local/bin/docker-compose
 
-# Install required R packages
-RUN Rscript -e "install.packages(c('fs','cachem','memoise','mime','sass','base64enc','digest','fastmap','jquerylib','fontawesome','yaml','evaluate','xfun','highr','knitr','bslib'), repos='https://cloud.r-project.org/', dependencies=TRUE)"
+# Install core R dependencies first
+RUN Rscript -e "install.packages(c( \
+  'fs','cachem','memoise','mime','sass','base64enc','digest','fastmap', \
+  'jquerylib','fontawesome','yaml','evaluate','xfun','highr','knitr', \
+  'bslib','htmltools','later','promises','httpuv','htmlwidgets', \
+  'Rcpp','cpp11','cli','glue','rlang','lifecycle','vctrs','withr', \
+  'jsonlite','curl','openssl','sys','processx','callr','desc','pkgload' \
+), repos='https://cloud.r-project.org/', dependencies=TRUE)"
 
-RUN Rscript -e "install.packages(c('rmarkdown','shiny','shinyjs','shinydashboard','shinyWidgets','shinyFiles','DT','plotly','future','promises','later','htmltools','stringr','purrr','tibble','scales','MASS','rstudioapi','svglite','ggplot2','rmdformats','kableExtra','GGally','viridis','dplyr','cowplot','tidyr','patchwork','reshape2','iterators','remotes','tidyverse','data.table','here'), repos='https://cloud.r-project.org/', dependencies=TRUE)"
+# Install Shiny, plotting, and workflow packages
+RUN Rscript -e "install.packages(c( \
+  'shiny','shinyjs','shinydashboard','shinyWidgets','shinyFiles', \
+  'DT','plotly','future','rstudioapi','stringr','purrr','tibble', \
+  'scales','MASS','ggplot2','cowplot','dplyr','tidyr','viridis', \
+  'patchwork','reshape2','rmarkdown','rmdformats','kableExtra', \
+  'GGally','tidyverse','data.table','here','remotes','iterators', \
+  'svglite','ragg','textshaping','systemfonts','magick','rsvg' \
+), repos='https://cloud.r-project.org/', dependencies=TRUE)"
 
-
+# Install project-specific R packages
 RUN Rscript -e "install.packages('FLCore', repos = c('https://flr.r-universe.dev', 'https://cloud.r-project.org'))"
 RUN Rscript -e "remotes::install_github('PacificCommunity/ofp-sam-flr4mfcl')"
 RUN Rscript -e "remotes::install_github('PacificCommunity/ofp-sam-CondorBox')"
