@@ -35,6 +35,7 @@ This repository includes a GitHub Actions workflow that:
 2. Put a **Dockerfile** inside that folder.
 3. Commit and push your changes (this will trigger the GitHub Actions workflow). 
    - The GitHub Actions workflow will detect the new directory, build a new Docker image, and push it to GHCR.
+   - If the Dockerfile installs from a private GitHub repository, add a repository secret named `PRIVATE_GITHUB_PAT` with read access to that repository. Docker builds can then consume it via BuildKit secrets.
 4. Make the package public (if non-sensitive and intended for public use) so that others can access it without authentication by going to https://github.com/orgs/PacificCommunity/packages and clicking on the package name. 
    - Click on the “Settings” tab and change the visibility to “Public”.
 

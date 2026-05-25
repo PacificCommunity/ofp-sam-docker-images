@@ -40,6 +40,9 @@ jobs:
       - name: Prepare Ephemeral Docker Config
         run: mkdir -p /tmp/docker-config
 
+      - name: Set Up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
       ##################################################################
       # 3) CONVERT REPO OWNER TO LOWERCASE
       ##################################################################
@@ -79,6 +82,8 @@ jobs:
       # 6) BUILD AND PUSH DOCKER IMAGES
       ##################################################################
       - name: Build and Push Docker Images
+        env:
+          BUILD_GITHUB_PAT: ${{ secrets.PRIVATE_GITHUB_PAT }}
         run: |
           # If no directories changed, skip
           if [ -z "${{ env.CHANGED_DIRS }}" ]; then
@@ -170,7 +175,7 @@ jobs:
             echo "=== Building Docker image: $IMAGE_NAME:v$NEW_VERSION ==="
 
             docker build \
-              --build-arg GITHUB_PAT=${{ secrets.GITHUB_TOKEN }} \
+              --secret id=github_pat,env=BUILD_GITHUB_PAT \
               -t "$IMAGE_NAME:v$NEW_VERSION" \
               -t "$IMAGE_NAME:latest" \
               "$dir/"
