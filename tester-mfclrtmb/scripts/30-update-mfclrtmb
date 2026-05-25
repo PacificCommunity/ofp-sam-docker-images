@@ -1,0 +1,6 @@
+#!/usr/bin/with-contenv bash
+set -e
+
+if ! Rscript /usr/local/bin/update-mfclrtmb.R; then
+  echo "[mfclrtmb-update] Update check failed; continuing container startup." >&2
+fi

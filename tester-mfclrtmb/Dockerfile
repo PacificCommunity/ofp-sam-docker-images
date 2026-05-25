@@ -74,15 +74,16 @@ RUN Rscript -e "install.packages('FLCore', repos = c('https://flr.r-universe.dev
 RUN Rscript -e "remotes::install_github('PacificCommunity/ofp-sam-flr4mfcl')"
 RUN Rscript -e "remotes::install_github('PacificCommunity/ofp-sam-CondorBox')"
 RUN Rscript -e "remotes::install_github('PacificCommunity/tandoori')"
-RUN --mount=type=secret,id=github_pat \
-    GITHUB_PAT="$(cat /run/secrets/github_pat)" \
-    Rscript -e "remotes::install_github('PacificCommunity/ofp-sam-mfclrtmb', auth_token = Sys.getenv('GITHUB_PAT'))"
 
 RUN chmod -R 777 /var/lib/rstudio-server && chmod -R 777 /home/rstudio
 
 RUN mkdir -p /home/mfcl
 COPY mfclo64_2026_02_04_vsn2278 /home/mfcl/mfclo64_2026_02_04_vsn2278
 RUN chmod 0755 /home/mfcl/mfclo64_2026_02_04_vsn2278
+
+COPY scripts/update-mfclrtmb.R /usr/local/bin/update-mfclrtmb.R
+COPY scripts/30-update-mfclrtmb /etc/cont-init.d/30-update-mfclrtmb
+RUN chmod 0755 /usr/local/bin/update-mfclrtmb.R /etc/cont-init.d/30-update-mfclrtmb
 
 RUN echo "copilot-enabled=1" >> /etc/rstudio/rsession.conf
 
