@@ -10,7 +10,14 @@ if [[ -f job_env.txt ]]; then
   set +a
 fi
 
-if ! bash /usr/local/bin/30-update-mfclrtmb; then
+if bash /usr/local/bin/30-update-mfclrtmb; then
+  :
+else
+  update_status=$?
+  if [[ "$update_status" -eq 42 ]]; then
+    echo "[mfclrtmb-update] mfclrtmb is not installed and no GitHub token was provided. Set GIT_PAT or GITHUB_PAT, or use an image built with mfclrtmb preinstalled." >&2
+    exit "$update_status"
+  fi
   echo "[mfclrtmb-update] Startup update failed; continuing container startup." >&2
 fi
 

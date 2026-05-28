@@ -86,6 +86,14 @@ RUN Rscript -e "remotes::install_github('PacificCommunity/ofp-sam-CondorBox')"
 
 RUN Rscript -e "remotes::install_github('PacificCommunity/tandoori')"
 
+RUN --mount=type=secret,id=github_pat \
+    export GITHUB_PAT="$(cat /run/secrets/github_pat 2>/dev/null || true)" && \
+    if [ -z "$GITHUB_PAT" ]; then \
+      echo "[mfclrtmb-build] github_pat secret is required to preinstall PacificCommunity/ofp-sam-mfclrtmb." >&2; \
+      exit 1; \
+    fi && \
+    Rscript -e "remotes::install_github('PacificCommunity/ofp-sam-mfclrtmb', auth_token = Sys.getenv('GITHUB_PAT'), upgrade = 'never')"
+
 RUN chmod -R 777 /var/lib/rstudio-server && \
     chmod -R 777 /home/rstudio
 

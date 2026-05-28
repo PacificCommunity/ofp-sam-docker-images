@@ -85,6 +85,21 @@ jobs:
         env:
           BUILD_GITHUB_PAT: ${{ secrets.PRIVATE_GITHUB_PAT }}
         run: |
+          BUILD_PAT="$BUILD_GITHUB_PAT"
+          if [ -z "$BUILD_PAT" ]; then
+            BUILD_PAT="${{ secrets.GHCR_TOKEN }}"
+            echo "PRIVATE_GITHUB_PAT is not set; falling back to GHCR_TOKEN for build-time GitHub access."
+          else
+            echo "Using PRIVATE_GITHUB_PAT for build-time GitHub access."
+          fi
+
+          if [ -z "$BUILD_PAT" ]; then
+            echo "No GitHub token available for build-time access to private repositories." >&2
+            exit 1
+          fi
+
+          export BUILD_GITHUB_PAT="$BUILD_PAT"
+
           # If no directories changed, skip
           if [ -z "${{ env.CHANGED_DIRS }}" ]; then
             echo "No top-level directories changed. Skipping build."
