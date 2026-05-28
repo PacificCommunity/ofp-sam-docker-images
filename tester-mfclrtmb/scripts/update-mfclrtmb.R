@@ -5,12 +5,16 @@ repo_name <- "ofp-sam-mfclrtmb"
 repo_slug <- sprintf("%s/%s", repo_owner, repo_name)
 token <- Sys.getenv("GITHUB_PAT", "")
 
+if (!nzchar(token)) {
+  token <- Sys.getenv("GIT_PAT", "")
+}
+
 log_message <- function(...) {
   message("[mfclrtmb-update] ", sprintf(...))
 }
 
 if (!nzchar(token)) {
-  log_message("GITHUB_PAT is not set; skipping %s update check.", repo_slug)
+  log_message("GITHUB_PAT or GIT_PAT is not set; skipping %s update check.", repo_slug)
   quit(save = "no", status = 0)
 }
 

@@ -1,5 +1,6 @@
 # syntax=docker/dockerfile:1.7
-FROM rocker/rstudio:4.5.2
+
+FROM rocker/rstudio:4.5.3
 
 RUN apt-get update && apt-get install -y \
     curl \
@@ -48,7 +49,9 @@ RUN apt-get update && apt-get install -y \
     texlive-fonts-recommended \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
-RUN curl -L "https://github.com/docker/compose/releases/download/2.23.0/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose && \
+RUN curl -L \
+    "https://github.com/docker/compose/releases/download/2.23.0/docker-compose-$(uname -s)-$(uname -m)" \
+    -o /usr/local/bin/docker-compose && \
     chmod +x /usr/local/bin/docker-compose
 
 RUN Rscript -e "options(repos = c(CRAN='https://cloud.r-project.org/')); install.packages(c( \
@@ -59,7 +62,9 @@ RUN Rscript -e "options(repos = c(CRAN='https://cloud.r-project.org/')); install
   'fontawesome','later','promises','httpuv','htmlwidgets','purrr','tibble' \
 ))"
 
-RUN Rscript -e "options(repos = c(CRAN='https://cloud.r-project.org/')); install.packages(c('sass','bslib','rmarkdown','shiny'))"
+RUN Rscript -e "options(repos = c(CRAN='https://cloud.r-project.org/')); install.packages(c( \
+  'sass','bslib','rmarkdown','shiny' \
+))"
 
 RUN Rscript -e "options(repos = c(CRAN='https://cloud.r-project.org/')); install.packages(c( \
   'shinyjs','shinydashboard','shinyWidgets','shinyFiles', \
@@ -70,21 +75,41 @@ RUN Rscript -e "options(repos = c(CRAN='https://cloud.r-project.org/')); install
   'magick','rsvg' \
 ))"
 
-RUN Rscript -e "install.packages('FLCore', repos = c('https://flr.r-universe.dev', 'https://cloud.r-project.org'))"
+RUN Rscript -e "install.packages( \
+  'FLCore', \
+  repos = c('https://flr.r-universe.dev', 'https://cloud.r-project.org') \
+)"
+
 RUN Rscript -e "remotes::install_github('PacificCommunity/ofp-sam-flr4mfcl')"
+
 RUN Rscript -e "remotes::install_github('PacificCommunity/ofp-sam-CondorBox')"
+
 RUN Rscript -e "remotes::install_github('PacificCommunity/tandoori')"
 
-RUN chmod -R 777 /var/lib/rstudio-server && chmod -R 777 /home/rstudio
+RUN --mount=type=secret,id=github_pat \
+    export GITHUB_PAT=$(cat /run/secrets/github_pat) && \
+    Rscript -e "remotes::install_github('PacificCommunity/ofp-sam-mfclrtmb')"
+
+RUN chmod -R 777 /var/lib/rstudio-server && \
+    chmod -R 777 /home/rstudio
 
 RUN mkdir -p /home/mfcl
-COPY mfclo64_2026_02_04_vsn2278 /home/mfcl/mfclo64_2026_02_04_vsn2278
-RUN chmod 0755 /home/mfcl/mfclo64_2026_02_04_vsn2278
 
 COPY scripts/update-mfclrtmb.R /usr/local/bin/update-mfclrtmb.R
-COPY scripts/30-update-mfclrtmb /etc/cont-init.d/30-update-mfclrtmb
-RUN chmod 0755 /usr/local/bin/update-mfclrtmb.R /etc/cont-init.d/30-update-mfclrtmb
+COPY scripts/30-update-mfclrtmb /usr/local/bin/30-update-mfclrtmb
+COPY scripts/docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
+
+COPY mfclo64_2026_02_04_vsn2278 \
+     /home/mfcl/mfclo64_2026_02_04_vsn2278
+
+RUN chmod 0755 /home/mfcl/mfclo64_2026_02_04_vsn2278 \
+  /usr/local/bin/30-update-mfclrtmb \
+  /usr/local/bin/docker-entrypoint.sh
 
 RUN echo "copilot-enabled=1" >> /etc/rstudio/rsession.conf
 
 EXPOSE 3838 3839
+
+ENTRYPOINT ["/usr/local/bin/docker-entrypoint.sh"]
+CMD ["/init"]
+
