@@ -21,6 +21,10 @@ is_package_installed <- function() {
   requireNamespace(package_name, quietly = TRUE)
 }
 
+installed_package_version <- function() {
+  as.character(utils::packageVersion(package_name))
+}
+
 resolve_runtime_library <- function() {
   configured_library <- Sys.getenv("R_LIBS_USER", "")
 
@@ -51,7 +55,12 @@ if (!nzchar(token)) {
 }
 
 if (is_package_installed()) {
-  log_message("Refreshing bundled %s from %s.", package_name, repo_slug)
+  log_message(
+    "Checking installed %s %s against %s; runtime install will be skipped when already current.",
+    package_name,
+    installed_package_version(),
+    repo_slug
+  )
 } else {
   log_message("%s is not installed; installing latest from %s.", package_name, repo_slug)
 }
@@ -85,5 +94,5 @@ remotes::install_github(
   auth_token = token,
   lib = runtime_library,
   upgrade = "never",
-  force = TRUE
+  force = FALSE
 )
