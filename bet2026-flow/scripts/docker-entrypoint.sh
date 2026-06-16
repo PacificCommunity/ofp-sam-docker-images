@@ -1,14 +1,17 @@
 #!/usr/bin/env bash
 set -e
 
-# CondorBox transfers job_env.txt into the job sandbox. Load it before runtime
-# package checks so GIT_PAT, GITHUB_PAT, and package override variables work.
-if [[ -f job_env.txt ]]; then
-  set -a
-  # shellcheck source=/dev/null
-  source job_env.txt
-  set +a
-fi
+# Kflow transfers job_env.sh into the job sandbox. CondorBox-based workflows
+# may still provide job_env.txt. Load either before runtime package checks.
+for env_file in job_env.sh job_env.txt; do
+  if [[ -f "$env_file" ]]; then
+    set -a
+    # shellcheck source=/dev/null
+    source "$env_file"
+    set +a
+    break
+  fi
+done
 
 if [[ -z "${R_LIBS_USER:-}" ]]; then
   export R_LIBS_USER="${KFLOW_RUNTIME_LIBRARY:-/home/rstudio/R/site-library}"
@@ -18,6 +21,9 @@ if bash /usr/local/bin/30-update-kflow-runtime-packages; then
   :
 else
   update_status=$?
+  case "${KFLOW_RUNTIME_REQUIRE_PRIVATE_PACKAGES:-false}" in
+    1|true|TRUE|yes|YES|on|ON) exit "$update_status" ;;
+  esac
   if [[ "$update_status" -eq 42 ]]; then
     echo "[kflow-runtime-update] A required private package is missing and no GitHub token was provided. Set GIT_PAT or GITHUB_PAT at runtime, or leave KFLOW_RUNTIME_REQUIRE_PRIVATE_PACKAGES=false for smoke workflows." >&2
     exit "$update_status"
