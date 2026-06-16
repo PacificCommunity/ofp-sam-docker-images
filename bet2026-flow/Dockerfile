@@ -46,6 +46,7 @@ RUN apt-get update && apt-get install -y \
     libssl-dev \
     libtiff5-dev \
     libudunits2-dev \
+    libuv1-dev \
     libwebp-dev \
     libxml2-dev \
     protobuf-compiler \
@@ -91,6 +92,14 @@ RUN Rscript -e "install.packages( \
 RUN Rscript -e "remotes::install_github('PacificCommunity/ofp-sam-flr4mfcl', upgrade = 'never')"
 RUN Rscript -e "remotes::install_github('PacificCommunity/ofp-sam-CondorBox', upgrade = 'never')"
 RUN Rscript -e "remotes::install_github('PacificCommunity/tandoori', upgrade = 'never')"
+
+RUN Rscript -e "required <- c( \
+  'fs','sass','bslib','rmarkdown','shiny','htmlwidgets', \
+  'shinyjs','shinydashboard','shinyWidgets','shinyFiles', \
+  'DT','plotly','rmdformats','kableExtra','tidyverse', \
+  'jsonlite','curl','yaml','remotes','data.table','ggplot2','dplyr','tidyr', \
+  'rpart.plot','partykit','vip','broom','yardstick' \
+); missing <- setdiff(required, rownames(installed.packages())); if (length(missing)) stop('Missing required R packages: ', paste(missing, collapse = ', '), call. = FALSE)"
 
 COPY scripts/update-kflow-runtime-packages.R /usr/local/bin/update-kflow-runtime-packages.R
 COPY scripts/30-update-kflow-runtime-packages /usr/local/bin/30-update-kflow-runtime-packages
