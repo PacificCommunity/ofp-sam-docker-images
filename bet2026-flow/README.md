@@ -20,11 +20,18 @@ only at container startup when `GIT_PAT` or `GITHUB_PAT` is provided at runtime.
 Tokens should be passed through the job environment or another runtime secret
 mechanism, not as Docker build arguments.
 
+When no token is provided, missing private packages are skipped by default so
+public smoke workflows can still run. Set
+`KFLOW_RUNTIME_REQUIRE_PRIVATE_PACKAGES=true` when a job must fail fast unless
+all private helper packages are installed.
+
 Useful runtime variables:
 
 - `KFLOW_RUNTIME_UPDATE=auto`: enable startup checks. Use `never` to disable.
 - `KFLOW_RUNTIME_UPDATE_INTERVAL_HOURS=24`: minimum time between checks.
 - `KFLOW_RUNTIME_FORCE_UPDATE=1`: force reinstall from GitHub.
+- `KFLOW_RUNTIME_REQUIRE_PRIVATE_PACKAGES=false`: skip missing private packages
+  when no token is available.
 - `KFLOW_RUNTIME_PACKAGES`: override package repo/ref specs.
 - `GIT_PAT` or `GITHUB_PAT`: token with read access to the private package repos.
 

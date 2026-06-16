@@ -168,8 +168,15 @@ if (!nzchar(token)) {
     quit(save = "no", status = 0)
   }
   missing <- vapply(specs[missing_packages], function(spec) spec$package, character(1))
-  log_message("No GIT_PAT or GITHUB_PAT set and package(s) missing: %s.", paste(missing, collapse = ", "))
-  quit(save = "no", status = missing_token_status)
+  if (truthy(env_value("KFLOW_RUNTIME_REQUIRE_PRIVATE_PACKAGES", "false"))) {
+    log_message("No GIT_PAT or GITHUB_PAT set and required package(s) missing: %s.", paste(missing, collapse = ", "))
+    quit(save = "no", status = missing_token_status)
+  }
+  log_message(
+    "No GIT_PAT or GITHUB_PAT set; skipping optional private package(s): %s.",
+    paste(missing, collapse = ", ")
+  )
+  quit(save = "no", status = 0)
 }
 
 if (!ensure_runtime_library(runtime_library)) {

@@ -19,7 +19,7 @@ if bash /usr/local/bin/30-update-kflow-runtime-packages; then
 else
   update_status=$?
   if [[ "$update_status" -eq 42 ]]; then
-    echo "[kflow-runtime-update] A required private package is missing and no GitHub token was provided. Set GIT_PAT or GITHUB_PAT at runtime." >&2
+    echo "[kflow-runtime-update] A required private package is missing and no GitHub token was provided. Set GIT_PAT or GITHUB_PAT at runtime, or leave KFLOW_RUNTIME_REQUIRE_PRIVATE_PACKAGES=false for smoke workflows." >&2
     exit "$update_status"
   fi
   if [[ "$update_status" -eq 43 ]]; then
