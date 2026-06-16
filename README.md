@@ -27,6 +27,12 @@ This repository includes a GitHub Actions workflow that:
 - **Top-level directory detection**:
   - Each changed directory is treated as a separate container image.
 
+# Notable Images
+
+- `bet2026-flow/`: BET 2026 Kflow runtime with MFCL, Quarto, and private flow
+  packages. Runtime startup can update only the private R packages when
+  `GIT_PAT` or `GITHUB_PAT` is provided.
+
 # Adding or Updating Docker Images
 
 ## Adding a New Docker Image for a New Project
