@@ -16,18 +16,19 @@ startup tooling for private workflow packages used by Kflow jobs:
 
 This image is safe to publish publicly: private package source code and GitHub
 tokens are not baked into the image. Private packages are installed or updated
-only at container startup when `GIT_PAT` or `GITHUB_PAT` is provided at runtime.
+only when `KFLOW_RUNTIME_UPDATE=auto` is set and `GIT_PAT` or `GITHUB_PAT` is
+provided at runtime.
 Tokens should be passed through the job environment or another runtime secret
 mechanism, not as Docker build arguments.
 
-When no token is provided, missing private packages are skipped by default so
-public smoke workflows can still run. Set
-`KFLOW_RUNTIME_REQUIRE_PRIVATE_PACKAGES=true` when a job must fail fast unless
-all private helper packages are installed.
+By default `KFLOW_RUNTIME_UPDATE=off`, so public smoke workflows never contact
+private GitHub repositories. Set `KFLOW_RUNTIME_REQUIRE_PRIVATE_PACKAGES=true`
+when a job must fail fast unless all private helper packages are installed.
 
 Useful runtime variables:
 
-- `KFLOW_RUNTIME_UPDATE=auto`: enable startup checks. Use `never` to disable.
+- `KFLOW_RUNTIME_UPDATE=off`: do not contact private GitHub repositories.
+- `KFLOW_RUNTIME_UPDATE=auto`: enable startup checks when a token is present.
 - `KFLOW_RUNTIME_UPDATE_INTERVAL_HOURS=24`: minimum time between checks.
 - `KFLOW_RUNTIME_FORCE_UPDATE=1`: force reinstall from GitHub.
 - `KFLOW_RUNTIME_REQUIRE_PRIVATE_PACKAGES=false`: skip missing private packages

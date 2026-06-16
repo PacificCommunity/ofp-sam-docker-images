@@ -25,9 +25,11 @@ truthy <- function(value) {
   tolower(value) %in% c("1", "true", "yes", "y", "on", "always")
 }
 
-runtime_updates_enabled <- function() {
+runtime_updates_enabled <- function(token = "") {
   value <- tolower(env_value("KFLOW_RUNTIME_UPDATE", "auto"))
-  !value %in% c("0", "false", "no", "off", "never")
+  if (value %in% c("0", "false", "no", "off", "never")) return(FALSE)
+  if (value %in% c("auto", "token")) return(nzchar(token))
+  TRUE
 }
 
 github_token <- function() {
@@ -156,12 +158,18 @@ runtime_library <- resolve_runtime_library()
 state_dir <- env_value("KFLOW_RUNTIME_STATE_DIR", default_state_dir)
 .libPaths(unique(c(runtime_library, .libPaths())))
 
-if (!runtime_updates_enabled()) {
+missing_packages <- vapply(specs, function(spec) !package_installed(spec$package), logical(1))
+
+if (!runtime_updates_enabled(token)) {
+  if (!nzchar(token) && any(missing_packages) && truthy(env_value("KFLOW_RUNTIME_REQUIRE_PRIVATE_PACKAGES", "false"))) {
+    missing <- vapply(specs[missing_packages], function(spec) spec$package, character(1))
+    log_message("Runtime package updates need GIT_PAT or GITHUB_PAT because required package(s) are missing: %s.", paste(missing, collapse = ", "))
+    quit(save = "no", status = missing_token_status)
+  }
   log_message("Runtime package updates are disabled.")
   quit(save = "no", status = 0)
 }
 
-missing_packages <- vapply(specs, function(spec) !package_installed(spec$package), logical(1))
 if (!nzchar(token)) {
   if (!any(missing_packages)) {
     log_message("No GIT_PAT or GITHUB_PAT set; keeping installed private packages.")
