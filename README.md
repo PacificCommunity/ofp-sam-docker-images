@@ -29,9 +29,9 @@ This repository includes a GitHub Actions workflow that:
 
 # Notable Images
 
-- `bet2026-flow/`: BET 2026 Kflow runtime with MFCL, Quarto, and private flow
-  packages. Runtime startup can update only the private R packages when
-  `GIT_PAT` or `GITHUB_PAT` is provided.
+- `bet2026-flow/`: Public BET 2026 Kflow runtime with MFCL, Quarto, and
+  non-sensitive dependencies. Private flow packages are installed or updated
+  only at runtime when `GIT_PAT` or `GITHUB_PAT` is provided.
 
 # Adding or Updating Docker Images
 

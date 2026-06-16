@@ -88,17 +88,14 @@ jobs:
           BUILD_PAT="$BUILD_GITHUB_PAT"
           if [ -z "$BUILD_PAT" ]; then
             BUILD_PAT="${{ secrets.GHCR_TOKEN }}"
-            echo "PRIVATE_GITHUB_PAT is not set; falling back to GHCR_TOKEN for build-time GitHub access."
+            echo "PRIVATE_GITHUB_PAT is not set; GHCR_TOKEN will be used only for Dockerfiles that request github_pat."
           else
-            echo "Using PRIVATE_GITHUB_PAT for build-time GitHub access."
+            echo "PRIVATE_GITHUB_PAT is available for Dockerfiles that request github_pat."
           fi
 
-          if [ -z "$BUILD_PAT" ]; then
-            echo "No GitHub token available for build-time access to private repositories." >&2
-            exit 1
+          if [ -n "$BUILD_PAT" ]; then
+            export BUILD_GITHUB_PAT="$BUILD_PAT"
           fi
-
-          export BUILD_GITHUB_PAT="$BUILD_PAT"
 
           # If no directories changed, skip
           if [ -z "${{ env.CHANGED_DIRS }}" ]; then
@@ -189,11 +186,22 @@ jobs:
             echo "Docker Image Name: $IMAGE_NAME"
             echo "=== Building Docker image: $IMAGE_NAME:v$NEW_VERSION ==="
 
-            docker build \
-              --secret id=github_pat,env=BUILD_GITHUB_PAT \
-              -t "$IMAGE_NAME:v$NEW_VERSION" \
-              -t "$IMAGE_NAME:latest" \
-              "$dir/"
+            BUILD_ARGS=(
+              -t "$IMAGE_NAME:v$NEW_VERSION"
+              -t "$IMAGE_NAME:latest"
+            )
+
+            if grep -q "id=github_pat" "$dir/Dockerfile"; then
+              if [ -z "${BUILD_GITHUB_PAT:-}" ]; then
+                echo "Dockerfile '$dir/Dockerfile' requests github_pat, but no suitable GitHub token is available." >&2
+                exit 1
+              fi
+              BUILD_ARGS=(--secret id=github_pat,env=BUILD_GITHUB_PAT "${BUILD_ARGS[@]}")
+            else
+              echo "Dockerfile '$dir/Dockerfile' does not request github_pat; building without private build secrets."
+            fi
+
+            docker build "${BUILD_ARGS[@]}" "$dir/"
             docker push "$IMAGE_NAME:v$NEW_VERSION"
             docker push "$IMAGE_NAME:latest"
             

@@ -7,16 +7,18 @@ ghcr.io/pacificcommunity/bet2026-flow:latest
 ```
 
 The image includes the BET MFCL executable, Quarto, FLR/MFCL dependencies, and
-private workflow packages used by Kflow jobs:
+startup tooling for private workflow packages used by Kflow jobs:
 
 - `mfclrtmb` from `PacificCommunity/ofp-sam-mfclrtmb`
 - `mfclkit` from `PacificCommunity/ofp-sam-mfclkit`
 - `mfclshiny` from `PacificCommunity/mfclshiny`
 - `KflowKit` from `kyuhank/KflowKit`
 
-Private packages are installed at build time using the `github_pat` BuildKit
-secret. At container startup, the image can also update only those private
-packages when `GIT_PAT` or `GITHUB_PAT` is available.
+This image is safe to publish publicly: private package source code and GitHub
+tokens are not baked into the image. Private packages are installed or updated
+only at container startup when `GIT_PAT` or `GITHUB_PAT` is provided at runtime.
+Tokens should be passed through the job environment or another runtime secret
+mechanism, not as Docker build arguments.
 
 Useful runtime variables:
 
@@ -24,16 +26,20 @@ Useful runtime variables:
 - `KFLOW_RUNTIME_UPDATE_INTERVAL_HOURS=24`: minimum time between checks.
 - `KFLOW_RUNTIME_FORCE_UPDATE=1`: force reinstall from GitHub.
 - `KFLOW_RUNTIME_PACKAGES`: override package repo/ref specs.
+- `GIT_PAT` or `GITHUB_PAT`: token with read access to the private package repos.
 
-Build-time refs can be pinned with:
+Package refs can be pinned at runtime with `KFLOW_RUNTIME_PACKAGES`:
 
 ```bash
-docker build \
-  --secret id=github_pat,env=GITHUB_PAT \
-  --build-arg MFCLRTMB_REF=<sha-or-tag> \
-  --build-arg MFCLKIT_REF=<sha-or-tag> \
-  --build-arg MFCLSHINY_REF=<sha-or-tag> \
-  --build-arg KFLOWKIT_REF=<sha-or-tag> \
-  bet2026-flow/
+KFLOW_RUNTIME_PACKAGES="\
+mfclrtmb=PacificCommunity/ofp-sam-mfclrtmb@<sha-or-tag>,\
+mfclkit=PacificCommunity/ofp-sam-mfclkit@<sha-or-tag>,\
+mfclshiny=PacificCommunity/mfclshiny@<sha-or-tag>,\
+KflowKit=kyuhank/KflowKit@<sha-or-tag>"
 ```
 
+Build the public base image without private secrets:
+
+```bash
+docker build bet2026-flow/
+```

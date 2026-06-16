@@ -3,16 +3,7 @@
 FROM rocker/rstudio:4.5.3
 
 ARG QUARTO_VERSION=1.9.38
-ARG MFCLRTMB_REF=main
-ARG MFCLKIT_REF=main
-ARG MFCLSHINY_REF=main
-ARG KFLOWKIT_REF=main
 
-ENV MFCLRTMB_REF=${MFCLRTMB_REF}
-ENV MFCLKIT_REF=${MFCLKIT_REF}
-ENV MFCLSHINY_REF=${MFCLSHINY_REF}
-ENV KFLOWKIT_REF=${KFLOWKIT_REF}
-ENV KFLOW_RUNTIME_PACKAGES="mfclrtmb=PacificCommunity/ofp-sam-mfclrtmb@${MFCLRTMB_REF},mfclkit=PacificCommunity/ofp-sam-mfclkit@${MFCLKIT_REF},mfclshiny=PacificCommunity/mfclshiny@${MFCLSHINY_REF},KflowKit=kyuhank/KflowKit@${KFLOWKIT_REF}"
 ENV KFLOW_RUNTIME_UPDATE=auto
 ENV KFLOW_RUNTIME_UPDATE_INTERVAL_HOURS=24
 ENV KFLOW_RUNTIME_LIBRARY=/home/rstudio/R/site-library
@@ -105,17 +96,6 @@ COPY scripts/update-kflow-runtime-packages.R /usr/local/bin/update-kflow-runtime
 COPY scripts/30-update-kflow-runtime-packages /usr/local/bin/30-update-kflow-runtime-packages
 COPY scripts/docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
 
-RUN --mount=type=secret,id=github_pat \
-    export GITHUB_PAT="$(cat /run/secrets/github_pat 2>/dev/null || true)" && \
-    if [ -z "$GITHUB_PAT" ]; then \
-      echo "[bet2026-flow-build] github_pat secret is required to preinstall private workflow packages." >&2; \
-      exit 1; \
-    fi && \
-    KFLOW_RUNTIME_LIBRARY=/usr/local/lib/R/site-library \
-    KFLOW_RUNTIME_FORCE_UPDATE=1 \
-    KFLOW_RUNTIME_UPDATE_INTERVAL_HOURS=0 \
-    Rscript /usr/local/bin/update-kflow-runtime-packages.R
-
 RUN chmod -R 777 /var/lib/rstudio-server && \
     chmod -R 777 /home/rstudio
 
@@ -137,4 +117,3 @@ EXPOSE 3838 3839
 
 ENTRYPOINT ["/usr/local/bin/docker-entrypoint.sh"]
 CMD ["/init"]
-

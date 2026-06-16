@@ -164,7 +164,7 @@ if (!runtime_updates_enabled()) {
 missing_packages <- vapply(specs, function(spec) !package_installed(spec$package), logical(1))
 if (!nzchar(token)) {
   if (!any(missing_packages)) {
-    log_message("No GIT_PAT or GITHUB_PAT set; keeping bundled private packages.")
+    log_message("No GIT_PAT or GITHUB_PAT set; keeping installed private packages.")
     quit(save = "no", status = 0)
   }
   missing <- vapply(specs[missing_packages], function(spec) spec$package, character(1))
@@ -174,7 +174,7 @@ if (!nzchar(token)) {
 
 if (!ensure_runtime_library(runtime_library)) {
   if (!any(missing_packages)) {
-    log_message("Runtime library %s is not writable; keeping bundled packages.", runtime_library)
+    log_message("Runtime library %s is not writable; keeping installed packages.", runtime_library)
     quit(save = "no", status = 0)
   }
   log_message("Runtime library %s is not writable and required packages are missing.", runtime_library)
