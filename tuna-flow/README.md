@@ -30,6 +30,8 @@ Useful runtime variables:
 - `KFLOW_RUNTIME_UPDATE=off`: do not contact private GitHub repositories.
 - `KFLOW_RUNTIME_UPDATE=auto`: enable startup checks when a token is present.
 - `KFLOW_RUNTIME_UPDATE_INTERVAL_HOURS=24`: minimum time between checks.
+- `KFLOW_RUNTIME_QUIET_INSTALL=true`: reduce R package build output when an
+  update actually installs a package.
 - `KFLOW_RUNTIME_FORCE_UPDATE=1`: force reinstall from GitHub.
 - `KFLOW_RUNTIME_REQUIRE_PRIVATE_PACKAGES=false`: skip missing private packages
   when no token is available.

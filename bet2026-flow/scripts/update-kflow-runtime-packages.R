@@ -156,7 +156,8 @@ install_package <- function(spec, token, library_path, force = TRUE) {
     auth_token = token,
     lib = library_path,
     upgrade = "never",
-    force = force
+    force = force,
+    quiet = truthy(env_value("KFLOW_RUNTIME_QUIET_INSTALL", "true"))
   )
 }
 
