@@ -1,0 +1,5 @@
+#!/usr/bin/with-contenv bash
+set -e
+
+Rscript /usr/local/bin/update-kflow-runtime-packages.R
+
