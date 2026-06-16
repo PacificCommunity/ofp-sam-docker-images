@@ -83,21 +83,29 @@ parse_package_specs <- function(spec_text) {
 }
 
 github_api <- function(path, token) {
-  args <- c(
-    "-fsSL",
-    "-H", "Accept: application/vnd.github+json",
-    "-H", "X-GitHub-Api-Version: 2022-11-28"
+  if (!requireNamespace("curl", quietly = TRUE)) {
+    stop("curl is required for runtime package updates.", call. = FALSE)
+  }
+  handle <- curl::new_handle()
+  curl::handle_setheaders(
+    handle,
+    Accept = "application/vnd.github+json",
+    "X-GitHub-Api-Version" = "2022-11-28",
+    "User-Agent" = "bet2026-flow-runtime-updater"
   )
   if (nzchar(token)) {
-    args <- c(args, "-H", paste("Authorization: Bearer", token))
+    curl::handle_setheaders(handle, Authorization = paste("Bearer", token))
   }
-  args <- c(args, paste0("https://api.github.com", path))
-  output <- system2("curl", args, stdout = TRUE, stderr = TRUE)
-  status <- attr(output, "status")
-  if (!is.null(status) && status != 0) {
-    stop(paste(output, collapse = "\n"), call. = FALSE)
+  response <- tryCatch(
+    curl::curl_fetch_memory(paste0("https://api.github.com", path), handle = handle),
+    error = function(error) stop(conditionMessage(error), call. = FALSE)
+  )
+  status <- response$status_code
+  if (status < 200 || status >= 300) {
+    body <- rawToChar(response$content)
+    stop(sprintf("GitHub API returned HTTP %s for %s\n%s", status, path, body), call. = FALSE)
   }
-  paste(output, collapse = "\n")
+  rawToChar(response$content)
 }
 
 remote_sha <- function(repo, ref, token) {
