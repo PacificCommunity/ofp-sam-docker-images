@@ -7,7 +7,8 @@ ghcr.io/pacificcommunity/bet2026-flow:latest
 ```
 
 The image includes the BET MFCL executable, Quarto, FLR/MFCL dependencies, and
-startup tooling for private workflow packages used by Kflow jobs:
+startup tooling for optional private workflow packages used by specific Kflow
+job stages:
 
 - `mfclrtmb` from `PacificCommunity/ofp-sam-mfclrtmb`
 - `mfclkit` from `PacificCommunity/ofp-sam-mfclkit`
@@ -35,7 +36,11 @@ Useful runtime variables:
 - `KFLOW_RUNTIME_FORCE_UPDATE=1`: force reinstall from GitHub.
 - `KFLOW_RUNTIME_REQUIRE_PRIVATE_PACKAGES=false`: skip missing private packages
   when no token is available.
-- `KFLOW_RUNTIME_PACKAGES`: override package repo/ref specs.
+- `KFLOW_RUNTIME_PACKAGES`: package repo/ref specs to check or install. When it
+  is unset or empty, the container uses the packages already baked into the
+  image and does not contact GitHub.
+- `KFLOW_RUNTIME_PACKAGES=none`: explicitly skip private package checks; useful
+  for report-only jobs that only render existing figures/tables.
 - `GIT_PAT` or `GITHUB_PAT`: token with read access to the private package repos.
 
 If GitHub returns `401`, `403`, or `404` for an optional private package, the
@@ -47,11 +52,14 @@ Package refs can be pinned at runtime with `KFLOW_RUNTIME_PACKAGES`:
 
 ```bash
 KFLOW_RUNTIME_PACKAGES="\
-mfclrtmb=PacificCommunity/ofp-sam-mfclrtmb@<sha-or-tag>,\
 mfclkit=PacificCommunity/ofp-sam-mfclkit@<sha-or-tag>,\
-mfclshiny=PacificCommunity/mfclshiny@<sha-or-tag>,\
-KflowKit=kyuhank/KflowKit@<sha-or-tag>"
+mfclshiny=PacificCommunity/mfclshiny@<sha-or-tag>"
 ```
+
+Use only the packages a stage actually needs. For example, model-input recipe
+jobs usually need `mfclkit`, `MFCL_BACKEND=mfclrtmb` jobs add `mfclrtmb`, plot
+jobs using mfclshiny request `mfclshiny`, and report rendering jobs can leave
+`KFLOW_RUNTIME_PACKAGES` unset or set it to `none`.
 
 Build the public base image without private secrets:
 

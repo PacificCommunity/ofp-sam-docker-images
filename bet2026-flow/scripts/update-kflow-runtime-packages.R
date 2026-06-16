@@ -4,7 +4,8 @@ missing_token_status <- 42L
 missing_library_status <- 43L
 default_runtime_library <- "/home/rstudio/R/site-library"
 default_state_dir <- "/home/rstudio/.cache/kflow-runtime-packages"
-default_packages <- paste(
+default_packages <- ""
+bundled_package_specs <- paste(
   "mfclrtmb=PacificCommunity/ofp-sam-mfclrtmb@main",
   "mfclkit=PacificCommunity/ofp-sam-mfclkit@main",
   "mfclshiny=PacificCommunity/mfclshiny@main",
@@ -62,7 +63,10 @@ installed_remote_sha <- function(package) {
 }
 
 parse_package_specs <- function(spec_text) {
-  if (!nzchar(spec_text)) spec_text <- default_packages
+  if (!nzchar(spec_text)) return(list())
+  if (tolower(trimws(spec_text)) %in% c("all", "default", "legacy")) {
+    spec_text <- bundled_package_specs
+  }
   parts <- trimws(unlist(strsplit(spec_text, ",")))
   parts <- parts[nzchar(parts)]
   lapply(parts, function(part) {
@@ -82,6 +86,11 @@ parse_package_specs <- function(spec_text) {
     }
     list(package = package, repo = repo, ref = ref)
   })
+}
+
+runtime_packages_disabled <- function(spec_text) {
+  value <- tolower(trimws(spec_text))
+  !nzchar(value) || value %in% c("0", "false", "no", "off", "none", "skip")
 }
 
 github_api <- function(path, token) {
@@ -162,7 +171,16 @@ install_package <- function(spec, token, library_path, force = TRUE) {
 }
 
 token <- github_token()
-specs <- parse_package_specs(env_value("KFLOW_RUNTIME_PACKAGES", default_packages))
+package_spec_text <- env_value("KFLOW_RUNTIME_PACKAGES", default_packages)
+if (runtime_packages_disabled(package_spec_text)) {
+  if (nzchar(package_spec_text)) {
+    log_message("Runtime package updates skipped because KFLOW_RUNTIME_PACKAGES=%s.", package_spec_text)
+  } else {
+    log_message("Runtime package updates skipped because KFLOW_RUNTIME_PACKAGES is not configured.")
+  }
+  quit(save = "no", status = 0)
+}
+specs <- parse_package_specs(package_spec_text)
 runtime_library <- resolve_runtime_library()
 state_dir <- env_value("KFLOW_RUNTIME_STATE_DIR", default_state_dir)
 .libPaths(unique(c(runtime_library, .libPaths())))
