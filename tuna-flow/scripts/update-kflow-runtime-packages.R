@@ -120,6 +120,14 @@ remote_sha <- function(repo, ref, token) {
   as.character(data$sha)
 }
 
+github_access_blocked <- function(error) {
+  grepl("GitHub API returned HTTP (401|403|404)", conditionMessage(error))
+}
+
+required_private_packages <- function() {
+  truthy(env_value("KFLOW_RUNTIME_REQUIRE_PRIVATE_PACKAGES", "false"))
+}
+
 state_path <- function(state_dir, package, repo, ref) {
   safe <- gsub("[^A-Za-z0-9_.-]+", "_", paste(package, repo, ref, sep = "__"))
   file.path(state_dir, paste0(safe, ".sha"))
@@ -208,7 +216,31 @@ for (spec in specs) {
   }
 
   current_sha <- installed_remote_sha(spec$package)
-  latest_sha <- remote_sha(spec$repo, spec$ref, token)
+  latest_sha <- tryCatch(
+    remote_sha(spec$repo, spec$ref, token),
+    error = function(error) error
+  )
+  if (inherits(latest_sha, "error")) {
+    if (!required_private_packages() && github_access_blocked(latest_sha)) {
+      if (installed) {
+        log_message(
+          "GitHub access denied for %s@%s; keeping installed optional package %s.",
+          spec$repo,
+          spec$ref,
+          spec$package
+        )
+      } else {
+        log_message(
+          "GitHub access denied for %s@%s; skipping missing optional package %s.",
+          spec$repo,
+          spec$ref,
+          spec$package
+        )
+      }
+      next
+    }
+    stop(conditionMessage(latest_sha), call. = FALSE)
+  }
   force_update <- truthy(env_value("KFLOW_RUNTIME_FORCE_UPDATE", "false"))
   needs_install <- force_update || !installed || !nzchar(current_sha) || !identical(current_sha, latest_sha)
 

@@ -36,6 +36,11 @@ Useful runtime variables:
 - `KFLOW_RUNTIME_PACKAGES`: override package repo/ref specs.
 - `GIT_PAT` or `GITHUB_PAT`: token with read access to the private package repos.
 
+If GitHub returns `401`, `403`, or `404` for an optional private package, the
+container keeps the installed package if present, otherwise skips that package.
+Set `KFLOW_RUNTIME_REQUIRE_PRIVATE_PACKAGES=true` only for workflows that must
+fail immediately when a private package cannot be checked or installed.
+
 Package refs can be pinned at runtime with `KFLOW_RUNTIME_PACKAGES`:
 
 ```bash
