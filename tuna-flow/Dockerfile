@@ -1,6 +1,6 @@
 # syntax=docker/dockerfile:1.7
 
-FROM rocker/rstudio:4.5.3
+FROM rocker/rstudio:4.6.0
 
 ARG QUARTO_VERSION=1.9.38
 
@@ -56,6 +56,8 @@ RUN apt-get update && apt-get install -y \
     texlive-xetex \
     texlive-latex-extra \
     texlive-fonts-recommended \
+    texlive-fonts-extra \
+    && kpsewhich fontawesome5.sty >/dev/null \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 RUN curl -L \
