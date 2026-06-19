@@ -15,6 +15,18 @@ job stages:
 - `mfclshiny` from `PacificCommunity/mfclshiny`
 - `KflowKit` from `kyuhank/KflowKit`
 
+Version `v1.6` also includes report image optimization tools used by BET plot
+jobs:
+
+- `pngquant` for high-reduction lossy PNG compression.
+- `optipng` and ImageMagick for PNG cleanup and fallback recompression.
+- `cwebp` for compact HTML figure sidecars.
+- `jpegoptim` and ImageMagick JPEG conversion for compact PDF sidecars.
+
+Keeping these tools in the image is preferred over installing them inside each
+Kflow job. Jobs start faster, logs stay cleaner, and every submitter uses the
+same optimizer versions.
+
 This image is safe to publish publicly: private package source code and GitHub
 tokens are not baked into the image. Private packages are installed or updated
 only when `KFLOW_RUNTIME_UPDATE=auto` is set and `GIT_PAT` or `GITHUB_PAT` is

@@ -18,6 +18,8 @@ RUN apt-get update && apt-get install -y \
     cmake \
     pkg-config \
     openssh-client \
+    optipng \
+    pngquant \
     git \
     rsync \
     tar \
@@ -26,6 +28,8 @@ RUN apt-get update && apt-get install -y \
     pandoc \
     default-jdk \
     gdal-bin \
+    imagemagick \
+    jpegoptim \
     libabsl-dev \
     libclang-dev \
     libcairo2-dev \
@@ -52,6 +56,7 @@ RUN apt-get update && apt-get install -y \
     libwebp-dev \
     libxml2-dev \
     protobuf-compiler \
+    webp \
     zlib1g-dev \
     texlive-xetex \
     texlive-latex-extra \
