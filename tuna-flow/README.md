@@ -15,6 +15,15 @@ job stages:
 - `mfclshiny` from `PacificCommunity/mfclshiny`
 - `KflowKit` from `kyuhank/KflowKit`
 
+Current MFCL executable:
+
+- installed path: `/home/mfcl/mfclo64`
+- version record: `v2278`
+- executable date: `2026-06-16`
+- sha256:
+  `8aedcb3fa803609a26f4ba209c0910054cc44b9daa3ad8300c8878cd4390d6cf`
+- in-image record: `/home/mfcl/mfclo64.version`
+
 Version `v1.6` also includes report image optimization tools used by BET plot
 jobs:
 
