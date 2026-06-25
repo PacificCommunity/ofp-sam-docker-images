@@ -67,9 +67,17 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     texlive-fonts-recommended \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
-RUN curl -fsSL \
-    https://mirrors.ctan.org/fonts/fontawesome5.zip \
-    -o /tmp/fontawesome5.zip && \
+RUN set -eux; \
+    for url in \
+      https://ctan.math.illinois.edu/fonts/fontawesome5.zip \
+      https://ctan.math.utah.edu/ctan/tex-archive/fonts/fontawesome5.zip \
+      https://mirrors.rit.edu/CTAN/fonts/fontawesome5.zip \
+      https://mirrors.ctan.org/fonts/fontawesome5.zip; do \
+      curl -fsSL --connect-timeout 15 --max-time 60 --retry 2 --retry-delay 2 \
+        "$url" -o /tmp/fontawesome5.zip && break; \
+      rm -f /tmp/fontawesome5.zip; \
+    done; \
+    test -s /tmp/fontawesome5.zip && \
     unzip -q /tmp/fontawesome5.zip -d /tmp && \
     install -d \
       /usr/local/share/texmf/tex/latex/fontawesome5 \
