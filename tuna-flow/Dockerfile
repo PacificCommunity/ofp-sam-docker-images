@@ -65,7 +65,11 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     texlive-xetex \
     texlive-latex-extra \
     texlive-fonts-recommended \
+    texlive-plain-generic \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
+
+RUN kpsewhich soul.sty >/dev/null && \
+    kpsewhich tocloft.sty >/dev/null
 
 RUN set -eux; \
     for url in \
@@ -119,7 +123,7 @@ RUN Rscript -e "options(repos = c(CRAN='https://cloud.r-project.org/')); install
   'DT','plotly','future','rstudioapi','stringr','scales','MASS', \
   'ggplot2','cowplot','dplyr','tidyr','viridis','patchwork','reshape2', \
   'rmdformats','kableExtra','GGally','tidyverse','data.table','here', \
-  'remotes','iterators', \
+  'remotes','iterators','maps', \
   'rpart.plot','partykit','vip','broom','yardstick','sf' \
 ))"
 
@@ -137,7 +141,7 @@ RUN Rscript -e "required <- c( \
   'shinyjs','shinydashboard','shinyWidgets','shinyFiles', \
   'DT','plotly','rmdformats','kableExtra','tidyverse', \
   'jsonlite','curl','yaml','remotes','data.table','ggplot2','dplyr','tidyr', \
-  'rpart.plot','partykit','vip','broom','yardstick','sf' \
+  'rpart.plot','partykit','vip','broom','yardstick','sf','maps' \
 ); missing <- setdiff(required, rownames(installed.packages())); if (length(missing)) stop('Missing required R packages: ', paste(missing, collapse = ', '), call. = FALSE)"
 
 COPY scripts/update-kflow-runtime-packages.R /usr/local/bin/update-kflow-runtime-packages.R
