@@ -21,13 +21,15 @@ ENV MFCL_EXECUTABLE=/home/mfcl/mfclo64
 ENV MFCL_EXECUTABLE_VERSION=${MFCL_EXECUTABLE_VERSION}
 ENV MFCL_EXECUTABLE_DATE=${MFCL_EXECUTABLE_DATE}
 
-RUN apt-get update && apt-get install -y \
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    ca-certificates \
     curl \
     gnupg \
     lsb-release \
     make \
     cmake \
     pkg-config \
+    unzip \
     openssh-client \
     optipng \
     pngquant \
@@ -37,12 +39,8 @@ RUN apt-get update && apt-get install -y \
     procps \
     bc \
     pandoc \
-    default-jdk \
-    gdal-bin \
     imagemagick \
     jpegoptim \
-    libabsl-dev \
-    libclang-dev \
     libcairo2-dev \
     libcurl4-openssl-dev \
     libfontconfig1-dev \
@@ -51,14 +49,10 @@ RUN apt-get update && apt-get install -y \
     libgdal-dev \
     libgeos-dev \
     libgit2-dev \
-    libgtk2.0-dev \
     libharfbuzz-dev \
     libjpeg-dev \
-    libmagick++-dev \
     libpng-dev \
     libproj-dev \
-    libprotobuf-dev \
-    librsvg2-dev \
     libssh2-1-dev \
     libssl-dev \
     libtiff5-dev \
@@ -66,15 +60,34 @@ RUN apt-get update && apt-get install -y \
     libuv1-dev \
     libwebp-dev \
     libxml2-dev \
-    protobuf-compiler \
     webp \
     zlib1g-dev \
     texlive-xetex \
     texlive-latex-extra \
     texlive-fonts-recommended \
-    texlive-fonts-extra \
-    && kpsewhich fontawesome5.sty >/dev/null \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
+
+RUN curl -fsSL \
+    https://mirrors.ctan.org/fonts/fontawesome5.zip \
+    -o /tmp/fontawesome5.zip && \
+    unzip -q /tmp/fontawesome5.zip -d /tmp && \
+    install -d \
+      /usr/local/share/texmf/tex/latex/fontawesome5 \
+      /usr/local/share/texmf/fonts/type1/public/fontawesome5 \
+      /usr/local/share/texmf/fonts/tfm/public/fontawesome5 \
+      /usr/local/share/texmf/fonts/opentype/public/fontawesome5 \
+      /usr/local/share/texmf/fonts/enc/dvips/fontawesome5 \
+      /usr/local/share/texmf/fonts/map/dvips/fontawesome5 && \
+    cp -a /tmp/fontawesome5/tex/. /usr/local/share/texmf/tex/latex/fontawesome5/ && \
+    cp -a /tmp/fontawesome5/type1/. /usr/local/share/texmf/fonts/type1/public/fontawesome5/ && \
+    cp -a /tmp/fontawesome5/tfm/. /usr/local/share/texmf/fonts/tfm/public/fontawesome5/ && \
+    cp -a /tmp/fontawesome5/opentype/. /usr/local/share/texmf/fonts/opentype/public/fontawesome5/ && \
+    cp -a /tmp/fontawesome5/enc/. /usr/local/share/texmf/fonts/enc/dvips/fontawesome5/ && \
+    cp -a /tmp/fontawesome5/map/. /usr/local/share/texmf/fonts/map/dvips/fontawesome5/ && \
+    rm -rf /tmp/fontawesome5 /tmp/fontawesome5.zip && \
+    mktexlsr && \
+    updmap-sys --enable Map=fontawesome5.map && \
+    kpsewhich fontawesome5.sty >/dev/null
 
 RUN curl -L \
     "https://github.com/quarto-dev/quarto-cli/releases/download/v${QUARTO_VERSION}/quarto-${QUARTO_VERSION}-linux-amd64.deb" \
@@ -91,17 +104,15 @@ RUN Rscript -e "options(repos = c(CRAN='https://cloud.r-project.org/')); install
   'fontawesome','later','promises','httpuv','htmlwidgets','purrr','tibble' \
 ))"
 
-RUN Rscript -e "options(repos = c(CRAN='https://cloud.r-project.org/')); install.packages(c( \
-  'sass','bslib','rmarkdown','shiny' \
-))"
+RUN Rscript -e "options(repos = c(CRAN='https://cloud.r-project.org/')); install.packages('shiny')"
 
 RUN Rscript -e "options(repos = c(CRAN='https://cloud.r-project.org/')); install.packages(c( \
   'shinyjs','shinydashboard','shinyWidgets','shinyFiles', \
   'DT','plotly','future','rstudioapi','stringr','scales','MASS', \
   'ggplot2','cowplot','dplyr','tidyr','viridis','patchwork','reshape2', \
   'rmdformats','kableExtra','GGally','tidyverse','data.table','here', \
-  'remotes','iterators','svglite','ragg','textshaping','systemfonts', \
-  'magick','rsvg','rpart.plot','partykit','vip','broom','yardstick' \
+  'remotes','iterators', \
+  'rpart.plot','partykit','vip','broom','yardstick','sf' \
 ))"
 
 RUN Rscript -e "install.packages( \
@@ -118,7 +129,7 @@ RUN Rscript -e "required <- c( \
   'shinyjs','shinydashboard','shinyWidgets','shinyFiles', \
   'DT','plotly','rmdformats','kableExtra','tidyverse', \
   'jsonlite','curl','yaml','remotes','data.table','ggplot2','dplyr','tidyr', \
-  'rpart.plot','partykit','vip','broom','yardstick' \
+  'rpart.plot','partykit','vip','broom','yardstick','sf' \
 ); missing <- setdiff(required, rownames(installed.packages())); if (length(missing)) stop('Missing required R packages: ', paste(missing, collapse = ', '), call. = FALSE)"
 
 COPY scripts/update-kflow-runtime-packages.R /usr/local/bin/update-kflow-runtime-packages.R
