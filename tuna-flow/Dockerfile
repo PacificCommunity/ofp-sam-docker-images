@@ -62,6 +62,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libxml2-dev \
     webp \
     zlib1g-dev \
+    lmodern \
     texlive-xetex \
     texlive-latex-extra \
     texlive-fonts-recommended \
@@ -69,7 +70,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 RUN kpsewhich soul.sty >/dev/null && \
-    kpsewhich tocloft.sty >/dev/null
+    kpsewhich tocloft.sty >/dev/null && \
+    kpsewhich lmodern.sty >/dev/null
 
 RUN set -eux; \
     for url in \
