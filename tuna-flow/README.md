@@ -36,6 +36,14 @@ Keeping these tools in the image is preferred over installing them inside each
 Kflow job. Jobs start faster, logs stay cleaner, and every submitter uses the
 same optimizer versions.
 
+The image intentionally keeps the workflow-critical command-line tools but avoids
+large optional stacks that are not needed by current Kflow BET stepwise/results
+jobs, such as GDAL/PROJ/GEOS, Java, and R-only image packages like `magick`,
+`rsvg`, and `ragg`. It also avoids the very large `texlive-fonts-extra` bundle
+while installing the small `fontawesome5` LaTeX package needed by Quarto/PDF
+rendering. This keeps the full Kflow runtime smaller while preserving MFCL runs,
+Quarto report rendering, and PNG/WebP/JPEG optimization.
+
 This image is safe to publish publicly: private package source code and GitHub
 tokens are not baked into the image. Private packages are installed or updated
 only when `KFLOW_RUNTIME_UPDATE=auto` is set and `GIT_PAT` or `GITHUB_PAT` is
