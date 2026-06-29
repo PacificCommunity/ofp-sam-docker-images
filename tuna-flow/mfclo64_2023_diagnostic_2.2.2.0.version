@@ -1,0 +1,10 @@
+name: mfclo64
+version: 2.2.2.0
+source: PacificCommunity/ofp-sam-bet-2023-diagnostic
+source_commit: 81fc412
+source_path: MFCL/mfclo64
+source_plot_report: MFCL/plot-11.par.rep
+sha256: b872c4d049a305d6d89600aea50ffb5d714ab1e5083c44cc712464612dd66aa2
+installed_path: /home/mfcl/mfclo64_2023_diagnostic_2.2.2.0
+compatibility_symlinks:
+  - /home/mfcl/mfclo64_2023_diagnostic

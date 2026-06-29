@@ -23,6 +23,23 @@ Current MFCL executable:
 - sha256:
   `8aedcb3fa803609a26f4ba209c0910054cc44b9daa3ad8300c8878cd4390d6cf`
 - in-image record: `/home/mfcl/mfclo64.version`
+- compatibility paths:
+  - `/home/mfcl/mfclo64_2026`
+  - `/home/mfcl/mfclo64_2026_06_16_v2278`
+
+Historical MFCL executable for reproducing the 2023 BET diagnostic step:
+
+- installed path: `/home/mfcl/mfclo64_2023_diagnostic_2.2.2.0`
+- compatibility path: `/home/mfcl/mfclo64_2023_diagnostic`
+- version record from `MFCL/plot-11.par.rep`: `2.2.2.0`
+- source: `PacificCommunity/ofp-sam-bet-2023-diagnostic@81fc412`, path `MFCL/mfclo64`
+- sha256:
+  `b872c4d049a305d6d89600aea50ffb5d714ab1e5083c44cc712464612dd66aa2`
+- in-image record: `/home/mfcl/mfclo64_2023_diagnostic_2.2.2.0.version`
+
+The default `MFCL_EXECUTABLE` remains the current 2026 executable. Workflows that
+need to reproduce the 2023 diagnostic model should explicitly set
+`PROGRAM_PATH=/home/mfcl/mfclo64_2023_diagnostic_2.2.2.0` for that step only.
 
 Version `v1.6` also includes report image optimization tools used by BET plot
 jobs:

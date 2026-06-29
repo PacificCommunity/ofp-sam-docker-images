@@ -6,11 +6,17 @@ ARG QUARTO_VERSION=1.9.38
 ARG MFCL_EXECUTABLE_VERSION=v2278
 ARG MFCL_EXECUTABLE_DATE=2026-06-16
 ARG MFCL_EXECUTABLE_SHA256=8aedcb3fa803609a26f4ba209c0910054cc44b9daa3ad8300c8878cd4390d6cf
+ARG MFCL_2023_DIAGNOSTIC_VERSION=2.2.2.0
+ARG MFCL_2023_DIAGNOSTIC_SOURCE=PacificCommunity/ofp-sam-bet-2023-diagnostic@81fc412
+ARG MFCL_2023_DIAGNOSTIC_SHA256=b872c4d049a305d6d89600aea50ffb5d714ab1e5083c44cc712464612dd66aa2
 
 LABEL org.pacificcommunity.mfcl.executable="mfclo64"
 LABEL org.pacificcommunity.mfcl.version="${MFCL_EXECUTABLE_VERSION}"
 LABEL org.pacificcommunity.mfcl.date="${MFCL_EXECUTABLE_DATE}"
 LABEL org.pacificcommunity.mfcl.sha256="${MFCL_EXECUTABLE_SHA256}"
+LABEL org.pacificcommunity.mfcl.2023_diagnostic.version="${MFCL_2023_DIAGNOSTIC_VERSION}"
+LABEL org.pacificcommunity.mfcl.2023_diagnostic.source="${MFCL_2023_DIAGNOSTIC_SOURCE}"
+LABEL org.pacificcommunity.mfcl.2023_diagnostic.sha256="${MFCL_2023_DIAGNOSTIC_SHA256}"
 
 ENV KFLOW_RUNTIME_UPDATE=off
 ENV KFLOW_RUNTIME_UPDATE_INTERVAL_HOURS=24
@@ -20,6 +26,8 @@ ENV KFLOW_RUNTIME_REQUIRE_PRIVATE_PACKAGES=false
 ENV MFCL_EXECUTABLE=/home/mfcl/mfclo64
 ENV MFCL_EXECUTABLE_VERSION=${MFCL_EXECUTABLE_VERSION}
 ENV MFCL_EXECUTABLE_DATE=${MFCL_EXECUTABLE_DATE}
+ENV MFCL_2023_DIAGNOSTIC_EXECUTABLE=/home/mfcl/mfclo64_2023_diagnostic_2.2.2.0
+ENV MFCL_2023_DIAGNOSTIC_VERSION=${MFCL_2023_DIAGNOSTIC_VERSION}
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
     ca-certificates \
@@ -157,14 +165,19 @@ RUN mkdir -p /home/mfcl
 
 COPY mfclo64 /home/mfcl/mfclo64
 COPY mfclo64.version /home/mfcl/mfclo64.version
+COPY mfclo64_2023_diagnostic_2.2.2.0 /home/mfcl/mfclo64_2023_diagnostic_2.2.2.0
+COPY mfclo64_2023_diagnostic_2.2.2.0.version /home/mfcl/mfclo64_2023_diagnostic_2.2.2.0.version
 
 RUN chmod 0755 /home/mfcl/mfclo64 \
+      /home/mfcl/mfclo64_2023_diagnostic_2.2.2.0 \
       /usr/local/bin/30-update-kflow-runtime-packages \
       /usr/local/bin/docker-entrypoint.sh && \
-    echo "${MFCL_EXECUTABLE_SHA256}  /home/mfcl/mfclo64" | sha256sum -c -
+    echo "${MFCL_EXECUTABLE_SHA256}  /home/mfcl/mfclo64" | sha256sum -c - && \
+    echo "${MFCL_2023_DIAGNOSTIC_SHA256}  /home/mfcl/mfclo64_2023_diagnostic_2.2.2.0" | sha256sum -c -
 
 RUN ln -sf /home/mfcl/mfclo64 /home/mfcl/mfclo64_2026 && \
-    ln -sf /home/mfcl/mfclo64 /home/mfcl/mfclo64_2026_06_16_v2278
+    ln -sf /home/mfcl/mfclo64 /home/mfcl/mfclo64_2026_06_16_v2278 && \
+    ln -sf /home/mfcl/mfclo64_2023_diagnostic_2.2.2.0 /home/mfcl/mfclo64_2023_diagnostic
 
 RUN echo "copilot-enabled=1" >> /etc/rstudio/rsession.conf
 
