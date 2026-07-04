@@ -53,6 +53,17 @@ Keeping these tools in the image is preferred over installing them inside each
 Kflow job. Jobs start faster, logs stay cleaner, and every submitter uses the
 same optimizer versions.
 
+Version `v2.1` preinstalls the public RTMB toolchain used by `mfclrtmb`:
+
+- `RcppEigen`
+- `TMB`
+- `RTMB`
+
+`mfclrtmb` itself remains a runtime-installed private package, like
+`mfclshiny` and `mfclkit`, so Kflow jobs can pin a branch or commit without
+rebuilding the public image. Baking these public dependencies into the image
+avoids rebuilding `TMB` and `RTMB` from source in every Suva job.
+
 The image intentionally keeps the workflow-critical command-line tools but avoids
 large optional stacks that are not needed by current Kflow BET stepwise/results
 jobs, such as GDAL/PROJ/GEOS, Java, and R-only image packages like `magick`,

@@ -126,6 +126,10 @@ RUN Rscript -e "options(repos = c(CRAN='https://cloud.r-project.org/')); install
   'fontawesome','later','promises','httpuv','htmlwidgets','purrr','tibble' \
 ))"
 
+RUN Rscript -e "options(repos = c(CRAN='https://cloud.r-project.org/')); install.packages(c( \
+  'RcppEigen','TMB','RTMB' \
+))"
+
 RUN Rscript -e "options(repos = c(CRAN='https://cloud.r-project.org/')); install.packages('shiny')"
 
 RUN Rscript -e "options(repos = c(CRAN='https://cloud.r-project.org/')); install.packages(c( \
@@ -151,7 +155,8 @@ RUN Rscript -e "required <- c( \
   'shinyjs','shinydashboard','shinyWidgets','shinyFiles', \
   'DT','plotly','rmdformats','kableExtra','tidyverse', \
   'jsonlite','curl','yaml','remotes','data.table','ggplot2','dplyr','tidyr', \
-  'rpart.plot','partykit','vip','broom','yardstick','sf','maps' \
+  'rpart.plot','partykit','vip','broom','yardstick','sf','maps', \
+  'RcppEigen','TMB','RTMB' \
 ); missing <- setdiff(required, rownames(installed.packages())); if (length(missing)) stop('Missing required R packages: ', paste(missing, collapse = ', '), call. = FALSE)"
 
 COPY scripts/update-kflow-runtime-packages.R /usr/local/bin/update-kflow-runtime-packages.R
