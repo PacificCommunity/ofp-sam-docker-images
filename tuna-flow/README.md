@@ -3,6 +3,7 @@
 Docker image for running tuna assessment Kflow workflows:
 
 ```text
+ghcr.io/pacificcommunity/tuna-flow:v2.2
 ghcr.io/pacificcommunity/tuna-flow:latest
 ```
 
@@ -18,14 +19,15 @@ job stages:
 Current MFCL executable:
 
 - installed path: `/home/mfcl/mfclo64`
-- version record: `v2278`
-- executable date: `2026-06-16`
+- MULTIFAN-CL version: `2.2.7.9`
+- version code: `v2279`
+- executable date: `2026-07-11`
 - sha256:
-  `8aedcb3fa803609a26f4ba209c0910054cc44b9daa3ad8300c8878cd4390d6cf`
+  `02e12dbdf2a564983e9fb50baf095ff472ba3831f71ecc0e3082f49478dac723`
 - in-image record: `/home/mfcl/mfclo64.version`
 - compatibility paths:
   - `/home/mfcl/mfclo64_2026`
-  - `/home/mfcl/mfclo64_2026_06_16_v2278`
+  - `/home/mfcl/mfclo64_2026_07_11_v2279`
 
 Historical MFCL executable for reproducing the 2023 BET diagnostic step:
 

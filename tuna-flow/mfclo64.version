@@ -1,8 +1,9 @@
 name: mfclo64
-version: v2278
-date: 2026-06-16
-sha256: 8aedcb3fa803609a26f4ba209c0910054cc44b9daa3ad8300c8878cd4390d6cf
+version: 2.2.7.9
+version_code: v2279
+date: 2026-07-11
+sha256: 02e12dbdf2a564983e9fb50baf095ff472ba3831f71ecc0e3082f49478dac723
 installed_path: /home/mfcl/mfclo64
 compatibility_symlinks:
   - /home/mfcl/mfclo64_2026
-  - /home/mfcl/mfclo64_2026_06_16_v2278
+  - /home/mfcl/mfclo64_2026_07_11_v2279
