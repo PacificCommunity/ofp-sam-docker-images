@@ -148,10 +148,14 @@ RUN Rscript -e "options(repos = c(CRAN='https://cloud.r-project.org/')); install
 
 # vip 0.4.6 is temporarily unavailable from CRAN for R 4.6. Install the
 # matching upstream release commit explicitly to keep its existing API stable.
+RUN Rscript -e "options(repos = c(CRAN='https://cloud.r-project.org/')); install.packages('foreach'); \
+if (!requireNamespace('foreach', quietly = TRUE)) stop('foreach installation failed', call. = FALSE)"
+
 RUN Rscript -e "remotes::install_github( \
   paste0('koalaverse/vip@', '${VIP_COMMIT}'), \
   dependencies = FALSE, upgrade = 'never' \
-)"
+); if (!requireNamespace('vip', quietly = TRUE)) stop('vip installation failed', call. = FALSE); \
+if (as.character(utils::packageVersion('vip')) != '0.4.6') stop('Unexpected vip version: ', utils::packageVersion('vip'), call. = FALSE)"
 
 RUN Rscript -e "install.packages( \
   'FLCore', \
