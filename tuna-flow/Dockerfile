@@ -3,6 +3,7 @@
 FROM rocker/rstudio:4.6.0
 
 ARG QUARTO_VERSION=1.9.38
+ARG VIP_COMMIT=c5b90e78c64adc440f6742f69d364c3a711e10e1
 ARG MFCL_EXECUTABLE_VERSION=v2279
 ARG MFCL_EXECUTABLE_FULL_VERSION=2.2.7.9
 ARG MFCL_EXECUTABLE_DATE=2026-07-11
@@ -142,8 +143,15 @@ RUN Rscript -e "options(repos = c(CRAN='https://cloud.r-project.org/')); install
   'ggplot2','cowplot','dplyr','tidyr','viridis','patchwork','reshape2', \
   'rmdformats','kableExtra','GGally','tidyverse','data.table','here', \
   'remotes','iterators','maps', \
-  'rpart.plot','partykit','vip','broom','yardstick','sf' \
+  'rpart.plot','partykit','broom','yardstick','sf' \
 ))"
+
+# vip 0.4.6 is temporarily unavailable from CRAN for R 4.6. Install the
+# matching upstream release commit explicitly to keep its existing API stable.
+RUN Rscript -e "remotes::install_github( \
+  paste0('koalaverse/vip@', '${VIP_COMMIT}'), \
+  dependencies = FALSE, upgrade = 'never' \
+)"
 
 RUN Rscript -e "install.packages( \
   'FLCore', \
