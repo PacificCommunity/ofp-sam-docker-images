@@ -3,6 +3,7 @@
 Docker image for running tuna assessment Kflow workflows:
 
 ```text
+ghcr.io/pacificcommunity/tuna-flow:v2.3
 ghcr.io/pacificcommunity/tuna-flow:v2.2
 ghcr.io/pacificcommunity/tuna-flow:latest
 ```
@@ -19,15 +20,33 @@ job stages:
 Current MFCL executable:
 
 - installed path: `/home/mfcl/mfclo64`
-- MULTIFAN-CL version: `2.2.7.9`
+- MULTIFAN-CL base version: `2.2.7.9`
 - version code: `v2279`
-- executable date: `2026-07-11`
+- custom build date: `2026-07-14`
+- source: `PacificCommunity/ofp-sam-mfcl@de4abeca920063bf234ce66ec3a0f043c56e885f`
+- variant: `realtag-exact-expectation`
 - sha256:
-  `02e12dbdf2a564983e9fb50baf095ff472ba3831f71ecc0e3082f49478dac723`
+  `c0b2d6234c5cd254934b60b7f0b5eac9b16ae03f84c41d827daa972310244e76`
 - in-image record: `/home/mfcl/mfclo64.version`
 - compatibility paths:
   - `/home/mfcl/mfclo64_2026`
   - `/home/mfcl/mfclo64_2026_07_11_v2279`
+  - `/home/mfcl/mfclo64_2026_07_14_v2279_realtag_exact`
+
+`tuna-flow:v2.3` contains a custom build based on MULTIFAN-CL 2.2.7.9. The
+native real-tag simulation path writes its deterministic pre-draw annual
+expectation to `report.realtag_expectation_annual.tsv`.
+
+The output is compact: the validated BET example contains 2,485 data rows and
+is 83,863 bytes (about 82 KiB). Its columns are recapture year, fishery,
+recapture region, and expected recaptures.
+
+The exact-expectation output adds no random-number calls. In a fixed-input,
+fixed-seed BET self-test, the standard stochastic tag report was byte-identical
+between the production 2.2.7.9 executable and this build. Across 30 seeds, the
+simulated recaptures were centred on the exported expectation. The ordinary
+assessment fitting path is unchanged. Image tag `v2.2` remains available for
+the unmodified 2026-07-11 executable.
 
 Historical MFCL executable for reproducing the 2023 BET diagnostic step:
 

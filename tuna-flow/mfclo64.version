@@ -1,9 +1,15 @@
 name: mfclo64
 version: 2.2.7.9
 version_code: v2279
-date: 2026-07-11
-sha256: 02e12dbdf2a564983e9fb50baf095ff472ba3831f71ecc0e3082f49478dac723
+date: 2026-07-14
+upstream_release_date: 2026-07-11
+variant: realtag-exact-expectation
+source: PacificCommunity/ofp-sam-mfcl@de4abeca920063bf234ce66ec3a0f043c56e885f
+sha256: c0b2d6234c5cd254934b60b7f0b5eac9b16ae03f84c41d827daa972310244e76
 installed_path: /home/mfcl/mfclo64
+features:
+  - native real-tag annual exact-expectation TSV output
 compatibility_symlinks:
   - /home/mfcl/mfclo64_2026
   - /home/mfcl/mfclo64_2026_07_11_v2279
+  - /home/mfcl/mfclo64_2026_07_14_v2279_realtag_exact
