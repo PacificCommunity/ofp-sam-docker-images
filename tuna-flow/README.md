@@ -3,6 +3,7 @@
 Docker image for running tuna assessment Kflow workflows:
 
 ```text
+ghcr.io/pacificcommunity/tuna-flow:v2.4
 ghcr.io/pacificcommunity/tuna-flow:v2.3
 ghcr.io/pacificcommunity/tuna-flow:v2.2
 ghcr.io/pacificcommunity/tuna-flow:latest
@@ -21,32 +22,34 @@ Current MFCL executable:
 
 - installed path: `/home/mfcl/mfclo64`
 - MULTIFAN-CL base version: `2.2.7.9`
-- version code: `v2279`
+- image executable version: `2.4.0-strict-tag-nb`
+- version code: `v24-strict-tag-nb`
 - custom build date: `2026-07-14`
-- source: `PacificCommunity/ofp-sam-mfcl@de4abeca920063bf234ce66ec3a0f043c56e885f`
-- variant: `realtag-exact-expectation`
+- source: `kyuhank/ofp-sam-mfcl@fe1fc5e`
+- base source: `PacificCommunity/ofp-sam-mfcl@de4abeca920063bf234ce66ec3a0f043c56e885f`
+- variant: `strict-tag-nb`
 - sha256:
-  `c0b2d6234c5cd254934b60b7f0b5eac9b16ae03f84c41d827daa972310244e76`
+  `bb7cf890bc143313e418abb76c714b27bf08f3c61a22a4c2f532d39e69c4145c`
 - in-image record: `/home/mfcl/mfclo64.version`
 - compatibility paths:
   - `/home/mfcl/mfclo64_2026`
-  - `/home/mfcl/mfclo64_2026_07_11_v2279`
-  - `/home/mfcl/mfclo64_2026_07_14_v2279_realtag_exact`
+  - `/home/mfcl/mfclo64_2026_07_14_v24_strict_tag_nb`
 
-`tuna-flow:v2.3` contains a custom build based on MULTIFAN-CL 2.2.7.9. The
-native real-tag simulation path writes its deterministic pre-draw annual
-expectation to `report.realtag_expectation_annual.tsv`.
+`tuna-flow:v2.4` contains a custom build based on MULTIFAN-CL 2.2.7.9 with an
+experimental strict conditional post-mixing tag bootstrap interface. The
+ordinary assessment path is unchanged when the strict tag environment variables
+are not set. The local qualification artifact showed byte-identical inactive
+behaviour against the 2.2.7.9 base and validated the native conditional tag
+cell export, sparse negative-binomial draw, truth preflight, receipt checks, and
+a short frozen-refit optimizer smoke test.
 
-The output is compact: the validated BET example contains 2,485 data rows and
-is 83,863 bytes (about 82 KiB). Its columns are recapture year, fishery,
-recapture region, and expected recaptures.
+The strict tag sidecar is compact because it stores only non-zero pseudo cells.
+It is used by `mfclkit` self-test diagnostics when the fitted model flags match
+the supported native v6 interface. Unsupported tag likelihood routes continue
+to use the established mechanistic `sim_realtag` process simulator.
 
-The exact-expectation output adds no random-number calls. In a fixed-input,
-fixed-seed BET self-test, the standard stochastic tag report was byte-identical
-between the production 2.2.7.9 executable and this build. Across 30 seeds, the
-simulated recaptures were centred on the exported expectation. The ordinary
-assessment fitting path is unchanged. Image tag `v2.2` remains available for
-the unmodified 2026-07-11 executable.
+Image tag `v2.3` remains available for the native real-tag expectation build,
+and `v2.2` remains available for the unmodified 2026-07-11 executable.
 
 Historical MFCL executable for reproducing the 2023 BET diagnostic step:
 

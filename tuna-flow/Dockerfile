@@ -4,12 +4,12 @@ FROM rocker/rstudio:4.6.0
 
 ARG QUARTO_VERSION=1.9.38
 ARG VIP_COMMIT=c5b90e78c64adc440f6742f69d364c3a711e10e1
-ARG MFCL_EXECUTABLE_VERSION=v2279
-ARG MFCL_EXECUTABLE_FULL_VERSION=2.2.7.9
+ARG MFCL_EXECUTABLE_VERSION=v24-strict-tag-nb
+ARG MFCL_EXECUTABLE_FULL_VERSION=2.4.0-strict-tag-nb
 ARG MFCL_EXECUTABLE_DATE=2026-07-14
-ARG MFCL_EXECUTABLE_SHA256=c0b2d6234c5cd254934b60b7f0b5eac9b16ae03f84c41d827daa972310244e76
-ARG MFCL_EXECUTABLE_VARIANT=realtag-exact-expectation
-ARG MFCL_EXECUTABLE_SOURCE=PacificCommunity/ofp-sam-mfcl@de4abeca920063bf234ce66ec3a0f043c56e885f
+ARG MFCL_EXECUTABLE_SHA256=bb7cf890bc143313e418abb76c714b27bf08f3c61a22a4c2f532d39e69c4145c
+ARG MFCL_EXECUTABLE_VARIANT=strict-tag-nb
+ARG MFCL_EXECUTABLE_SOURCE=kyuhank/ofp-sam-mfcl@fe1fc5e
 ARG MFCL_2023_DIAGNOSTIC_VERSION=2.2.2.0
 ARG MFCL_2023_DIAGNOSTIC_SOURCE=PacificCommunity/ofp-sam-bet-2023-diagnostic@81fc412
 ARG MFCL_2023_DIAGNOSTIC_SHA256=b872c4d049a305d6d89600aea50ffb5d714ab1e5083c44cc712464612dd66aa2
@@ -203,8 +203,7 @@ RUN chmod 0755 /home/mfcl/mfclo64 \
     echo "${MFCL_2023_DIAGNOSTIC_SHA256}  /home/mfcl/mfclo64_2023_diagnostic_2.2.2.0" | sha256sum -c -
 
 RUN ln -sf /home/mfcl/mfclo64 /home/mfcl/mfclo64_2026 && \
-    ln -sf /home/mfcl/mfclo64 /home/mfcl/mfclo64_2026_07_11_v2279 && \
-    ln -sf /home/mfcl/mfclo64 /home/mfcl/mfclo64_2026_07_14_v2279_realtag_exact && \
+    ln -sf /home/mfcl/mfclo64 /home/mfcl/mfclo64_2026_07_14_v24_strict_tag_nb && \
     ln -sf /home/mfcl/mfclo64_2023_diagnostic_2.2.2.0 /home/mfcl/mfclo64_2023_diagnostic
 
 RUN echo "copilot-enabled=1" >> /etc/rstudio/rsession.conf
