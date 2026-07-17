@@ -3,6 +3,7 @@
 Docker image for running tuna assessment Kflow workflows:
 
 ```text
+ghcr.io/pacificcommunity/tuna-flow:v2.5
 ghcr.io/pacificcommunity/tuna-flow:v2.4
 ghcr.io/pacificcommunity/tuna-flow:v2.3
 ghcr.io/pacificcommunity/tuna-flow:v2.2
@@ -22,22 +23,25 @@ Current MFCL executable:
 
 - installed path: `/home/mfcl/mfclo64`
 - MULTIFAN-CL base version: `2.2.7.9`
-- image executable version: `2.4.0-strict-tag-nb`
-- version code: `v24-strict-tag-nb`
-- custom build date: `2026-07-14`
-- source: `kyuhank/ofp-sam-mfcl@fe1fc5e`
+- image executable version: `2.5.0-strict-tag-nb-dm-report`
+- version code: `v25-strict-tag-nb-dm-report`
+- custom build date: `2026-07-18`
+- source: `kyuhank/ofp-sam-mfcl@1321ccd`
 - base source: `PacificCommunity/ofp-sam-mfcl@de4abeca920063bf234ce66ec3a0f043c56e885f`
-- variant: `strict-tag-nb`
+- variant: `strict-tag-nb-dm-report`
 - sha256:
-  `bb7cf890bc143313e418abb76c714b27bf08f3c61a22a4c2f532d39e69c4145c`
+  `f5bc1e232a86e51f920bce7271d8e0930d0b160e4d18dc46de44078f0fa24cd0`
 - in-image record: `/home/mfcl/mfclo64.version`
 - compatibility paths:
   - `/home/mfcl/mfclo64_2026`
-  - `/home/mfcl/mfclo64_2026_07_14_v24_strict_tag_nb`
+  - `/home/mfcl/mfclo64_2026_07_18_v25_strict_tag_nb_dm_report`
 
-`tuna-flow:v2.4` contains a custom build based on MULTIFAN-CL 2.2.7.9 with an
-experimental strict conditional post-mixing tag bootstrap interface. The
-ordinary assessment path is unchanged when the strict tag environment variables
+`tuna-flow:v2.5` contains a custom build based on MULTIFAN-CL 2.2.7.9 with the
+experimental strict conditional post-mixing tag bootstrap interface from
+`v2.4`. It also guards DM report generation when an internal LF or WF
+composition group vector is not allocated. This prevents a post-fit report
+segmentation fault without changing the model likelihood or fitted parameters.
+The ordinary assessment path is unchanged when the strict tag environment variables
 are not set. The local qualification artifact showed byte-identical inactive
 behaviour against the 2.2.7.9 base and validated the native conditional tag
 cell export, sparse negative-binomial draw, truth preflight, receipt checks, and
@@ -48,8 +52,9 @@ It is used by `mfclkit` self-test diagnostics when the fitted model flags match
 the supported native v6 interface. Unsupported tag likelihood routes continue
 to use the established mechanistic `sim_realtag` process simulator.
 
-Image tag `v2.3` remains available for the native real-tag expectation build,
-and `v2.2` remains available for the unmodified 2026-07-11 executable.
+Image tag `v2.4` remains available for the original strict-tag build, `v2.3`
+remains available for the native real-tag expectation build, and `v2.2`
+remains available for the unmodified 2026-07-11 executable.
 
 Historical MFCL executable for reproducing the 2023 BET diagnostic step:
 

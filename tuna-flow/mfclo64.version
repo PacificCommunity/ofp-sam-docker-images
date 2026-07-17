@@ -1,14 +1,15 @@
 name: mfclo64
-version: 2.4.0-strict-tag-nb
-version_code: v24-strict-tag-nb
-date: 2026-07-14
-source: kyuhank/ofp-sam-mfcl@fe1fc5e
+version: 2.5.0-strict-tag-nb-dm-report
+version_code: v25-strict-tag-nb-dm-report
+date: 2026-07-18
+source: kyuhank/ofp-sam-mfcl@1321ccd
 base_source: PacificCommunity/ofp-sam-mfcl@de4abeca920063bf234ce66ec3a0f043c56e885f
-sha256: bb7cf890bc143313e418abb76c714b27bf08f3c61a22a4c2f532d39e69c4145c
+sha256: f5bc1e232a86e51f920bce7271d8e0930d0b160e4d18dc46de44078f0fa24cd0
 installed_path: /home/mfcl/mfclo64
 compatibility_symlinks:
   - /home/mfcl/mfclo64_2026
-  - /home/mfcl/mfclo64_2026_07_14_v24_strict_tag_nb
+  - /home/mfcl/mfclo64_2026_07_18_v25_strict_tag_nb_dm_report
 notes:
   - Experimental strict conditional post-mixing tag bootstrap interface for MFCL self-test diagnostics.
   - Inactive behavior was parity-checked against MFCL 2.2.7.9 in the local validation artifact.
+  - DM report generation safely derives LF and WF group vectors when an internal composition group vector is not allocated.
