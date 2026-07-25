@@ -1,15 +1,15 @@
 name: mfclo64
-version: 2.5.0-strict-tag-nb-dm-report
-version_code: v25-strict-tag-nb-dm-report
-date: 2026-07-18
-source: kyuhank/ofp-sam-mfcl@1321ccd
-base_source: PacificCommunity/ofp-sam-mfcl@de4abeca920063bf234ce66ec3a0f043c56e885f
-sha256: f5bc1e232a86e51f920bce7271d8e0930d0b160e4d18dc46de44078f0fa24cd0
+version: 2.6.0-tag-premixing-reporting-rate-fix
+version_code: v26-tag-premix-rr-fix
+date: 2026-07-26
+source: PacificCommunity/ofp-sam-mfcl@a5a83cd
+base_source: PacificCommunity/ofp-sam-mfcl@aad7241ca72634ef7509038e1bcb5fcfb957df04
+sha256: 13f5b1b6a8873cfd9afc850b3bdcb46d5bb62d28dcc70604362e4c89b29fb682
 installed_path: /home/mfcl/mfclo64
 compatibility_symlinks:
   - /home/mfcl/mfclo64_2026
-  - /home/mfcl/mfclo64_2026_07_18_v25_strict_tag_nb_dm_report
+  - /home/mfcl/mfclo64_2026_07_26_v26_tag_premix_rr_fix
 notes:
-  - Experimental strict conditional post-mixing tag bootstrap interface for MFCL self-test diagnostics.
-  - Inactive behavior was parity-checked against MFCL 2.2.7.9 in the local validation artifact.
-  - DM report generation safely derives LF and WF group vectors when an internal composition group vector is not allocated.
+  - Includes the strict conditional post-mixing tag bootstrap interface and the DM report guard from tuna-flow v2.5.
+  - Applies tag flag 2 consistently by excluding reporting rates from expected tag returns during pre-mixing periods.
+  - Post-mixing calculations and tag flag 2 = 0 behavior are unchanged.
