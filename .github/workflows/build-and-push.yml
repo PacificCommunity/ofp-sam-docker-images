@@ -121,6 +121,14 @@ jobs:
               IMAGE_PACKAGE="tuna-flow-private"
             fi
 
+            # A private runtime must be published under an explicit reviewed
+            # version. This avoids an unrelated main-branch push replacing its
+            # immutable release tag or unexpectedly creating a new version.
+            if [ "$dir" = "tuna-flow" ] && [ "${{ github.event_name }}" != "workflow_dispatch" ]; then
+              echo "Skipping tuna-flow on push; publish it with workflow_dispatch and an explicit version."
+              continue
+            fi
+
             # If user specified a version, use it; otherwise auto-detect
             if [ -n "$USER_SPECIFIED_VERSION" ]; then
               NEW_VERSION="$USER_SPECIFIED_VERSION"
