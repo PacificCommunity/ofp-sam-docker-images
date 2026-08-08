@@ -4,12 +4,20 @@ FROM rocker/rstudio:4.6.0
 
 ARG QUARTO_VERSION=1.9.38
 ARG VIP_COMMIT=c5b90e78c64adc440f6742f69d364c3a711e10e1
-ARG MFCL_EXECUTABLE_VERSION=v26-tag-premix-rr-fix
-ARG MFCL_EXECUTABLE_FULL_VERSION=2.6.0-tag-premixing-reporting-rate-fix
-ARG MFCL_EXECUTABLE_DATE=2026-07-26
-ARG MFCL_EXECUTABLE_SHA256=13f5b1b6a8873cfd9afc850b3bdcb46d5bb62d28dcc70604362e4c89b29fb682
-ARG MFCL_EXECUTABLE_VARIANT=tag-premixing-reporting-rate-fix
-ARG MFCL_EXECUTABLE_SOURCE=PacificCommunity/ofp-sam-mfcl@a5a83cd
+ARG FLCORE_COMMIT=0642117cb7b66d398abc084f814c7c8b4a12dc8d
+ARG FLR4MFCL_COMMIT=5a29a9b3246bd19dcff350ded7e0e5099145da5e
+ARG CONDORBOX_COMMIT=9ceeb908fdb46b30e00e04aa531184e1727b3227
+ARG TANDOORI_COMMIT=270031c8ff9afa15fa836a9d082152eddaa84363
+ARG KFLOWKIT_COMMIT=934ceccce062d1d659348ac95f9e8c8e20bcf979
+ARG MFCLRTMB_COMMIT=92f2878b9d1e17cc2a8b4b011bd791e562ddd477
+ARG MFCLKIT_COMMIT=44abaaa05692db7ae3e0ec0e52250c51714d1e50
+ARG MFCLSHINY_COMMIT=d76d3cebb3007c633ae64ee8f96cb75632b7d79c
+ARG MFCL_EXECUTABLE_VERSION=v25-strict-tag-nb-dm-report
+ARG MFCL_EXECUTABLE_FULL_VERSION=2.5.0-strict-tag-nb-dm-report
+ARG MFCL_EXECUTABLE_DATE=2026-07-18
+ARG MFCL_EXECUTABLE_SHA256=f5bc1e232a86e51f920bce7271d8e0930d0b160e4d18dc46de44078f0fa24cd0
+ARG MFCL_EXECUTABLE_VARIANT=strict-tag-nb-dm-report
+ARG MFCL_EXECUTABLE_SOURCE=kyuhank/ofp-sam-mfcl@1321ccd
 ARG MFCL_2023_DIAGNOSTIC_VERSION=2.2.2.0
 ARG MFCL_2023_DIAGNOSTIC_SOURCE=PacificCommunity/ofp-sam-bet-2023-diagnostic@81fc412
 ARG MFCL_2023_DIAGNOSTIC_SHA256=b872c4d049a305d6d89600aea50ffb5d714ab1e5083c44cc712464612dd66aa2
@@ -26,10 +34,7 @@ LABEL org.pacificcommunity.mfcl.2023_diagnostic.source="${MFCL_2023_DIAGNOSTIC_S
 LABEL org.pacificcommunity.mfcl.2023_diagnostic.sha256="${MFCL_2023_DIAGNOSTIC_SHA256}"
 
 ENV KFLOW_RUNTIME_UPDATE=off
-ENV KFLOW_RUNTIME_UPDATE_INTERVAL_HOURS=24
-ENV KFLOW_RUNTIME_QUIET_INSTALL=true
-ENV KFLOW_RUNTIME_LIBRARY=/home/rstudio/R/site-library
-ENV KFLOW_RUNTIME_REQUIRE_PRIVATE_PACKAGES=false
+ENV KFLOW_RUNTIME_PACKAGES=none
 ENV MFCL_EXECUTABLE=/home/mfcl/mfclo64
 ENV MFCL_EXECUTABLE_VERSION=${MFCL_EXECUTABLE_VERSION}
 ENV MFCL_EXECUTABLE_FULL_VERSION=${MFCL_EXECUTABLE_FULL_VERSION}
@@ -147,7 +152,7 @@ RUN Rscript -e "options(repos = c(CRAN='https://cloud.r-project.org/')); install
   'shinyjs','shinydashboard','shinyWidgets','shinyFiles', \
   'DT','plotly','future','rstudioapi','stringr','scales','MASS', \
   'ggplot2','cowplot','dplyr','tidyr','viridis','patchwork','reshape2', \
-  'rmdformats','kableExtra','GGally','tidyverse','data.table','here', \
+  'rmdformats','kableExtra','GGally','tidyverse','data.table','here','ragg', \
   'remotes','iterators','maps', \
   'rpart.plot','partykit','broom','yardstick','sf' \
 ))"
@@ -163,14 +168,21 @@ RUN Rscript -e "remotes::install_github( \
 ); if (!requireNamespace('vip', quietly = TRUE)) stop('vip installation failed', call. = FALSE); \
 if (as.character(utils::packageVersion('vip')) != '0.4.6') stop('Unexpected vip version: ', utils::packageVersion('vip'), call. = FALSE)"
 
-RUN Rscript -e "install.packages( \
-  'FLCore', \
-  repos = c('https://flr.r-universe.dev', 'https://cloud.r-project.org') \
-)"
+RUN Rscript -e "remotes::install_github('flr/FLCore@${FLCORE_COMMIT}', dependencies = FALSE, upgrade = 'never')"
+RUN Rscript -e "remotes::install_github('PacificCommunity/ofp-sam-flr4mfcl@${FLR4MFCL_COMMIT}', dependencies = FALSE, upgrade = 'never')"
+RUN Rscript -e "remotes::install_github('PacificCommunity/ofp-sam-CondorBox@${CONDORBOX_COMMIT}', dependencies = FALSE, upgrade = 'never')"
+RUN Rscript -e "remotes::install_github('PacificCommunity/tandoori@${TANDOORI_COMMIT}', dependencies = FALSE, upgrade = 'never')"
 
-RUN Rscript -e "remotes::install_github('PacificCommunity/ofp-sam-flr4mfcl', upgrade = 'never')"
-RUN Rscript -e "remotes::install_github('PacificCommunity/ofp-sam-CondorBox', upgrade = 'never')"
-RUN Rscript -e "remotes::install_github('PacificCommunity/tandoori', upgrade = 'never')"
+# The token is mounted only while this layer is built. It is neither copied into
+# the image nor printed. All private packages are pinned to immutable commits.
+RUN --mount=type=secret,id=github_pat,required=true \
+    Rscript -e "token <- trimws(readLines('/run/secrets/github_pat', warn = FALSE)[1]); \
+      if (!nzchar(token)) stop('github_pat build secret is empty', call. = FALSE); \
+      install <- function(repo) remotes::install_github(repo, auth_token = token, dependencies = FALSE, upgrade = 'never'); \
+      install('kyuhank/KflowKit@${KFLOWKIT_COMMIT}'); \
+      install('PacificCommunity/ofp-sam-mfclrtmb@${MFCLRTMB_COMMIT}'); \
+      install('PacificCommunity/ofp-sam-mfclkit@${MFCLKIT_COMMIT}'); \
+      install('PacificCommunity/mfclshiny@${MFCLSHINY_COMMIT}')"
 
 RUN Rscript -e "required <- c( \
   'fs','sass','bslib','rmarkdown','shiny','htmlwidgets', \
@@ -178,12 +190,22 @@ RUN Rscript -e "required <- c( \
   'DT','plotly','rmdformats','kableExtra','tidyverse', \
   'jsonlite','curl','yaml','remotes','data.table','ggplot2','dplyr','tidyr', \
   'rpart.plot','partykit','vip','broom','yardstick','sf','maps', \
-  'RcppEigen','TMB','RTMB' \
+  'RcppEigen','TMB','RTMB','FLCore','FLR4MFCL','CondorBox','tandoori', \
+  'KflowKit','mfclrtmb','mfclkit','mfclshiny' \
 ); missing <- setdiff(required, rownames(installed.packages())); if (length(missing)) stop('Missing required R packages: ', paste(missing, collapse = ', '), call. = FALSE)"
 
-COPY scripts/update-kflow-runtime-packages.R /usr/local/bin/update-kflow-runtime-packages.R
-COPY scripts/30-update-kflow-runtime-packages /usr/local/bin/30-update-kflow-runtime-packages
+COPY scripts/verify-bundled-r-packages.R /usr/local/bin/verify-bundled-r-packages.R
 COPY scripts/docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
+
+RUN Rscript /usr/local/bin/verify-bundled-r-packages.R \
+    --flcore=${FLCORE_COMMIT} \
+    --flr4mfcl=${FLR4MFCL_COMMIT} \
+    --condorbox=${CONDORBOX_COMMIT} \
+    --tandoori=${TANDOORI_COMMIT} \
+    --kflowkit=${KFLOWKIT_COMMIT} \
+    --mfclrtmb=${MFCLRTMB_COMMIT} \
+    --mfclkit=${MFCLKIT_COMMIT} \
+    --mfclshiny=${MFCLSHINY_COMMIT}
 
 RUN chmod -R 777 /var/lib/rstudio-server && \
     chmod -R 777 /home/rstudio
@@ -197,13 +219,12 @@ COPY mfclo64_2023_diagnostic_2.2.2.0.version /home/mfcl/mfclo64_2023_diagnostic_
 
 RUN chmod 0755 /home/mfcl/mfclo64 \
       /home/mfcl/mfclo64_2023_diagnostic_2.2.2.0 \
-      /usr/local/bin/30-update-kflow-runtime-packages \
       /usr/local/bin/docker-entrypoint.sh && \
     echo "${MFCL_EXECUTABLE_SHA256}  /home/mfcl/mfclo64" | sha256sum -c - && \
     echo "${MFCL_2023_DIAGNOSTIC_SHA256}  /home/mfcl/mfclo64_2023_diagnostic_2.2.2.0" | sha256sum -c -
 
 RUN ln -sf /home/mfcl/mfclo64 /home/mfcl/mfclo64_2026 && \
-    ln -sf /home/mfcl/mfclo64 /home/mfcl/mfclo64_2026_07_26_v26_tag_premix_rr_fix && \
+    ln -sf /home/mfcl/mfclo64 /home/mfcl/mfclo64_2026_07_18_v25_strict_tag_nb_dm_report && \
     ln -sf /home/mfcl/mfclo64_2023_diagnostic_2.2.2.0 /home/mfcl/mfclo64_2023_diagnostic
 
 RUN echo "copilot-enabled=1" >> /etc/rstudio/rsession.conf
