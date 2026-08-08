@@ -213,6 +213,7 @@ jobs:
             if [ "$dir" = "tuna-flow" ]; then
               docker run --rm --entrypoint /bin/bash "$IMAGE_NAME:v$NEW_VERSION" -lc '
                 test -x /home/mfcl/mfclo64
+                quarto --version
                 Rscript -e "required <- c(\"FLCore\", \"FLR4MFCL\", \"CondorBox\", \"tandoori\", \"KflowKit\", \"mfclrtmb\", \"mfclkit\", \"mfclshiny\"); missing <- setdiff(required, rownames(installed.packages())); if (length(missing)) stop(paste(\"Missing bundled R packages:\", paste(missing, collapse = \", \")))"
               '
             fi
