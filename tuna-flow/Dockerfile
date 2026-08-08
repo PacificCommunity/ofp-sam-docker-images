@@ -136,7 +136,7 @@ RUN curl -L \
 
 RUN Rscript -e "options(repos = c(CRAN='https://cloud.r-project.org/')); install.packages(c( \
   'Rcpp','cpp11','cli','glue','rlang','lifecycle','vctrs','withr', \
-  'jsonlite','curl','openssl','sys','processx','callr','desc','pkgload', \
+  'jsonlite','curl','openssl','sys','processx','callr','desc','pkgload','testthat', \
   'fs','cachem','memoise','mime','base64enc','digest','fastmap', \
   'yaml','evaluate','xfun','highr','knitr','htmltools','jquerylib', \
   'fontawesome','later','promises','httpuv','htmlwidgets','purrr','tibble' \
