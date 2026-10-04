@@ -9,6 +9,7 @@ ENV PYTHONDONTWRITEBYTECODE=1 PYTHONUNBUFFERED=1 \
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
     python3 python-is-python3 ca-certificates curl build-essential fonts-dejavu-core \
+    pkg-config libuv1-dev \
     && rm -rf /var/lib/apt/lists/*
 
 RUN curl --fail --location --retry 3 \
