@@ -1,0 +1,238 @@
+{
+  "schema_version": 1,
+  "packages": [
+    {
+      "name": "jsonlite",
+      "version": "2.0.0",
+      "url": "https://cran.r-project.org/src/contrib/jsonlite_2.0.0.tar.gz",
+      "filename": "jsonlite_2.0.0.tar.gz",
+      "sha256": "75eb910c82b350ec33f094779da0f87bff154c232e4ae39c9896a9b89f3ac82d",
+      "bytes": 1055849
+    },
+    {
+      "name": "Rcpp",
+      "version": "1.1.2",
+      "url": "https://cran.r-project.org/src/contrib/Rcpp_1.1.2.tar.gz",
+      "filename": "Rcpp_1.1.2.tar.gz",
+      "sha256": "2746cf2fb188e5f0a84dbf5c8f68915b54564ed33e5754572f174e7b32e7f4f3",
+      "bytes": 1892159
+    },
+    {
+      "name": "RcppEigen",
+      "version": "0.3.4.0.2",
+      "url": "https://cran.r-project.org/src/contrib/RcppEigen_0.3.4.0.2.tar.gz",
+      "filename": "RcppEigen_0.3.4.0.2.tar.gz",
+      "sha256": "ecad7ba2129fd48b7ebb825558d38492ed1f3a8934959e27fcd6688175e542bb",
+      "bytes": 1761745
+    },
+    {
+      "name": "TMB",
+      "version": "1.9.25",
+      "url": "https://cran.r-project.org/src/contrib/TMB_1.9.25.tar.gz",
+      "filename": "TMB_1.9.25.tar.gz",
+      "sha256": "cf9663b29949cd5eaccb32e11900c9e07caec7d6ac4f17cfd938317dc33acff2",
+      "bytes": 781382
+    },
+    {
+      "name": "RTMB",
+      "version": "2.0",
+      "url": "https://cran.r-project.org/src/contrib/RTMB_2.0.tar.gz",
+      "filename": "RTMB_2.0.tar.gz",
+      "sha256": "a87b21eb5b30071c702b6b45866dfd2ee2aee51d78da0cbf4fdab5d7c1454635",
+      "bytes": 684988
+    },
+    {
+      "name": "evaluate",
+      "version": "1.0.5",
+      "url": "https://cran.r-project.org/src/contrib/evaluate_1.0.5.tar.gz",
+      "filename": "evaluate_1.0.5.tar.gz",
+      "sha256": "47aac79f889a828a5f8b4756cb972d7c2966bb984cbae17a4bd2389a73270794",
+      "bytes": 39322
+    },
+    {
+      "name": "xfun",
+      "version": "0.61",
+      "url": "https://cran.r-project.org/src/contrib/xfun_0.61.tar.gz",
+      "filename": "xfun_0.61.tar.gz",
+      "sha256": "b0deb0e2aff784e511545193e5583fc2df3a98bc877287280f19341661769530",
+      "bytes": 205446
+    },
+    {
+      "name": "highr",
+      "version": "0.12",
+      "url": "https://cran.r-project.org/src/contrib/highr_0.12.tar.gz",
+      "filename": "highr_0.12.tar.gz",
+      "sha256": "e8e1d6460022a9948799602d6b95dc78fbfa318ff6f0627e95c20b7190fc612b",
+      "bytes": 13622
+    },
+    {
+      "name": "yaml",
+      "version": "2.3.12",
+      "url": "https://cran.r-project.org/src/contrib/yaml_2.3.12.tar.gz",
+      "filename": "yaml_2.3.12.tar.gz",
+      "sha256": "80ccf3dde851133ef3e333b818a817c296c6ccdacfc4709cd466995289cd556c",
+      "bytes": 108975
+    },
+    {
+      "name": "knitr",
+      "version": "1.52",
+      "url": "https://cran.r-project.org/src/contrib/knitr_1.52.tar.gz",
+      "filename": "knitr_1.52.tar.gz",
+      "sha256": "bdd66a02dfba08a4c644b38a6ae08f6ba915c16d6b6ab6a188ec193c35905ff2",
+      "bytes": 490015
+    },
+    {
+      "name": "base64enc",
+      "version": "0.1-6",
+      "url": "https://cran.r-project.org/src/contrib/base64enc_0.1-6.tar.gz",
+      "filename": "base64enc_0.1-6.tar.gz",
+      "sha256": "3c7e9d22f7409fa2989008fa6e980c3dd8e2693eb20676acf2470ae7addb0816",
+      "bytes": 9418
+    },
+    {
+      "name": "rlang",
+      "version": "1.3.0",
+      "url": "https://cran.r-project.org/src/contrib/rlang_1.3.0.tar.gz",
+      "filename": "rlang_1.3.0.tar.gz",
+      "sha256": "80aa537d49e72265f443a15e8936128af583caa5e572086518b503cbf064279c",
+      "bytes": 784080
+    },
+    {
+      "name": "fastmap",
+      "version": "1.2.0",
+      "url": "https://cran.r-project.org/src/contrib/fastmap_1.2.0.tar.gz",
+      "filename": "fastmap_1.2.0.tar.gz",
+      "sha256": "b1da04a2915d1d057f3c2525e295ef15016a64e6667eac83a14641bbd83b9246",
+      "bytes": 46710
+    },
+    {
+      "name": "cachem",
+      "version": "1.1.0",
+      "url": "https://cran.r-project.org/src/contrib/cachem_1.1.0.tar.gz",
+      "filename": "cachem_1.1.0.tar.gz",
+      "sha256": "550839fc2ae5d865db475ba2c1714144f07fa0c052c72135b0e4a70287492e21",
+      "bytes": 27192
+    },
+    {
+      "name": "digest",
+      "version": "0.6.39",
+      "url": "https://cran.r-project.org/src/contrib/digest_0.6.39.tar.gz",
+      "filename": "digest_0.6.39.tar.gz",
+      "sha256": "8bf048b49b2d17077138fae758bda56bbd53278d9437f2fdeaedf979c90a13c9",
+      "bytes": 236629
+    },
+    {
+      "name": "htmltools",
+      "version": "0.5.9",
+      "url": "https://cran.r-project.org/src/contrib/htmltools_0.5.9.tar.gz",
+      "filename": "htmltools_0.5.9.tar.gz",
+      "sha256": "19308618da485818f69dcfeeadd2ddc81d43a736a74519df7b3fd98e13128afd",
+      "bytes": 135206
+    },
+    {
+      "name": "jquerylib",
+      "version": "0.1.4",
+      "url": "https://cran.r-project.org/src/contrib/jquerylib_0.1.4.tar.gz",
+      "filename": "jquerylib_0.1.4.tar.gz",
+      "sha256": "f0bcc11dcde3a6ff180277e45c24642d3da3c8690900e38f44495efbc9064411",
+      "bytes": 520207
+    },
+    {
+      "name": "cli",
+      "version": "3.6.6",
+      "url": "https://cran.r-project.org/src/contrib/cli_3.6.6.tar.gz",
+      "filename": "cli_3.6.6.tar.gz",
+      "sha256": "b2b58d6dd82f5798b335e39c00591686a01fd3e94399ef898e146173e36f18f9",
+      "bytes": 644134
+    },
+    {
+      "name": "lifecycle",
+      "version": "1.0.5",
+      "url": "https://cran.r-project.org/src/contrib/lifecycle_1.0.5.tar.gz",
+      "filename": "lifecycle_1.0.5.tar.gz",
+      "sha256": "61841e3e6edba056a88355a3f1d6698ab8d5d9cb3c05f2af0ec5a44ab516f8ee",
+      "bytes": 107137
+    },
+    {
+      "name": "memoise",
+      "version": "2.0.1",
+      "url": "https://cran.r-project.org/src/contrib/memoise_2.0.1.tar.gz",
+      "filename": "memoise_2.0.1.tar.gz",
+      "sha256": "f85034ee98c8ca07fb3cd826142c1cd1e1e5747075a94c75a45783bbc4fe2deb",
+      "bytes": 17852
+    },
+    {
+      "name": "mime",
+      "version": "0.13",
+      "url": "https://cran.r-project.org/src/contrib/mime_0.13.tar.gz",
+      "filename": "mime_0.13.tar.gz",
+      "sha256": "7132834cf3c3388eff12bad376d69fbcf8275acc37d36c290e59174fe3c7f3eb",
+      "bytes": 21950
+    },
+    {
+      "name": "fs",
+      "version": "2.1.0",
+      "url": "https://cran.r-project.org/src/contrib/fs_2.1.0.tar.gz",
+      "filename": "fs_2.1.0.tar.gz",
+      "sha256": "7088af1117d65c4ceb144b532e323f197fc8243b1d704bf6edf40774789829cd",
+      "bytes": 1471347
+    },
+    {
+      "name": "R6",
+      "version": "2.6.1",
+      "url": "https://cran.r-project.org/src/contrib/R6_2.6.1.tar.gz",
+      "filename": "R6_2.6.1.tar.gz",
+      "sha256": "59c6eba8b1b912eb7e104f65053235604be853425ee67c152ac4e86a1f2073b4",
+      "bytes": 64507
+    },
+    {
+      "name": "rappdirs",
+      "version": "0.3.4",
+      "url": "https://cran.r-project.org/src/contrib/rappdirs_0.3.4.tar.gz",
+      "filename": "rappdirs_0.3.4.tar.gz",
+      "sha256": "2320ebc9ef3b1a32a1e63f94a6ce2c1c34d66782221a6531e786804f681abc66",
+      "bytes": 11763
+    },
+    {
+      "name": "sass",
+      "version": "0.4.10",
+      "url": "https://cran.r-project.org/src/contrib/sass_0.4.10.tar.gz",
+      "filename": "sass_0.4.10.tar.gz",
+      "sha256": "4adb4c243f74d811276529e346deaa064bce28dbfbb837208fc85f2c47b79b30",
+      "bytes": 3025163
+    },
+    {
+      "name": "bslib",
+      "version": "0.12.0",
+      "url": "https://cran.r-project.org/src/contrib/bslib_0.12.0.tar.gz",
+      "filename": "bslib_0.12.0.tar.gz",
+      "sha256": "26fc11793dc1fdccd6d8d2fc1d638c29c47aa0c2e5cbadc6a35af3819f5446d1",
+      "bytes": 5847376
+    },
+    {
+      "name": "fontawesome",
+      "version": "0.5.3",
+      "url": "https://cran.r-project.org/src/contrib/fontawesome_0.5.3.tar.gz",
+      "filename": "fontawesome_0.5.3.tar.gz",
+      "sha256": "1b1909d0fad5ec4c658f5c628a195b9bd93d544afa957e68e897224cfb81fb4f",
+      "bytes": 1320479
+    },
+    {
+      "name": "tinytex",
+      "version": "0.61",
+      "url": "https://cran.r-project.org/src/contrib/tinytex_0.61.tar.gz",
+      "filename": "tinytex_0.61.tar.gz",
+      "sha256": "78300dc6163911c7de3efbe225c3bf455287c67886ed0e5a04fd347c6eaf2680",
+      "bytes": 38437
+    },
+    {
+      "name": "rmarkdown",
+      "version": "2.32",
+      "url": "https://cran.r-project.org/src/contrib/rmarkdown_2.32.tar.gz",
+      "filename": "rmarkdown_2.32.tar.gz",
+      "sha256": "f7fab8ae670d18a4b91409d11e4275b565c4081d77c4522443d01f94a8c2acee",
+      "bytes": 2193865
+    }
+  ],
+  "base_recommended_packages": "Provided by immutable rocker/r-ver R4.6.0 base; actual versions recorded during build."
+}

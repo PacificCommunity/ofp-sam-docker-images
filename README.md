@@ -29,7 +29,7 @@ This repository includes a GitHub Actions workflow that:
 
 # Notable Images
 
-- `fisheries-workflow/`: Preserved Python and SQLite runtime for the fisheries
+- `fisheries-workflow/`: Preserved R, RTMB and Quarto runtime for the fisheries
   workflow paper and demonstration, covering data preparation, CPUE
   standardisation, stock assessment and management strategy evaluation.
   See its [Dockerfile and run instructions](fisheries-workflow/README.md).

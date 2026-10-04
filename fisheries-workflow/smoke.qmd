@@ -1,0 +1,19 @@
+---
+title: "Container report checked"
+format:
+  html:
+    theme: none
+    embed-resources: true
+execute:
+  echo: false
+  warning: false
+---
+
+```{r}
+library(RTMB)
+objective <- function(p) (p$mu - 2)^2
+ad <- MakeADFun(objective, list(mu = 0), silent = TRUE)
+fit <- nlminb(ad$par, ad$fn, ad$gr)
+stopifnot(fit$convergence == 0, abs(fit$par[[1]] - 2) < 1e-8)
+cat("RTMB fit checked")
+```
