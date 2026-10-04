@@ -29,6 +29,10 @@ This repository includes a GitHub Actions workflow that:
 
 # Notable Images
 
+- `fisheries-workflow/`: Preserved Python and SQLite runtime for the fisheries
+  workflow paper and demonstration, covering data preparation, CPUE
+  standardisation, stock assessment and management strategy evaluation.
+  See its [Dockerfile and run instructions](fisheries-workflow/README.md).
 - `bet2026-flow/`: Public BET 2026 Kflow runtime with MFCL, Quarto, and
   non-sensitive dependencies. Private flow packages are installed or updated
   only at runtime when `GIT_PAT` or `GITHUB_PAT` is provided.
