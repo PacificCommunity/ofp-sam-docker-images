@@ -11,9 +11,9 @@ import subprocess
 import sys
 import time
 
-# Exact additional targets are defined by pinned d812 CMake sources retained
-# in metadata-v3/v5. Nine literal CPU-stage families, never a generic suffix.
-LIBRARY=re.compile(r'lib(?:llama(?:-batched-bench-impl|-bench-impl|-common|-server-impl|-cli-impl|-completion-impl|-fit-params-impl|-perplexity-impl|-quantize-impl)?|mtmd|ggml(?:-base|-cpu(?:-[A-Za-z0-9_-]+)?)?)\.so(?:\.[0-9]+)*\Z')
+# Exact additional targets are defined by pinned d812 CMake sources retained in
+# metadata-v3: batched-bench, llama-bench, common, and server. No generic suffix.
+LIBRARY=re.compile(r'lib(?:llama(?:-batched-bench-impl|-bench-impl|-common|-server-impl)?|mtmd|ggml(?:-base|-cpu(?:-[A-Za-z0-9_-]+)?)?)\.so(?:\.[0-9]+)*\Z')
 EXECUTABLES={'llama','llama-server'}
 
 
@@ -104,7 +104,7 @@ def engine_inventory(root,clock=time.monotonic,diagnostic=None):
             rows.append(dict(path=str(root/name),kind='library_alias',raw_target=aliases[name],ordinary_target=ordinary_rows[current],alias_chain=chain))
         if sorted(os.listdir(fd))!=names or any(identity(os.stat(name,dir_fd=fd,follow_symlinks=False))!=identity(initial[name]) for name in names) or any(os.readlink(name,dir_fd=fd)!=target for name,target in aliases.items()):raise ValueError('CPU closure changed during inventory')
         if clock()>=deadline:raise ValueError('Cooperative closure inventory deadline exhausted')
-        return dict(scope='Pinned official CPU server flat /app copies: ordinary llama/llama-server, libllama/core/common/server-impl/bench-impl/batched-bench-impl/cli-impl/completion-impl/fit-params-impl/perplexity-impl/quantize-impl, libmtmd/libggml/base/cpu shared libraries and confined library aliases; no claimed full ELF dependency qualification',files=rows,unique_ordinary_bytes=total,ordinary_files=len(ordinary_rows),aliases=len(aliases),cooperative_seconds=15)
+        return dict(scope='Pinned official CPU server flat /app copies: ordinary llama/llama-server, libllama/core/common/server-impl/bench-impl/batched-bench-impl, libmtmd/libggml/base/cpu shared libraries and confined library aliases; no claimed full ELF dependency qualification',files=rows,unique_ordinary_bytes=total,ordinary_files=len(ordinary_rows),aliases=len(aliases),cooperative_seconds=15)
     finally:os.close(fd)
 
 

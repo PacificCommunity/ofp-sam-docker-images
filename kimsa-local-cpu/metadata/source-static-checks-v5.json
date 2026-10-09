@@ -1,0 +1,88 @@
+{
+  "AST_parsed_files": [
+    "runtime/fetch_model.py",
+    "runtime/serve.py",
+    "runtime/smoke.py",
+    "runtime/test_fetch_model.py",
+    "runtime/test_smoke.py"
+  ],
+  "Mac_subject_import_execution": false,
+  "actual_client": "codex",
+  "alias_input_resources_caps_changed": false,
+  "current_build": "UNRUN",
+  "current_subject_tests": "UNRUN",
+  "fixture_counts": {
+    "CPU_closure": 24,
+    "model_input": 25
+  },
+  "full39_layout_scope": "UNQUALIFIED names/kinds only, not fullhash/ABI closure",
+  "new_fixture_methods": [
+    "test_observed_five_pinned_tool_libraries_ordinary",
+    "test_observed_five_pinned_tool_library_aliases"
+  ],
+  "only_new_exact_library_families": [
+    "llama-cli-impl",
+    "llama-completion-impl",
+    "llama-fit-params-impl",
+    "llama-perplexity-impl",
+    "llama-quantize-impl"
+  ],
+  "preserved_all47_previous_methods": true,
+  "previous_v4_CI": {
+    "fixture_pass_scope": "Previous25+22 only",
+    "result": "FAILED_BEFORE_PUBLISH",
+    "run_id": 37917951788,
+    "source": "1ce2cb750baa9d28adc0a1d0983705171b95ccd5"
+  },
+  "primary_CMake_receipts": [
+    {
+      "TLS": "Normal verified system TLS",
+      "bytes": 772,
+      "file": "tools-cli-CMakeLists.txt",
+      "scope": "Pinned primary CMake text only; no binaries/layers/model body",
+      "sha256": "6094ef7727f29dc18d88765611a6771deb083f9e3acf3b5d18eca8706349c5a7",
+      "url": "https://raw.githubusercontent.com/ggml-org/llama.cpp/d81235049384534c167caea52b85a694f6103d14/tools/cli/CMakeLists.txt"
+    },
+    {
+      "TLS": "Normal verified system TLS",
+      "bytes": 724,
+      "file": "tools-completion-CMakeLists.txt",
+      "scope": "Pinned primary CMake text only; no binaries/layers/model body",
+      "sha256": "e0d4a61bfa231df06803349aaffc4bfaa86d85ac1a6788a5c021c4b7a6099fbc",
+      "url": "https://raw.githubusercontent.com/ggml-org/llama.cpp/d81235049384534c167caea52b85a694f6103d14/tools/completion/CMakeLists.txt"
+    },
+    {
+      "TLS": "Normal verified system TLS",
+      "bytes": 724,
+      "file": "tools-fit-params-CMakeLists.txt",
+      "scope": "Pinned primary CMake text only; no binaries/layers/model body",
+      "sha256": "c4824a2ee48dfa20009c8ce0f998906427f8d98ba0700b246ea95be8482bce62",
+      "url": "https://raw.githubusercontent.com/ggml-org/llama.cpp/d81235049384534c167caea52b85a694f6103d14/tools/fit-params/CMakeLists.txt"
+    },
+    {
+      "TLS": "Normal verified system TLS",
+      "bytes": 724,
+      "file": "tools-perplexity-CMakeLists.txt",
+      "scope": "Pinned primary CMake text only; no binaries/layers/model body",
+      "sha256": "5667e9fd89bf8fd6619f606c36cbe10a62a33a30848ba917c8ee40c154e62696",
+      "url": "https://raw.githubusercontent.com/ggml-org/llama.cpp/d81235049384534c167caea52b85a694f6103d14/tools/perplexity/CMakeLists.txt"
+    },
+    {
+      "TLS": "Normal verified system TLS",
+      "bytes": 710,
+      "file": "tools-quantize-CMakeLists.txt",
+      "scope": "Pinned primary CMake text only; no binaries/layers/model body",
+      "sha256": "6c83d543401a38879ebd935cac9c2b7226aa134cafd4016f7681dc70f9dbc64e",
+      "url": "https://raw.githubusercontent.com/ggml-org/llama.cpp/d81235049384534c167caea52b85a694f6103d14/tools/quantize/CMakeLists.txt"
+    },
+    {
+      "TLS": "Normal verified system TLS",
+      "bytes": 1015,
+      "file": "tools-CMakeLists.txt",
+      "scope": "Pinned primary CMake text only; no binaries/layers/model body",
+      "sha256": "07d5aaee1a0a77109f4e7d1aededb9c276e286263e9ec6cb52ab6a19034aa36d",
+      "url": "https://raw.githubusercontent.com/ggml-org/llama.cpp/d81235049384534c167caea52b85a694f6103d14/tools/CMakeLists.txt"
+    }
+  ],
+  "status": "PASS_SOURCE_AST_AND_PIN_STATIC_ONLY"
+}

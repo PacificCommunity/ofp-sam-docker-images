@@ -1,0 +1,83 @@
+{
+  "CMake_proven_exact_extra_targets": [
+    "llama-batched-bench-impl",
+    "llama-bench-impl",
+    "llama-common",
+    "llama-server-impl"
+  ],
+  "Mac_subject_import_execution": false,
+  "current_build": "UNRUN",
+  "current_fixture_counts": {
+    "CPU_closure": 21,
+    "model_input": 25
+  },
+  "current_subject_tests": "UNRUN",
+  "diagnostic_scope": "At most64KiB names/kinds before classification; no hashes/ABI/qualified closure",
+  "new_closure_fixture_methods": [
+    "test_layout_diagnostic_precedes_refusal_without_qualification",
+    "test_pinned_CMake_extra_libraries_ordinary",
+    "test_pinned_CMake_extra_library_aliases"
+  ],
+  "old43fixtures_actual_pass_scope": "Previous CI25+18 only; current21closure remainsUNRUN",
+  "preserved_all_v2_closure_fixture_methods": [
+    "test_complete_ordinary_flat_inventory",
+    "test_single_library_alias_retains_raw_target_and_target_hash",
+    "test_confined_multihop_alias_order",
+    "test_absolute_library_alias_refused",
+    "test_parent_escape_alias_refused",
+    "test_slash_alias_refused",
+    "test_dangling_alias_refused",
+    "test_cycle_refused",
+    "test_directory_alias_refused",
+    "test_fifo_refused_without_open_or_block",
+    "test_socket_refused",
+    "test_executable_alias_refused",
+    "test_other_entry_and_gpu_backend_refused",
+    "test_library_hardlink_refused",
+    "test_root_symlink_refused",
+    "test_missing_required_executable_refused",
+    "test_expired_cooperative_inventory_refused",
+    "test_changed_regular_target_refused"
+  ],
+  "previous_CI_result": "FAILED_BEFORE_PUBLISH_UNEXPECTED_CPU_LIBRARY",
+  "previous_CI_source": "01c996cc44d1697644d12e41ca1699d7567918dd",
+  "primary_source_CMake_receipts": [
+    {
+      "TLS": "Normal verified system TLS",
+      "bytes": 745,
+      "file": "llama-batched-bench-CMakeLists.txt",
+      "scope": "Pinned primary CMake text only; no binaries/layers/modelbody",
+      "sha256": "6ab4f1741f2d2c95506e0ce2d67521baab07a28077383f752ff4a1db6666c95a",
+      "url": "https://raw.githubusercontent.com/ggml-org/llama.cpp/d81235049384534c167caea52b85a694f6103d14/tools/batched-bench/CMakeLists.txt"
+    },
+    {
+      "TLS": "Normal verified system TLS",
+      "bytes": 699,
+      "file": "llama-bench-CMakeLists.txt",
+      "scope": "Pinned primary CMake text only; no binaries/layers/modelbody",
+      "sha256": "0d3c923bfc475ecf498160ff453db21e5ccbf0d512c75e52dcef828999a92e64",
+      "url": "https://raw.githubusercontent.com/ggml-org/llama.cpp/d81235049384534c167caea52b85a694f6103d14/tools/llama-bench/CMakeLists.txt"
+    },
+    {
+      "TLS": "Normal verified system TLS",
+      "bytes": 5020,
+      "file": "llama-common-CMakeLists.txt",
+      "scope": "Only direct linked common/server CMake primary text to complete exact default CPU shared-library namespace; no binaries/layers/modelbody",
+      "sha256": "67cedba04a44face1177e3aa9fc192712873dda0b30bde1ab356007dcde0d9f1",
+      "url": "https://raw.githubusercontent.com/ggml-org/llama.cpp/d81235049384534c167caea52b85a694f6103d14/common/CMakeLists.txt"
+    },
+    {
+      "TLS": "Normal verified system TLS",
+      "bytes": 1826,
+      "file": "llama-server-CMakeLists.txt",
+      "scope": "Only direct linked common/server CMake primary text to complete exact default CPU shared-library namespace; no binaries/layers/modelbody",
+      "sha256": "553ce6725d470274a6bb2b120da87b5328497a1a6c760ae8a5510c7277e05180",
+      "url": "https://raw.githubusercontent.com/ggml-org/llama.cpp/d81235049384534c167caea52b85a694f6103d14/tools/server/CMakeLists.txt"
+    }
+  ],
+  "status": "PASS_SOURCE_STATIC_ONLY",
+  "still_unobserved": [
+    "New image build/published digest",
+    "Executable ABI smoke/model loading/API/KIMSA trials"
+  ]
+}

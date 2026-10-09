@@ -115,22 +115,6 @@ class Closure(unittest.TestCase):
             truncated=smoke.layout_metadata(-1,names)
             self.assertLessEqual(len(line(truncated)),65536);self.assertFalse(truncated['complete_names']);self.assertEqual(truncated['observed_entries'],400);self.assertLess(len(truncated['files']),400)
 
-    def test_observed_five_pinned_tool_libraries_ordinary(self):
-        names=('libllama-cli-impl.so','libllama-completion-impl.so','libllama-fit-params-impl.so','libllama-perplexity-impl.so','libllama-quantize-impl.so')
-        for name in names:(self.root/name).write_bytes(b'inert pinned tool library')
-        rows=self.inventory()['files']
-        for name in names:
-            row=next(row for row in rows if Path(row['path']).name==name)
-            self.assertEqual(row['kind'],'ordinary');self.assertEqual(row['sha256'],hashlib.sha256(b'inert pinned tool library').hexdigest())
-    def test_observed_five_pinned_tool_library_aliases(self):
-        names=('libllama-cli-impl.so','libllama-completion-impl.so','libllama-fit-params-impl.so','libllama-perplexity-impl.so','libllama-quantize-impl.so')
-        for name in names:
-            (self.root/(name+'.1')).write_bytes(b'inert pinned tool target');(self.root/name).symlink_to(name+'.1')
-        rows=self.inventory()['files']
-        for name in names:
-            row=next(row for row in rows if Path(row['path']).name==name)
-            self.assertEqual(row['raw_target'],name+'.1');self.assertEqual(row['ordinary_target']['sha256'],hashlib.sha256(b'inert pinned tool target').hexdigest())
-
 
 def main():
     global ROOT

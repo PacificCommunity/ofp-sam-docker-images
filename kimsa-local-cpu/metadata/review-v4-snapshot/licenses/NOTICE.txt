@@ -1,0 +1,22 @@
+Public input notices
+
+llama.cpp CPU runtime: ggml-org/llama.cpp, revision
+d81235049384534c167caea52b85a694f6103d14, MIT.
+See llama.cpp-LICENSE.txt. Its official immutable image supplies /app contents.
+
+Node v24.21.0: official docker.io/library/node amd64 image, source
+nodejs/docker-node@93a7bafc324a85ac1ee461604cff87cffacb6d7a.
+The build copies /usr/local/LICENSE from that exact image to Node-LICENSE.txt.
+
+Qwen3 0.6B public quantized model: Ollama library/qwen3:0.6b,
+exact blob SHA256
+7f4030143c1c477224c5434f8272c662a8b042079a0a584f0a27a1684fe2e1fa.
+Its manifest-attached Apache-2.0 copyright/license text is preserved in
+Qwen-Ollama-attached-LICENSE.txt. The upstream Qwen/Qwen3-0.6B license at
+c1899de289a04d12100db370d81485cdf75e47ca is preserved separately in
+Qwen-upstream-LICENSE.txt. Quantization is the Ollama publisher artifact;
+no cryptographic attribution or byte equivalence to upstream weights is claimed.
+
+Existing base image licenses/notices remain inherited from immutable
+ghcr.io/pacificcommunity/tuna-flow digest c87f1f6d9d4f62dc447844b58afe35f96af175bf933cb6cffbbbe39a59172360.
+No private source, credentials, or user data are added by this folder.

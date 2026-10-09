@@ -64,18 +64,13 @@
         "llama-batched-bench-impl",
         "llama-bench-impl",
         "llama-common",
-        "llama-server-impl",
-        "llama-cli-impl",
-        "llama-completion-impl",
-        "llama-fit-params-impl",
-        "llama-perplexity-impl",
-        "llama-quantize-impl"
+        "llama-server-impl"
       ],
       "files_max": 1024,
       "full_ELF_dependencies": "UNQUALIFIED",
       "inventory_before_version_start": true,
       "preclassification_diagnostic": "UNQUALIFIED name/kind only; complete encoded line including trailing LF <=65536 bytes; no qualified hashclosure",
-      "scope": "Pinned official flat CPU server copies plus exact d812 CMake llama-common/server-impl/bench-impl/batched-bench-impl targets; arbitrary siblings/GPU members remain refused; five exact observed CPU-stage cli/completion/fit-params/perplexity/quantize implementation targets are additionally source-pinned, not a generic implementation suffix",
+      "scope": "Pinned official flat CPU server copies plus exact d812 CMake llama-common/server-impl/bench-impl/batched-bench-impl targets; arbitrary siblings/GPU members remain refused",
       "unique_ordinary_bytes_max": 536870912
     },
     "CPU_llama_build_version_required": "11429/d812350",
@@ -88,7 +83,7 @@
       "python3"
     ],
     "inert_fixture_counts": {
-      "CPU_closure": 24,
+      "CPU_closure": 22,
       "model_input": 25
     },
     "manual_server_loopback": "127.0.0.1:8080",

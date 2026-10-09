@@ -1,0 +1,86 @@
+{
+  "alias_inventory_fields": [
+    "path",
+    "kind",
+    "raw_target",
+    "alias_chain",
+    "ordinary_target(path,bytes,sha256,mode)"
+  ],
+  "closure_inventory_precedes_llama_execution": true,
+  "fixture_counts": {
+    "test_fetch_model.py": 25,
+    "test_smoke.py": 18
+  },
+  "fixture_methods": {
+    "test_fetch_model.py": [
+      "test_exact_bytes_sha_readonly_single_inode_receipt",
+      "test_hash_mismatch_removes_body",
+      "test_truncated_body",
+      "test_oversize_body",
+      "test_content_length_mismatch",
+      "test_content_encoding_refused",
+      "test_http_failure_no_retry",
+      "test_network_error_no_retry",
+      "test_bad_magic_fullhash_refused",
+      "test_unsupported_header_fullhash_refused",
+      "test_zero_tensor_count_refused",
+      "test_no_body_before_complete_gate",
+      "test_expired_before_request",
+      "test_deadline_during_body_removes_partial",
+      "test_final_receipt_write_crosses_deadline_revokes",
+      "test_receipt_failure_after_creation_revokes",
+      "test_existing_model_untouched_no_request",
+      "test_symlink_directory_refused",
+      "test_existing_final_symlink_untouched",
+      "test_raced_publication_never_overwrites_other_file",
+      "test_wrong_directory_mode_refused",
+      "test_http_and_credential_url_refused_before_request",
+      "test_redirect_downgrade_and_credentials_refused",
+      "test_redirect_bound",
+      "test_malformed_pin_refused_without_artifacts"
+    ],
+    "test_smoke.py": [
+      "test_complete_ordinary_flat_inventory",
+      "test_single_library_alias_retains_raw_target_and_target_hash",
+      "test_confined_multihop_alias_order",
+      "test_absolute_library_alias_refused",
+      "test_parent_escape_alias_refused",
+      "test_slash_alias_refused",
+      "test_dangling_alias_refused",
+      "test_cycle_refused",
+      "test_directory_alias_refused",
+      "test_fifo_refused_without_open_or_block",
+      "test_socket_refused",
+      "test_executable_alias_refused",
+      "test_other_entry_and_gpu_backend_refused",
+      "test_library_hardlink_refused",
+      "test_root_symlink_refused",
+      "test_missing_required_executable_refused",
+      "test_expired_cooperative_inventory_refused",
+      "test_changed_regular_target_refused"
+    ]
+  },
+  "preserved_v1_packet_sha256": "f986e2fb8b3ae5ea836dd0ba465acf0933add58efd52e4fbae69b4ed30349f35",
+  "required_CLI": {
+    "fetch_model.py": [
+      "--output-dir"
+    ],
+    "serve.py": "fixed literal argv",
+    "smoke.py": [
+      "--mode",
+      "--output",
+      "--baseline(required-final)"
+    ],
+    "test_fetch_model.py": [
+      "--output-dir"
+    ],
+    "test_smoke.py": [
+      "--output-dir"
+    ]
+  },
+  "scope": "Exact source-only correction for CPU library aliases; no new image/source/model/admission/runtime claim",
+  "status": "PASS_SOURCE_STATIC_ONLY",
+  "subject_build": "UNRUN",
+  "subject_imports_on_Mac": false,
+  "subject_tests": "UNRUN"
+}

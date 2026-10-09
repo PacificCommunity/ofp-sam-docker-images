@@ -1,0 +1,880 @@
+{
+  "CI_scope": {
+    "actual_new_digest": "UNOBSERVED",
+    "build_secrets_requested": false,
+    "existing_workflow_changed": false,
+    "expected_folder_image": "ghcr.io/pacificcommunity/kimsa-local-cpu",
+    "main_push_auto_publishes": true,
+    "private_KIMSA_Actions_changed": false
+  },
+  "actual_client": "codex",
+  "additional_primary_source_receipts": [
+    {
+      "bytes": 1078,
+      "file": "llama-LICENSE.txt",
+      "http_status": 200,
+      "scope": "Primary public source or JSON metadata only; verified systemTLS; no runtime/modelbody",
+      "sha256": "94f29bbed6a22c35b992c5c6ebf0e7c92f13b836b90f36f461c9cf2f0f1d010d",
+      "url": "https://raw.githubusercontent.com/ggml-org/llama.cpp/d81235049384534c167caea52b85a694f6103d14/LICENSE"
+    },
+    {
+      "bytes": 222368,
+      "file": "llama-arg.cpp",
+      "http_status": 200,
+      "scope": "Primary public source or JSON metadata only; verified systemTLS; no runtime/modelbody",
+      "sha256": "60fe5331fbc60b7dcefcebce8d2097b5b986a1cd3a4dca126c0e6d21060df4d3",
+      "url": "https://raw.githubusercontent.com/ggml-org/llama.cpp/d81235049384534c167caea52b85a694f6103d14/common/arg.cpp"
+    },
+    {
+      "bytes": 5035,
+      "file": "node-official-Dockerfile",
+      "http_status": 200,
+      "scope": "Primary public source or JSON metadata only; verified systemTLS; no runtime/modelbody",
+      "sha256": "900128d44c3aa6377fde276c4111be8b60693b21f3955267803f1800ab2046de",
+      "url": "https://raw.githubusercontent.com/nodejs/docker-node/93a7bafc324a85ac1ee461604cff87cffacb6d7a/24/bookworm-slim/Dockerfile"
+    },
+    {
+      "bytes": 9067,
+      "file": "qwen-upstream-model-metadata.json",
+      "http_status": 200,
+      "scope": "Primary public source or JSON metadata only; verified systemTLS; no runtime/modelbody",
+      "sha256": "1ec04cff6745f70fe65a08f7d584886ce52f0efb18bb41b82f2a9ee5d6a25b44",
+      "url": "https://huggingface.co/api/models/Qwen/Qwen3-0.6B"
+    },
+    {
+      "bytes": 11343,
+      "file": "qwen-upstream-LICENSE.txt",
+      "http_status": 200,
+      "scope": "Exact revision public model license/card text only; not modelbody",
+      "sha256": "832dd9e00a68dd83b3c3fb9f5588dad7dcf337a0db50f7d9483f310cd292e92e",
+      "url": "https://huggingface.co/Qwen/Qwen3-0.6B/raw/c1899de289a04d12100db370d81485cdf75e47ca/LICENSE"
+    },
+    {
+      "bytes": 13965,
+      "file": "qwen-upstream-README.md",
+      "http_status": 200,
+      "scope": "Exact revision public model license/card text only; not modelbody",
+      "sha256": "1ab64a26fcb3b461423b89a433a8c858f1bf8d4086f979cbb3ff878d47cf20e9",
+      "url": "https://huggingface.co/Qwen/Qwen3-0.6B/raw/c1899de289a04d12100db370d81485cdf75e47ca/README.md"
+    }
+  ],
+  "author_owns": "NEW kimsa-local-cpu/ only; parent reviews/signs/pushes public main. No other images/global workflow changes.",
+  "build_gates": [
+    "Complete inert25 tests -> zero errors/failures/skips, retained FIXTURES.json",
+    "One verified public HTTPS model acquisition inside cooperative110/external120; exact fullSHA/size -> exclusive readonly publication; late receipt failure revokes it",
+    "Base R>=4.5/RTMB/jsonlite>=2 runtime/library snapshot before copies",
+    "Complete18 inert CPU closure/alias fixtures -> zero errors/failures/skips; retained cpu-closure-fixtures.json; source-gated closure inventory before llama-server version start",
+    "Final Linuxamd64 Nodev24.21.0 and llama11429/d812350 version starts plus full binary/model hashes and unchanged R runtime snapshot",
+    "Any failure fails docker build; existing publisher workflow does not push after failing build step"
+  ],
+  "build_inputs": {
+    "client": "codex",
+    "images": {
+      "base": {
+        "amd64_manifest_digest": "sha256:c87f1f6d9d4f62dc447844b58afe35f96af175bf933cb6cffbbbe39a59172360",
+        "config_digest": "sha256:898925450ab7ec3f99cb9d8427cc37d24097cc2fe9f0468d74f70aaf35daec3a",
+        "index_digest": "sha256:c87f1f6d9d4f62dc447844b58afe35f96af175bf933cb6cffbbbe39a59172360",
+        "observed_tag": "ghcr.io/pacificcommunity/tuna-flow:sha256:c87f1f6d9d4f62dc447844b58afe35f96af175bf933cb6cffbbbe39a59172360",
+        "publisher_source": "Existing company registered image digest; no rebuilding of mutable base recipe"
+      },
+      "llama": {
+        "amd64_manifest_digest": "sha256:a7c742ec2070a17d715c02d4329c049a984c81c3234f9ab14bdb14e46b077317",
+        "config_digest": "sha256:6219d926c9ba7857e323aa913b0c0ea79cf7b89a118afb4cb1d50b5636283098",
+        "index_digest": "sha256:2f8ebc2dde83c4bd7e5c6d61efa57965e0d5a79d29802c246c4593740d9c04c1",
+        "observed_tag": "ghcr.io/ggml-org/llama.cpp:server-b11429",
+        "publisher_source": "ggml-org/llama.cpp@d81235049384534c167caea52b85a694f6103d14"
+      },
+      "node": {
+        "amd64_manifest_digest": "sha256:51b1100cc2a83d370c6a60952e3f2989c8a43159d0e38586e090f3b3326efefd",
+        "config_digest": "sha256:470015c1ab1577c19efce2e80cdad4afd9c682cf8f4dcf3dccae5abfd9113397",
+        "index_digest": "sha256:d6aa754f16b3197301076f047b5def2f02ea1dbbc2ca920407d46d7ec7f87b20",
+        "observed_tag": "docker.io/library/node:24.21.0-bookworm-slim",
+        "publisher_source": "nodejs/docker-node@93a7bafc324a85ac1ee461604cff87cffacb6d7a:24/bookworm-slim"
+      }
+    },
+    "limits": {
+      "110_scope": "Cooperative input acceptance including final receipt; no hard-kernel or abrupt-loss guarantee",
+      "company_job_output_caps_unchanged": true,
+      "image_inputs_are_separate_from_job_outputs": true,
+      "memory_speed_pull_timing_guarantees": false
+    },
+    "model": {
+      "attached_license_sha256": "d18a5cc71b84bc4af394a31116bd3932b42241de70c77d2b76d69a314ec8aa12",
+      "body_bytes": 522640096,
+      "body_sha256": "7f4030143c1c477224c5434f8272c662a8b042079a0a584f0a27a1684fe2e1fa",
+      "body_url": "https://registry.ollama.ai/v2/library/qwen3/blobs/sha256:7f4030143c1c477224c5434f8272c662a8b042079a0a584f0a27a1684fe2e1fa",
+      "build_acquisition": {
+        "automatic_retries": false,
+        "cooperative_seconds": 110,
+        "external_timeout_seconds": 120,
+        "full_size_sha_before_publication": true,
+        "model_loading": false,
+        "one_attempt": true,
+        "redirects_max": 3,
+        "verified_https": true
+      },
+      "image_path": "/opt/kimsa/models/qwen3-0.6b.gguf",
+      "manifest_bytes": 858,
+      "manifest_sha256": "7df6b6e09427a769808717c0a93cadc4ae99ed4eb8bf5ca557c90846becea435",
+      "manifest_url": "https://registry.ollama.ai/v2/library/qwen3/manifests/0.6b",
+      "publisher": "Ollama library/qwen3:0.6b public GGUF artifact",
+      "quantized_weight_mapping": "Exact Ollama artifact SHA pinned; no asserted byte identity to original HuggingFace weights or cryptographic publisher attestation",
+      "readonly_mode": "0444",
+      "upstream_license": "Apache-2.0",
+      "upstream_metadata_revision": "Qwen/Qwen3-0.6B@c1899de289a04d12100db370d81485cdf75e47ca"
+    },
+    "operations": {
+      "CPU_closure_inventory": {
+        "alias_hops_max": 64,
+        "alias_target": "Existing library basename only; complete raw target/orderedchain/ordinarytargetfullhash retained",
+        "cooperative_seconds": 15,
+        "each_file_bytes_max": 536870912,
+        "files_max": 1024,
+        "full_ELF_dependencies": "UNQUALIFIED",
+        "inventory_before_version_start": true,
+        "scope": "Pinned official server stage flat llama/llama-server, libllama/libmtmd/libggml/base/cpu families; unknown actual names fail, no broadening/fallback",
+        "unique_ordinary_bytes_max": 536870912
+      },
+      "CPU_llama_build_version_required": "11429/d812350",
+      "GPU_layers": 0,
+      "Node_version_required": "v24.21.0",
+      "base_R_libpaths_must_match_build_baseline": true,
+      "base_entrypoint_reset": true,
+      "base_updater_disabled": true,
+      "default_command": [
+        "python3"
+      ],
+      "inert_fixture_counts": {
+        "CPU_closure": 18,
+        "model_input": 25
+      },
+      "manual_server_loopback": "127.0.0.1:8080",
+      "manual_server_threads": 2,
+      "runtime_downloads": false,
+      "server_context_size": 4096
+    },
+    "scope": "Public immutable Linuxamd64 image input recipe; no KIMSA private source, scientific approval or actual model API qualification",
+    "status": "SOURCE_ONLY_UNBUILT_UNQUALIFIED",
+    "unobserved": [
+      "Actual image build/publication/digest",
+      "Linux dynamic loader/ABI smoke",
+      "Actual publisher model complete bytes/fullGGUF architecture/tokenizer parsing",
+      "Model loading/server API/schema/KIMSA model proposal",
+      "Fresh company complete builder suite and R validation",
+      "Saved generation and separate replay"
+    ]
+  },
+  "correction": {
+    "bounded_inventory": "1024entries,160char names,64alias hops,512MiB each/uniqueordinary total,15cooperative seconds under existing60finalsmoke timeout",
+    "changed_behavior": "Complete flat CPU inventory accepts only confined library aliases, records literal targets/orderedchains/fullordinarytargetsha, rejects escapes/dangling/cycles/diraliases/executablealiases/specials/unexpected/GPU names, hashes stable single-link targets with nofollow before version start. Atime is excluded from immutable content metadata because hashing may update it.",
+    "critic": "Official pinned CPU Dockerfile43-44 cp-P preserves legitimate library aliases; v1 ordinary-only inventory would refuse them. No layer bodies observed.",
+    "new_complete_inert_fixture_methods": 18,
+    "old_subject_execution": "UNRUN",
+    "preserved_v1_packet": {
+      "bytes": 25388,
+      "path": "metadata/image-source-review-packet.json",
+      "sha256": "f986e2fb8b3ae5ea836dd0ba465acf0933add58efd52e4fbae69b4ed30349f35"
+    },
+    "preserved_v1_snapshot_packet": {
+      "bytes": 25388,
+      "path": "metadata/review-v1-snapshot/metadata/image-source-review-packet.json",
+      "sha256": "f986e2fb8b3ae5ea836dd0ba465acf0933add58efd52e4fbae69b4ed30349f35"
+    },
+    "preserved_v1_source_root": "metadata/review-v1-snapshot/",
+    "source_allowlist": "Literal llama/llama-server plus libllama/libmtmd/libggml/base/cpu sharedlibrary names. No actual filename set is inferred; unexpected members fail CI with no fallback or widening."
+  },
+  "existing_pipeline_readonly_sources": [
+    {
+      "bytes": 3742,
+      "path": "../README.md",
+      "sha256": "dcec1855763a4475ced5dd28af4fb244639dde23027bce42020527ac7bda1d8f"
+    },
+    {
+      "bytes": 8735,
+      "path": "../.github/workflows/build-and-push.yml",
+      "sha256": "1923a3e94651b870c03b852579c42ffb7e1d464add1b234ac7573f47de29ac3b"
+    }
+  ],
+  "files": [
+    {
+      "bytes": 98,
+      "path": ".dockerignore",
+      "sha256": "43ef25d651271bda0c1e260cabbd4de07997036684fe46378dba91032d2c3fe9"
+    },
+    {
+      "bytes": 2533,
+      "path": "Dockerfile",
+      "sha256": "0053070df8816828dec7e32f82e97a562200edf9def13c42524e85c1fdad9616"
+    },
+    {
+      "bytes": 5114,
+      "path": "README.md",
+      "sha256": "f995dab03f4f9bce20ba45a373a719a70031b85c42b5791ec45b57aba240057a"
+    },
+    {
+      "bytes": 1174,
+      "path": "licenses/NOTICE.txt",
+      "sha256": "50cf9c961117258bbf0f6553c2586c4ae8981526765f764f355c3d6a325f2263"
+    },
+    {
+      "bytes": 11338,
+      "path": "licenses/Qwen-Ollama-attached-LICENSE.txt",
+      "sha256": "d18a5cc71b84bc4af394a31116bd3932b42241de70c77d2b76d69a314ec8aa12"
+    },
+    {
+      "bytes": 11343,
+      "path": "licenses/Qwen-upstream-LICENSE.txt",
+      "sha256": "832dd9e00a68dd83b3c3fb9f5588dad7dcf337a0db50f7d9483f310cd292e92e"
+    },
+    {
+      "bytes": 1078,
+      "path": "licenses/llama.cpp-LICENSE.txt",
+      "sha256": "94f29bbed6a22c35b992c5c6ebf0e7c92f13b836b90f36f461c9cf2f0f1d010d"
+    },
+    {
+      "bytes": 188,
+      "path": "metadata/base-refusal.json",
+      "sha256": "ff3ba19786a4b8cd9a0242e4d5ade3f8c118f47c3a43893ded4b610ba0f6cf0c"
+    },
+    {
+      "bytes": 25388,
+      "path": "metadata/image-source-review-packet.json",
+      "sha256": "f986e2fb8b3ae5ea836dd0ba465acf0933add58efd52e4fbae69b4ed30349f35"
+    },
+    {
+      "bytes": 6292,
+      "path": "metadata/inspect-public-oci.py",
+      "sha256": "994b3a077da025dab6b697544cefa9a1ea65d2b32cb3844b79f3b2ac9fd8ce20"
+    },
+    {
+      "bytes": 196,
+      "path": "metadata/llama-server-refusal.json",
+      "sha256": "b7063a42171ca4ef63ea856852ae74eb1c337d2b084be17f8d8d494590eaa971"
+    },
+    {
+      "bytes": 2261,
+      "path": "metadata/metadata-v2/additional-primary-metadata-manifest.json",
+      "sha256": "da860729eec72d6b57f4390f2e4de1789aacd40e3f597de4553eee613431c0ca"
+    },
+    {
+      "bytes": 40006,
+      "path": "metadata/metadata-v2/base-amd64-config.json",
+      "sha256": "898925450ab7ec3f99cb9d8427cc37d24097cc2fe9f0468d74f70aaf35daec3a"
+    },
+    {
+      "bytes": 9737,
+      "path": "metadata/metadata-v2/base-index.json",
+      "sha256": "c87f1f6d9d4f62dc447844b58afe35f96af175bf933cb6cffbbbe39a59172360"
+    },
+    {
+      "bytes": 10864,
+      "path": "metadata/metadata-v2/base-selection.json",
+      "sha256": "992875b01a1d6970343c122c18c00bc2400a01af203f4379b2b078ade3919a66"
+    },
+    {
+      "bytes": 7528,
+      "path": "metadata/metadata-v2/inspect-public-oci.py",
+      "sha256": "2b97ecdcea1f0e48af6ebaa977160a5cc03c61245ffe906922a65c1dfb0ed49a"
+    },
+    {
+      "bytes": 1078,
+      "path": "metadata/metadata-v2/llama-LICENSE.txt",
+      "sha256": "94f29bbed6a22c35b992c5c6ebf0e7c92f13b836b90f36f461c9cf2f0f1d010d"
+    },
+    {
+      "bytes": 222368,
+      "path": "metadata/metadata-v2/llama-arg.cpp",
+      "sha256": "60fe5331fbc60b7dcefcebce8d2097b5b986a1cd3a4dca126c0e6d21060df4d3"
+    },
+    {
+      "bytes": 3212,
+      "path": "metadata/metadata-v2/llama-cpu.Dockerfile",
+      "sha256": "760f473703f7d34649ffb6c6dd58bee6a4baccdda598ab1033a9e70d362f5f92"
+    },
+    {
+      "bytes": 12274,
+      "path": "metadata/metadata-v2/llama-docker.md",
+      "sha256": "73f5543c6c7a5fce2e8dfc104c0ecec7af1ffa344c9c12f25753b29427c842c4"
+    },
+    {
+      "bytes": 25944,
+      "path": "metadata/metadata-v2/llama-docker.yml",
+      "sha256": "3c1c6dfcc09cfa23c1b6155fa88a54d66bae1723ea3aad2ccb30f74c5a9c70de"
+    },
+    {
+      "bytes": 4735,
+      "path": "metadata/metadata-v2/llama-server-amd64-config.json",
+      "sha256": "6219d926c9ba7857e323aa913b0c0ea79cf7b89a118afb4cb1d50b5636283098"
+    },
+    {
+      "bytes": 1746,
+      "path": "metadata/metadata-v2/llama-server-amd64-manifest.json",
+      "sha256": "a7c742ec2070a17d715c02d4329c049a984c81c3234f9ab14bdb14e46b077317"
+    },
+    {
+      "bytes": 1419,
+      "path": "metadata/metadata-v2/llama-server-index.json",
+      "sha256": "2f8ebc2dde83c4bd7e5c6d61efa57965e0d5a79d29802c246c4593740d9c04c1"
+    },
+    {
+      "bytes": 1915,
+      "path": "metadata/metadata-v2/llama-server-selection.json",
+      "sha256": "4bc64969179883c703279a56a511c676e117953430965846bb912c66fda9f2e4"
+    },
+    {
+      "bytes": 6323,
+      "path": "metadata/metadata-v2/metadata-manifest.json",
+      "sha256": "ddd341411eeec3441a266ce0f2899ff814647d548b4fa90bdf8fc4b284bc0151"
+    },
+    {
+      "bytes": 6715,
+      "path": "metadata/metadata-v2/node-amd64-config.json",
+      "sha256": "470015c1ab1577c19efce2e80cdad4afd9c682cf8f4dcf3dccae5abfd9113397"
+    },
+    {
+      "bytes": 1929,
+      "path": "metadata/metadata-v2/node-amd64-manifest.json",
+      "sha256": "51b1100cc2a83d370c6a60952e3f2989c8a43159d0e38586e090f3b3326efefd"
+    },
+    {
+      "bytes": 3929,
+      "path": "metadata/metadata-v2/node-index.json",
+      "sha256": "d6aa754f16b3197301076f047b5def2f02ea1dbbc2ca920407d46d7ec7f87b20"
+    },
+    {
+      "bytes": 5035,
+      "path": "metadata/metadata-v2/node-official-Dockerfile",
+      "sha256": "900128d44c3aa6377fde276c4111be8b60693b21f3955267803f1800ab2046de"
+    },
+    {
+      "bytes": 1453,
+      "path": "metadata/metadata-v2/node-selection.json",
+      "sha256": "5dec3b1e90383bc03ed926a02f6bdcd8f95d5869cc3cc3cdfd67a18469e535e1"
+    },
+    {
+      "bytes": 11343,
+      "path": "metadata/metadata-v2/qwen-upstream-LICENSE.txt",
+      "sha256": "832dd9e00a68dd83b3c3fb9f5588dad7dcf337a0db50f7d9483f310cd292e92e"
+    },
+    {
+      "bytes": 13965,
+      "path": "metadata/metadata-v2/qwen-upstream-README.md",
+      "sha256": "1ab64a26fcb3b461423b89a433a8c858f1bf8d4086f979cbb3ff878d47cf20e9"
+    },
+    {
+      "bytes": 9067,
+      "path": "metadata/metadata-v2/qwen-upstream-model-metadata.json",
+      "sha256": "1ec04cff6745f70fe65a08f7d584886ce52f0efb18bb41b82f2a9ee5d6a25b44"
+    },
+    {
+      "bytes": 188,
+      "path": "metadata/node-refusal.json",
+      "sha256": "7fa56c31ef5369a23b6f0d9f2bbe60009dd73e84e7136b7093c1c1f572e8f667"
+    },
+    {
+      "bytes": 98,
+      "path": "metadata/review-v1-snapshot/.dockerignore",
+      "sha256": "43ef25d651271bda0c1e260cabbd4de07997036684fe46378dba91032d2c3fe9"
+    },
+    {
+      "bytes": 2232,
+      "path": "metadata/review-v1-snapshot/Dockerfile",
+      "sha256": "b465d9de96ee4623b7b2c349e4d1a67fece7f72785c003021cfad571a49c0284"
+    },
+    {
+      "bytes": 4389,
+      "path": "metadata/review-v1-snapshot/README.md",
+      "sha256": "2b4cbf5fbe428b39e4ddf5c68a15f73e7c2efb25dcb66d471adf3c80cfa73f9f"
+    },
+    {
+      "bytes": 1174,
+      "path": "metadata/review-v1-snapshot/licenses/NOTICE.txt",
+      "sha256": "50cf9c961117258bbf0f6553c2586c4ae8981526765f764f355c3d6a325f2263"
+    },
+    {
+      "bytes": 11338,
+      "path": "metadata/review-v1-snapshot/licenses/Qwen-Ollama-attached-LICENSE.txt",
+      "sha256": "d18a5cc71b84bc4af394a31116bd3932b42241de70c77d2b76d69a314ec8aa12"
+    },
+    {
+      "bytes": 11343,
+      "path": "metadata/review-v1-snapshot/licenses/Qwen-upstream-LICENSE.txt",
+      "sha256": "832dd9e00a68dd83b3c3fb9f5588dad7dcf337a0db50f7d9483f310cd292e92e"
+    },
+    {
+      "bytes": 1078,
+      "path": "metadata/review-v1-snapshot/licenses/llama.cpp-LICENSE.txt",
+      "sha256": "94f29bbed6a22c35b992c5c6ebf0e7c92f13b836b90f36f461c9cf2f0f1d010d"
+    },
+    {
+      "bytes": 188,
+      "path": "metadata/review-v1-snapshot/metadata/base-refusal.json",
+      "sha256": "ff3ba19786a4b8cd9a0242e4d5ade3f8c118f47c3a43893ded4b610ba0f6cf0c"
+    },
+    {
+      "bytes": 25388,
+      "path": "metadata/review-v1-snapshot/metadata/image-source-review-packet.json",
+      "sha256": "f986e2fb8b3ae5ea836dd0ba465acf0933add58efd52e4fbae69b4ed30349f35"
+    },
+    {
+      "bytes": 6292,
+      "path": "metadata/review-v1-snapshot/metadata/inspect-public-oci.py",
+      "sha256": "994b3a077da025dab6b697544cefa9a1ea65d2b32cb3844b79f3b2ac9fd8ce20"
+    },
+    {
+      "bytes": 196,
+      "path": "metadata/review-v1-snapshot/metadata/llama-server-refusal.json",
+      "sha256": "b7063a42171ca4ef63ea856852ae74eb1c337d2b084be17f8d8d494590eaa971"
+    },
+    {
+      "bytes": 2261,
+      "path": "metadata/review-v1-snapshot/metadata/metadata-v2/additional-primary-metadata-manifest.json",
+      "sha256": "da860729eec72d6b57f4390f2e4de1789aacd40e3f597de4553eee613431c0ca"
+    },
+    {
+      "bytes": 40006,
+      "path": "metadata/review-v1-snapshot/metadata/metadata-v2/base-amd64-config.json",
+      "sha256": "898925450ab7ec3f99cb9d8427cc37d24097cc2fe9f0468d74f70aaf35daec3a"
+    },
+    {
+      "bytes": 9737,
+      "path": "metadata/review-v1-snapshot/metadata/metadata-v2/base-index.json",
+      "sha256": "c87f1f6d9d4f62dc447844b58afe35f96af175bf933cb6cffbbbe39a59172360"
+    },
+    {
+      "bytes": 10864,
+      "path": "metadata/review-v1-snapshot/metadata/metadata-v2/base-selection.json",
+      "sha256": "992875b01a1d6970343c122c18c00bc2400a01af203f4379b2b078ade3919a66"
+    },
+    {
+      "bytes": 7528,
+      "path": "metadata/review-v1-snapshot/metadata/metadata-v2/inspect-public-oci.py",
+      "sha256": "2b97ecdcea1f0e48af6ebaa977160a5cc03c61245ffe906922a65c1dfb0ed49a"
+    },
+    {
+      "bytes": 1078,
+      "path": "metadata/review-v1-snapshot/metadata/metadata-v2/llama-LICENSE.txt",
+      "sha256": "94f29bbed6a22c35b992c5c6ebf0e7c92f13b836b90f36f461c9cf2f0f1d010d"
+    },
+    {
+      "bytes": 222368,
+      "path": "metadata/review-v1-snapshot/metadata/metadata-v2/llama-arg.cpp",
+      "sha256": "60fe5331fbc60b7dcefcebce8d2097b5b986a1cd3a4dca126c0e6d21060df4d3"
+    },
+    {
+      "bytes": 3212,
+      "path": "metadata/review-v1-snapshot/metadata/metadata-v2/llama-cpu.Dockerfile",
+      "sha256": "760f473703f7d34649ffb6c6dd58bee6a4baccdda598ab1033a9e70d362f5f92"
+    },
+    {
+      "bytes": 12274,
+      "path": "metadata/review-v1-snapshot/metadata/metadata-v2/llama-docker.md",
+      "sha256": "73f5543c6c7a5fce2e8dfc104c0ecec7af1ffa344c9c12f25753b29427c842c4"
+    },
+    {
+      "bytes": 25944,
+      "path": "metadata/review-v1-snapshot/metadata/metadata-v2/llama-docker.yml",
+      "sha256": "3c1c6dfcc09cfa23c1b6155fa88a54d66bae1723ea3aad2ccb30f74c5a9c70de"
+    },
+    {
+      "bytes": 4735,
+      "path": "metadata/review-v1-snapshot/metadata/metadata-v2/llama-server-amd64-config.json",
+      "sha256": "6219d926c9ba7857e323aa913b0c0ea79cf7b89a118afb4cb1d50b5636283098"
+    },
+    {
+      "bytes": 1746,
+      "path": "metadata/review-v1-snapshot/metadata/metadata-v2/llama-server-amd64-manifest.json",
+      "sha256": "a7c742ec2070a17d715c02d4329c049a984c81c3234f9ab14bdb14e46b077317"
+    },
+    {
+      "bytes": 1419,
+      "path": "metadata/review-v1-snapshot/metadata/metadata-v2/llama-server-index.json",
+      "sha256": "2f8ebc2dde83c4bd7e5c6d61efa57965e0d5a79d29802c246c4593740d9c04c1"
+    },
+    {
+      "bytes": 1915,
+      "path": "metadata/review-v1-snapshot/metadata/metadata-v2/llama-server-selection.json",
+      "sha256": "4bc64969179883c703279a56a511c676e117953430965846bb912c66fda9f2e4"
+    },
+    {
+      "bytes": 6323,
+      "path": "metadata/review-v1-snapshot/metadata/metadata-v2/metadata-manifest.json",
+      "sha256": "ddd341411eeec3441a266ce0f2899ff814647d548b4fa90bdf8fc4b284bc0151"
+    },
+    {
+      "bytes": 6715,
+      "path": "metadata/review-v1-snapshot/metadata/metadata-v2/node-amd64-config.json",
+      "sha256": "470015c1ab1577c19efce2e80cdad4afd9c682cf8f4dcf3dccae5abfd9113397"
+    },
+    {
+      "bytes": 1929,
+      "path": "metadata/review-v1-snapshot/metadata/metadata-v2/node-amd64-manifest.json",
+      "sha256": "51b1100cc2a83d370c6a60952e3f2989c8a43159d0e38586e090f3b3326efefd"
+    },
+    {
+      "bytes": 3929,
+      "path": "metadata/review-v1-snapshot/metadata/metadata-v2/node-index.json",
+      "sha256": "d6aa754f16b3197301076f047b5def2f02ea1dbbc2ca920407d46d7ec7f87b20"
+    },
+    {
+      "bytes": 5035,
+      "path": "metadata/review-v1-snapshot/metadata/metadata-v2/node-official-Dockerfile",
+      "sha256": "900128d44c3aa6377fde276c4111be8b60693b21f3955267803f1800ab2046de"
+    },
+    {
+      "bytes": 1453,
+      "path": "metadata/review-v1-snapshot/metadata/metadata-v2/node-selection.json",
+      "sha256": "5dec3b1e90383bc03ed926a02f6bdcd8f95d5869cc3cc3cdfd67a18469e535e1"
+    },
+    {
+      "bytes": 11343,
+      "path": "metadata/review-v1-snapshot/metadata/metadata-v2/qwen-upstream-LICENSE.txt",
+      "sha256": "832dd9e00a68dd83b3c3fb9f5588dad7dcf337a0db50f7d9483f310cd292e92e"
+    },
+    {
+      "bytes": 13965,
+      "path": "metadata/review-v1-snapshot/metadata/metadata-v2/qwen-upstream-README.md",
+      "sha256": "1ab64a26fcb3b461423b89a433a8c858f1bf8d4086f979cbb3ff878d47cf20e9"
+    },
+    {
+      "bytes": 9067,
+      "path": "metadata/review-v1-snapshot/metadata/metadata-v2/qwen-upstream-model-metadata.json",
+      "sha256": "1ec04cff6745f70fe65a08f7d584886ce52f0efb18bb41b82f2a9ee5d6a25b44"
+    },
+    {
+      "bytes": 188,
+      "path": "metadata/review-v1-snapshot/metadata/node-refusal.json",
+      "sha256": "7fa56c31ef5369a23b6f0d9f2bbe60009dd73e84e7136b7093c1c1f572e8f667"
+    },
+    {
+      "bytes": 3550,
+      "path": "metadata/review-v1-snapshot/metadata/source-static-checks.json",
+      "sha256": "1156956a2c7984aec9281ef853f401bd3b057a0294694d4b9dcb1774e1a92854"
+    },
+    {
+      "bytes": 858,
+      "path": "metadata/review-v1-snapshot/provenance/qwen3-0.6b-manifest.json",
+      "sha256": "7df6b6e09427a769808717c0a93cadc4ae99ed4eb8bf5ca557c90846becea435"
+    },
+    {
+      "bytes": 4187,
+      "path": "metadata/review-v1-snapshot/provenance/runtime-provenance.json",
+      "sha256": "c75ab02828971ccffa6878c97aeeea868f6cb4afdd8c186dd777ddd04d6ae24b"
+    },
+    {
+      "bytes": 8665,
+      "path": "metadata/review-v1-snapshot/runtime/fetch_model.py",
+      "sha256": "5403df614c8b2300e454eebeffe44df57c6b2ee7b1e04072fce7bf87536cdf3a"
+    },
+    {
+      "bytes": 464,
+      "path": "metadata/review-v1-snapshot/runtime/serve.py",
+      "sha256": "4f497e1de7cf54e5fbbfa63749cd6e46b8336fc3b77f25890bfbdd9ebedd50cd"
+    },
+    {
+      "bytes": 4483,
+      "path": "metadata/review-v1-snapshot/runtime/smoke.py",
+      "sha256": "a52c86298d883f74948e60574178332727ab85596f705184abad90f1e226f43f"
+    },
+    {
+      "bytes": 9894,
+      "path": "metadata/review-v1-snapshot/runtime/test_fetch_model.py",
+      "sha256": "71a24a3ccb19e434fe3d9e27747d36aa49fb8af40e10bec7076c4a0afc8df393"
+    },
+    {
+      "bytes": 2932,
+      "path": "metadata/source-static-checks-v2.json",
+      "sha256": "0e99ef1ec3df80c1d2e24f398785cd94d2be41452848d3d7b5b0208778c0189a"
+    },
+    {
+      "bytes": 3550,
+      "path": "metadata/source-static-checks.json",
+      "sha256": "1156956a2c7984aec9281ef853f401bd3b057a0294694d4b9dcb1774e1a92854"
+    },
+    {
+      "bytes": 858,
+      "path": "provenance/qwen3-0.6b-manifest.json",
+      "sha256": "7df6b6e09427a769808717c0a93cadc4ae99ed4eb8bf5ca557c90846becea435"
+    },
+    {
+      "bytes": 4862,
+      "path": "provenance/runtime-provenance.json",
+      "sha256": "6c00ad42c43d120aefbdda08bf06e60b98a1b330e5e6e4e4df13872ed7fb244a"
+    },
+    {
+      "bytes": 8665,
+      "path": "runtime/fetch_model.py",
+      "sha256": "5403df614c8b2300e454eebeffe44df57c6b2ee7b1e04072fce7bf87536cdf3a"
+    },
+    {
+      "bytes": 464,
+      "path": "runtime/serve.py",
+      "sha256": "4f497e1de7cf54e5fbbfa63749cd6e46b8336fc3b77f25890bfbdd9ebedd50cd"
+    },
+    {
+      "bytes": 8949,
+      "path": "runtime/smoke.py",
+      "sha256": "6e9e889330c12c607c83baf2d0fc2644187e90f38f9f5c98dd07cbc3b017b629"
+    },
+    {
+      "bytes": 9894,
+      "path": "runtime/test_fetch_model.py",
+      "sha256": "71a24a3ccb19e434fe3d9e27747d36aa49fb8af40e10bec7076c4a0afc8df393"
+    },
+    {
+      "bytes": 6159,
+      "path": "runtime/test_smoke.py",
+      "sha256": "c482b6ea996a496c39f8d993493ab81af6c646b0a0cb87d7176add83d78fc86f"
+    }
+  ],
+  "fixture_count": 43,
+  "fixture_counts": {
+    "test_fetch_model.py": 25,
+    "test_smoke.py": 18
+  },
+  "fixture_methods": {
+    "test_fetch_model.py": [
+      "test_exact_bytes_sha_readonly_single_inode_receipt",
+      "test_hash_mismatch_removes_body",
+      "test_truncated_body",
+      "test_oversize_body",
+      "test_content_length_mismatch",
+      "test_content_encoding_refused",
+      "test_http_failure_no_retry",
+      "test_network_error_no_retry",
+      "test_bad_magic_fullhash_refused",
+      "test_unsupported_header_fullhash_refused",
+      "test_zero_tensor_count_refused",
+      "test_no_body_before_complete_gate",
+      "test_expired_before_request",
+      "test_deadline_during_body_removes_partial",
+      "test_final_receipt_write_crosses_deadline_revokes",
+      "test_receipt_failure_after_creation_revokes",
+      "test_existing_model_untouched_no_request",
+      "test_symlink_directory_refused",
+      "test_existing_final_symlink_untouched",
+      "test_raced_publication_never_overwrites_other_file",
+      "test_wrong_directory_mode_refused",
+      "test_http_and_credential_url_refused_before_request",
+      "test_redirect_downgrade_and_credentials_refused",
+      "test_redirect_bound",
+      "test_malformed_pin_refused_without_artifacts"
+    ],
+    "test_smoke.py": [
+      "test_complete_ordinary_flat_inventory",
+      "test_single_library_alias_retains_raw_target_and_target_hash",
+      "test_confined_multihop_alias_order",
+      "test_absolute_library_alias_refused",
+      "test_parent_escape_alias_refused",
+      "test_slash_alias_refused",
+      "test_dangling_alias_refused",
+      "test_cycle_refused",
+      "test_directory_alias_refused",
+      "test_fifo_refused_without_open_or_block",
+      "test_socket_refused",
+      "test_executable_alias_refused",
+      "test_other_entry_and_gpu_backend_refused",
+      "test_library_hardlink_refused",
+      "test_root_symlink_refused",
+      "test_missing_required_executable_refused",
+      "test_expired_cooperative_inventory_refused",
+      "test_changed_regular_target_refused"
+    ]
+  },
+  "input_output_scope": {
+    "direct_readonly_model_path": "/opt/kimsa/models/qwen3-0.6b.gguf",
+    "existing_job_output_resources_caps_unchanged": true,
+    "image_input_build_layer_space_separate": true,
+    "model_in_image": true,
+    "no_cap_bypass_or_pull_speed_guarantee": true,
+    "no_native_parent_extraction": true,
+    "no_per_job_model_output_copy": true
+  },
+  "limits_and_uncertainty": [
+    "All new fixture/model-fetch/smoke/launcher source UNRUN; no binaries/layers/modelbody downloaded/executed onMac",
+    "OCI digests/config/source labels observed; dynamic linking/model loading/API/schema/builder/R/replay not qualified",
+    "GGUF architecture/tokenizer/source-weight equivalence not proven by header-only fixed fullbody fetch",
+    "110 cooperative acceptance with finalwrite guard, external120 user-space timeout; no hard-kernel/abrupt-loss guarantee",
+    "Initial metadata Python TLS refusal preserved, later metadata retrieval used normal verified systemTLS, no trust bypass",
+    "Held Node archive helperv1 remains refused/unpromoted; new official OCI route has separate gates",
+    "Originalc87 placements, originalUNKNOWN, unconfirmedmodel and failedpartialruntime unchanged; no retries or childqualification",
+    "CPU closure source-family allowlist is a bounded candidate predicate; actual layer contents and full system ELF dependency closure remain unobserved/unqualified until build/runtime evidence. Aliases do not imply complete model/API/CPU qualification."
+  ],
+  "literal_server_argv": [
+    "/opt/llama/llama-server",
+    "--model",
+    "/opt/kimsa/models/qwen3-0.6b.gguf",
+    "--host",
+    "127.0.0.1",
+    "--port",
+    "8080",
+    "--threads",
+    "2",
+    "--threads-batch",
+    "2",
+    "--parallel",
+    "1",
+    "--ctx-size",
+    "4096",
+    "--n-gpu-layers",
+    "0",
+    "--cache-ram",
+    "0",
+    "--cache-reuse",
+    "0",
+    "--offline",
+    "--no-warmup"
+  ],
+  "next_safe_action": "Independent source review of this exact transitive packet. Parent then signs/pushes only reviewed new folder; CI actual build results/digest must be collected before fresh company job selection/admission. No publish by this worker.",
+  "observed_repo_head": "a2c886b335d8b7f64bf021c74e68e4d3fe7035c3",
+  "primary_registry_source_receipts": [
+    {
+      "bytes": 1419,
+      "file": "llama-server-index.json",
+      "http_status": 200,
+      "scope": "Public source/OCI JSON only; normal trusted TLS; anonymous pull-token held only in memory; no layers/binaries/models or user credentials",
+      "selected_headers": {
+        "Content-Length": "1419",
+        "Content-Type": "application/vnd.oci.image.index.v1+json",
+        "Docker-Content-Digest": "sha256:2f8ebc2dde83c4bd7e5c6d61efa57965e0d5a79d29802c246c4593740d9c04c1"
+      },
+      "sha256": "2f8ebc2dde83c4bd7e5c6d61efa57965e0d5a79d29802c246c4593740d9c04c1",
+      "url": "https://ghcr.io/v2/ggml-org/llama.cpp/manifests/server-b11429"
+    },
+    {
+      "bytes": 1746,
+      "file": "llama-server-amd64-manifest.json",
+      "http_status": 200,
+      "scope": "Public source/OCI JSON only; normal trusted TLS; anonymous pull-token held only in memory; no layers/binaries/models or user credentials",
+      "selected_headers": {
+        "Content-Length": "1746",
+        "Content-Type": "application/vnd.oci.image.manifest.v1+json",
+        "Docker-Content-Digest": "sha256:a7c742ec2070a17d715c02d4329c049a984c81c3234f9ab14bdb14e46b077317"
+      },
+      "sha256": "a7c742ec2070a17d715c02d4329c049a984c81c3234f9ab14bdb14e46b077317",
+      "url": "https://ghcr.io/v2/ggml-org/llama.cpp/manifests/sha256:a7c742ec2070a17d715c02d4329c049a984c81c3234f9ab14bdb14e46b077317"
+    },
+    {
+      "bytes": 4735,
+      "file": "llama-server-amd64-config.json",
+      "http_status": 200,
+      "scope": "Public source/OCI JSON only; normal trusted TLS; anonymous pull-token held only in memory; no layers/binaries/models or user credentials",
+      "selected_headers": {
+        "Content-Length": "4735",
+        "Content-Type": "application/octet-stream",
+        "Docker-Content-Digest": null
+      },
+      "sha256": "6219d926c9ba7857e323aa913b0c0ea79cf7b89a118afb4cb1d50b5636283098",
+      "url": "https://ghcr.io/v2/ggml-org/llama.cpp/blobs/sha256:6219d926c9ba7857e323aa913b0c0ea79cf7b89a118afb4cb1d50b5636283098"
+    },
+    {
+      "bytes": 3929,
+      "file": "node-index.json",
+      "http_status": 200,
+      "scope": "Public source/OCI JSON only; normal trusted TLS; anonymous pull-token held only in memory; no layers/binaries/models or user credentials",
+      "selected_headers": {
+        "Content-Length": "3929",
+        "Content-Type": "application/vnd.oci.image.index.v1+json",
+        "Docker-Content-Digest": "sha256:d6aa754f16b3197301076f047b5def2f02ea1dbbc2ca920407d46d7ec7f87b20"
+      },
+      "sha256": "d6aa754f16b3197301076f047b5def2f02ea1dbbc2ca920407d46d7ec7f87b20",
+      "url": "https://registry-1.docker.io/v2/library/node/manifests/24.21.0-bookworm-slim"
+    },
+    {
+      "bytes": 1929,
+      "file": "node-amd64-manifest.json",
+      "http_status": 200,
+      "scope": "Public source/OCI JSON only; normal trusted TLS; anonymous pull-token held only in memory; no layers/binaries/models or user credentials",
+      "selected_headers": {
+        "Content-Length": "1929",
+        "Content-Type": "application/vnd.oci.image.manifest.v1+json",
+        "Docker-Content-Digest": "sha256:51b1100cc2a83d370c6a60952e3f2989c8a43159d0e38586e090f3b3326efefd"
+      },
+      "sha256": "51b1100cc2a83d370c6a60952e3f2989c8a43159d0e38586e090f3b3326efefd",
+      "url": "https://registry-1.docker.io/v2/library/node/manifests/sha256:51b1100cc2a83d370c6a60952e3f2989c8a43159d0e38586e090f3b3326efefd"
+    },
+    {
+      "bytes": 6715,
+      "file": "node-amd64-config.json",
+      "http_status": 200,
+      "scope": "Public source/OCI JSON only; normal trusted TLS; anonymous pull-token held only in memory; no layers/binaries/models or user credentials",
+      "selected_headers": {
+        "Content-Length": "6715",
+        "Content-Type": "application/octet-stream",
+        "Docker-Content-Digest": null
+      },
+      "sha256": "470015c1ab1577c19efce2e80cdad4afd9c682cf8f4dcf3dccae5abfd9113397",
+      "url": "https://registry-1.docker.io/v2/library/node/blobs/sha256:470015c1ab1577c19efce2e80cdad4afd9c682cf8f4dcf3dccae5abfd9113397"
+    },
+    {
+      "bytes": 9737,
+      "file": "base-index.json",
+      "http_status": 200,
+      "scope": "Public source/OCI JSON only; normal trusted TLS; anonymous pull-token held only in memory; no layers/binaries/models or user credentials",
+      "selected_headers": {
+        "Content-Length": "9737",
+        "Content-Type": "application/vnd.docker.distribution.manifest.v2+json",
+        "Docker-Content-Digest": "sha256:c87f1f6d9d4f62dc447844b58afe35f96af175bf933cb6cffbbbe39a59172360"
+      },
+      "sha256": "c87f1f6d9d4f62dc447844b58afe35f96af175bf933cb6cffbbbe39a59172360",
+      "url": "https://ghcr.io/v2/pacificcommunity/tuna-flow/manifests/sha256:c87f1f6d9d4f62dc447844b58afe35f96af175bf933cb6cffbbbe39a59172360"
+    },
+    {
+      "bytes": 40006,
+      "file": "base-amd64-config.json",
+      "http_status": 200,
+      "scope": "Public source/OCI JSON only; normal trusted TLS; anonymous pull-token held only in memory; no layers/binaries/models or user credentials",
+      "selected_headers": {
+        "Content-Length": "40006",
+        "Content-Type": "application/octet-stream",
+        "Docker-Content-Digest": null
+      },
+      "sha256": "898925450ab7ec3f99cb9d8427cc37d24097cc2fe9f0468d74f70aaf35daec3a",
+      "url": "https://ghcr.io/v2/pacificcommunity/tuna-flow/blobs/sha256:898925450ab7ec3f99cb9d8427cc37d24097cc2fe9f0468d74f70aaf35daec3a"
+    },
+    {
+      "bytes": 12274,
+      "file": "llama-docker.md",
+      "http_status": 200,
+      "scope": "Pinned public primary source text; not executed",
+      "sha256": "73f5543c6c7a5fce2e8dfc104c0ecec7af1ffa344c9c12f25753b29427c842c4",
+      "url": "https://raw.githubusercontent.com/ggml-org/llama.cpp/d81235049384534c167caea52b85a694f6103d14/docs/docker.md"
+    },
+    {
+      "bytes": 3212,
+      "file": "llama-cpu.Dockerfile",
+      "http_status": 200,
+      "scope": "Pinned public primary source text; not executed",
+      "sha256": "760f473703f7d34649ffb6c6dd58bee6a4baccdda598ab1033a9e70d362f5f92",
+      "url": "https://raw.githubusercontent.com/ggml-org/llama.cpp/d81235049384534c167caea52b85a694f6103d14/.devops/cpu.Dockerfile"
+    },
+    {
+      "bytes": 25944,
+      "file": "llama-docker.yml",
+      "http_status": 200,
+      "scope": "Pinned public primary source text; not executed",
+      "sha256": "3c1c6dfcc09cfa23c1b6155fa88a54d66bae1723ea3aad2ccb30f74c5a9c70de",
+      "url": "https://raw.githubusercontent.com/ggml-org/llama.cpp/d81235049384534c167caea52b85a694f6103d14/.github/workflows/docker.yml"
+    }
+  ],
+  "public_repo": "https://github.com/PacificCommunity/ofp-sam-docker-images",
+  "required_CLI_mapping": {
+    "fetch_model.py": [
+      "--output-dir"
+    ],
+    "serve.py": "fixed literal argv",
+    "smoke.py": [
+      "--mode",
+      "--output",
+      "--baseline(required-final)"
+    ],
+    "test_fetch_model.py": [
+      "--output-dir"
+    ],
+    "test_smoke.py": [
+      "--output-dir"
+    ]
+  },
+  "source_root": "kimsa-local-cpu/",
+  "status": "SOURCE_ONLY_REVIEW_CORRECTION_V2_NO_BUILD_NO_PUBLICATION"
+}

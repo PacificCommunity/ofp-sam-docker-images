@@ -1,0 +1,238 @@
+{
+  "actual_fixture_outcome": "47 complete cases passed; zero skips observed by parent; these are previous v4 only",
+  "actual_layout_metadata": {
+    "complete_names": true,
+    "files": [
+      {
+        "kind": "symlink",
+        "name": "libggml-base.so",
+        "name_truncated": false
+      },
+      {
+        "kind": "symlink",
+        "name": "libggml-base.so.0",
+        "name_truncated": false
+      },
+      {
+        "kind": "ordinary",
+        "name": "libggml-base.so.0.26.0",
+        "name_truncated": false
+      },
+      {
+        "kind": "ordinary",
+        "name": "libggml-cpu-alderlake.so",
+        "name_truncated": false
+      },
+      {
+        "kind": "ordinary",
+        "name": "libggml-cpu-cannonlake.so",
+        "name_truncated": false
+      },
+      {
+        "kind": "ordinary",
+        "name": "libggml-cpu-cascadelake.so",
+        "name_truncated": false
+      },
+      {
+        "kind": "ordinary",
+        "name": "libggml-cpu-cooperlake.so",
+        "name_truncated": false
+      },
+      {
+        "kind": "ordinary",
+        "name": "libggml-cpu-haswell.so",
+        "name_truncated": false
+      },
+      {
+        "kind": "ordinary",
+        "name": "libggml-cpu-icelake.so",
+        "name_truncated": false
+      },
+      {
+        "kind": "ordinary",
+        "name": "libggml-cpu-ivybridge.so",
+        "name_truncated": false
+      },
+      {
+        "kind": "ordinary",
+        "name": "libggml-cpu-piledriver.so",
+        "name_truncated": false
+      },
+      {
+        "kind": "ordinary",
+        "name": "libggml-cpu-sandybridge.so",
+        "name_truncated": false
+      },
+      {
+        "kind": "ordinary",
+        "name": "libggml-cpu-sapphirerapids.so",
+        "name_truncated": false
+      },
+      {
+        "kind": "ordinary",
+        "name": "libggml-cpu-skylakex.so",
+        "name_truncated": false
+      },
+      {
+        "kind": "ordinary",
+        "name": "libggml-cpu-sse42.so",
+        "name_truncated": false
+      },
+      {
+        "kind": "ordinary",
+        "name": "libggml-cpu-x64.so",
+        "name_truncated": false
+      },
+      {
+        "kind": "ordinary",
+        "name": "libggml-cpu-zen4.so",
+        "name_truncated": false
+      },
+      {
+        "kind": "symlink",
+        "name": "libggml.so",
+        "name_truncated": false
+      },
+      {
+        "kind": "symlink",
+        "name": "libggml.so.0",
+        "name_truncated": false
+      },
+      {
+        "kind": "ordinary",
+        "name": "libggml.so.0.26.0",
+        "name_truncated": false
+      },
+      {
+        "kind": "ordinary",
+        "name": "libllama-batched-bench-impl.so",
+        "name_truncated": false
+      },
+      {
+        "kind": "ordinary",
+        "name": "libllama-bench-impl.so",
+        "name_truncated": false
+      },
+      {
+        "kind": "ordinary",
+        "name": "libllama-cli-impl.so",
+        "name_truncated": false
+      },
+      {
+        "kind": "symlink",
+        "name": "libllama-common.so",
+        "name_truncated": false
+      },
+      {
+        "kind": "symlink",
+        "name": "libllama-common.so.0",
+        "name_truncated": false
+      },
+      {
+        "kind": "ordinary",
+        "name": "libllama-common.so.0.6.0",
+        "name_truncated": false
+      },
+      {
+        "kind": "ordinary",
+        "name": "libllama-completion-impl.so",
+        "name_truncated": false
+      },
+      {
+        "kind": "ordinary",
+        "name": "libllama-fit-params-impl.so",
+        "name_truncated": false
+      },
+      {
+        "kind": "ordinary",
+        "name": "libllama-perplexity-impl.so",
+        "name_truncated": false
+      },
+      {
+        "kind": "ordinary",
+        "name": "libllama-quantize-impl.so",
+        "name_truncated": false
+      },
+      {
+        "kind": "ordinary",
+        "name": "libllama-server-impl.so",
+        "name_truncated": false
+      },
+      {
+        "kind": "symlink",
+        "name": "libllama.so",
+        "name_truncated": false
+      },
+      {
+        "kind": "symlink",
+        "name": "libllama.so.0",
+        "name_truncated": false
+      },
+      {
+        "kind": "ordinary",
+        "name": "libllama.so.0.6.0",
+        "name_truncated": false
+      },
+      {
+        "kind": "symlink",
+        "name": "libmtmd.so",
+        "name_truncated": false
+      },
+      {
+        "kind": "symlink",
+        "name": "libmtmd.so.0",
+        "name_truncated": false
+      },
+      {
+        "kind": "ordinary",
+        "name": "libmtmd.so.0.6.0",
+        "name_truncated": false
+      },
+      {
+        "kind": "ordinary",
+        "name": "llama",
+        "name_truncated": false
+      },
+      {
+        "kind": "ordinary",
+        "name": "llama-server",
+        "name_truncated": false
+      }
+    ],
+    "observed_entries": 39,
+    "scope": "Flat name/kind observation only; no accepted type/alias/hash/CPU/ABI closure",
+    "status": "UNQUALIFIED_CPU_LAYOUT_METADATA_ONLY"
+  },
+  "client": "codex",
+  "failed_gate": "libllama-cli-impl.so outside previous exact source allowlist",
+  "observed_fixture_counts": {
+    "CPU_closure": 22,
+    "input": 25
+  },
+  "primary_retained_receipts": [
+    {
+      "bytes": 174109,
+      "path": "work/docker-ci-1ce2cb7-20261009/run.log",
+      "sha256": "8b59f7a9577926dfb28b37b4f57446c82e422b5f18f0a797099de651dc943a02"
+    },
+    {
+      "bytes": 2309,
+      "path": "work/docker-ci-1ce2cb7-20261009/run-terminal.json",
+      "sha256": "4b56150fd3a39ec421b58e267074fee51cc7445ea8aa8b57b6bd67f28304a05e"
+    }
+  ],
+  "publication": "NOT_REACHED",
+  "run_id": 37917951788,
+  "scope": "Complete flat names/kinds only; ordinary labels are lstat metadata, not accepted fullhash/closure/ABI; no model loading/API/scientific qualification",
+  "selected_actual_log_lines": [
+    "build-and-push\tBuild and Push Docker Images\t2026-10-09T10:31:07.2934920Z #16 1.619 {\"report\": \"/opt/kimsa/provenance/base-runtime.json\", \"sha256\": \"bcc4c35122cb26576cee87e6e3b5603d50e4879c2d52383972e16dfb25237e81\", \"status\": \"PASS_BASE_RUNTIME_ONLY\"}",
+    "build-and-push\tBuild and Push Docker Images\t2026-10-09T10:31:07.4787265Z #17 0.315 Ran 25 tests in 0.063s",
+    "build-and-push\tBuild and Push Docker Images\t2026-10-09T10:31:07.6918509Z #18 0.273 Ran 22 tests in 0.033s",
+    "build-and-push\tBuild and Push Docker Images\t2026-10-09T10:31:11.9940101Z #17 6.365 {\"attempts\": 1, \"bytes\": 522640096, \"bytes_received\": 522640096, \"deadline_scope\": \"Cooperative110 includes full body/hash/fsync/publication/final receipt; no hard-kernel/abrupt-loss guarantee\", \"elapsed_seconds\": 5.9752711290000065, \"expected_bytes\": 522640096, \"expected_sha256\": \"7f4030143c1c477224c5434f8272c662a8b042079a0a584f0a27a1684fe2e1fa\", \"filename\": \"qwen3-0.6b.gguf\", \"gguf_header\": {\"metadata_keys\": 28, \"scope\": \"Header only; architecture/tokenizer/model compatibility unqualified\", \"tensors\": 311, \"version\": 3}, \"mode\": \"0444\", \"publisher_url\": \"https://registry.ollama.ai/v2/library/qwen3/blobs/sha256:7f4030143c1c477224c5434f8272c662a8b042079a0a584f0a27a1684fe2e1fa\", \"received_prefix_sha256\": \"7f4030143c1c477224c5434f8272c662a8b042079a0a584f0a27a1684fe2e1fa\", \"redirect_hosts\": [\"dd20bb891979d25aebc8bec07b2b3bbc.r2.cloudflarestorage.com\"], \"retries\": 0, \"scope\": \"Public immutable build input only; no model loading/inference, parent-job qualification or output-cap exception\", \"sha256\": \"7f4030143c1c477224c5434f8272c662a8b042079a0a584f0a27a1684fe2e1fa\", \"status\": \"PASS_EXACT_PUBLIC_INPUT_ONLY\", \"tls\": \"Default verified HTTPS; no user credentials, proxy config, retries or runtime download\"}",
+    "build-and-push\tBuild and Push Docker Images\t2026-10-09T10:31:16.3351892Z #25 2.668 ValueError: Unexpected CPU server closure member: libllama-cli-impl.so",
+    "build-and-push\tBuild and Push Docker Images\t2026-10-09T10:31:16.3385476Z 2.668 ValueError: Unexpected CPU server closure member: libllama-cli-impl.so"
+  ],
+  "source": "1ce2cb750baa9d28adc0a1d0983705171b95ccd5",
+  "status": "ACTUAL_CI_FAILED_BEFORE_PUBLICATION",
+  "url": "https://github.com/PacificCommunity/ofp-sam-docker-images/actions/runs/37917951788"
+}
