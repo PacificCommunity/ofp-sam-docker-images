@@ -1,0 +1,7 @@
+{
+  "HTTP": 404,
+  "body_observed": false,
+  "curl_exit": 56,
+  "scope": "Metadata only wrong source-path GET; no job/runtime/model attempt",
+  "url": "https://raw.githubusercontent.com/ggml-org/llama.cpp/d81235049384534c167caea52b85a694f6103d14/examples/batched-bench/CMakeLists.txt"
+}

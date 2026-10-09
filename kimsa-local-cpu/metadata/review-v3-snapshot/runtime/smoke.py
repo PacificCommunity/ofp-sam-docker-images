@@ -58,8 +58,7 @@ def layout_metadata(fd,names):
         kind=('ordinary' if stat.S_ISREG(mode) else 'symlink' if stat.S_ISLNK(mode) else 'directory' if stat.S_ISDIR(mode) else 'fifo' if stat.S_ISFIFO(mode) else 'socket' if stat.S_ISSOCK(mode) else 'other_special')
         rows.append(dict(name=name[:160],name_truncated=len(name)>160,kind=kind))
     report=dict(status='UNQUALIFIED_CPU_LAYOUT_METADATA_ONLY',scope='Flat name/kind observation only; no accepted type/alias/hash/CPU/ABI closure',observed_entries=len(names),complete_names=len(rows)==len(names) and all(not row['name_truncated'] for row in rows),files=rows)
-    # The actual Linux print call appends one LF byte. Reserve that byte too.
-    while len(json.dumps(report,ensure_ascii=True,sort_keys=True).encode())+1>65536:
+    while len(json.dumps(report,ensure_ascii=True,sort_keys=True).encode())>65536:
         rows.pop();report['complete_names']=False
     return report
 

@@ -1,0 +1,113 @@
+{
+  "Docker_FROM": [
+    "ghcr.io/ggml-org/llama.cpp:server-b11429@sha256:a7c742ec2070a17d715c02d4329c049a984c81c3234f9ab14bdb14e46b077317",
+    "docker.io/library/node:24.21.0-bookworm-slim@sha256:51b1100cc2a83d370c6a60952e3f2989c8a43159d0e38586e090f3b3326efefd",
+    "ghcr.io/pacificcommunity/tuna-flow:v2.5@sha256:c87f1f6d9d4f62dc447844b58afe35f96af175bf933cb6cffbbbe39a59172360",
+    "ghcr.io/pacificcommunity/tuna-flow:v2.5@sha256:c87f1f6d9d4f62dc447844b58afe35f96af175bf933cb6cffbbbe39a59172360"
+  ],
+  "Mac_binary_model_layers": "NOT_DOWNLOADED",
+  "checks": {
+    "runtime/fetch_model.py": {
+      "AST": "PASS_SOURCE_ONLY",
+      "subject_executed": false,
+      "subject_imported": false
+    },
+    "runtime/serve.py": {
+      "AST": "PASS_SOURCE_ONLY",
+      "subject_executed": false,
+      "subject_imported": false
+    },
+    "runtime/smoke.py": {
+      "AST": "PASS_SOURCE_ONLY",
+      "subject_executed": false,
+      "subject_imported": false
+    },
+    "runtime/test_fetch_model.py": {
+      "AST": "PASS_SOURCE_ONLY",
+      "subject_executed": false,
+      "subject_imported": false
+    }
+  },
+  "complete_fixture_methods": [
+    "test_exact_bytes_sha_readonly_single_inode_receipt",
+    "test_hash_mismatch_removes_body",
+    "test_truncated_body",
+    "test_oversize_body",
+    "test_content_length_mismatch",
+    "test_content_encoding_refused",
+    "test_http_failure_no_retry",
+    "test_network_error_no_retry",
+    "test_bad_magic_fullhash_refused",
+    "test_unsupported_header_fullhash_refused",
+    "test_zero_tensor_count_refused",
+    "test_no_body_before_complete_gate",
+    "test_expired_before_request",
+    "test_deadline_during_body_removes_partial",
+    "test_final_receipt_write_crosses_deadline_revokes",
+    "test_receipt_failure_after_creation_revokes",
+    "test_existing_model_untouched_no_request",
+    "test_symlink_directory_refused",
+    "test_existing_final_symlink_untouched",
+    "test_raced_publication_never_overwrites_other_file",
+    "test_wrong_directory_mode_refused",
+    "test_http_and_credential_url_refused_before_request",
+    "test_redirect_downgrade_and_credentials_refused",
+    "test_redirect_bound",
+    "test_malformed_pin_refused_without_artifacts"
+  ],
+  "fixture_count": 25,
+  "launcher_ARGV": [
+    "/opt/llama/llama-server",
+    "--model",
+    "/opt/kimsa/models/qwen3-0.6b.gguf",
+    "--host",
+    "127.0.0.1",
+    "--port",
+    "8080",
+    "--threads",
+    "2",
+    "--threads-batch",
+    "2",
+    "--parallel",
+    "1",
+    "--ctx-size",
+    "4096",
+    "--n-gpu-layers",
+    "0",
+    "--cache-ram",
+    "0",
+    "--cache-reuse",
+    "0",
+    "--offline",
+    "--no-warmup"
+  ],
+  "missing_actual_proof": [
+    "CI build and immutable published image digest",
+    "Build fixture result and R/Node/llama executable ABI smoke",
+    "Model loading/API/KIMSA/R/replay"
+  ],
+  "model_PIN": {
+    "bytes": 522640096,
+    "filename": "qwen3-0.6b.gguf",
+    "sha256": "7f4030143c1c477224c5434f8272c662a8b042079a0a584f0a27a1684fe2e1fa",
+    "url": "https://registry.ollama.ai/v2/library/qwen3/blobs/sha256:7f4030143c1c477224c5434f8272c662a8b042079a0a584f0a27a1684fe2e1fa"
+  },
+  "pinned_llama_arg_source_flags": true,
+  "required_CLI": {
+    "fetch_model.py": [
+      "--output-dir"
+    ],
+    "serve.py": "fixed literal ARGV only",
+    "smoke.py": [
+      "--mode",
+      "--output",
+      "--baseline(required-final)"
+    ],
+    "test_fetch_model.py": [
+      "--output-dir"
+    ]
+  },
+  "status": "PASS_SOURCE_STATIC_ONLY",
+  "subject_build": "UNRUN",
+  "subject_tests": "UNRUN"
+}

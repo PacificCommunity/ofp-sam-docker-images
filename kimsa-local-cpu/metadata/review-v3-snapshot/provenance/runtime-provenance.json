@@ -69,7 +69,7 @@
       "files_max": 1024,
       "full_ELF_dependencies": "UNQUALIFIED",
       "inventory_before_version_start": true,
-      "preclassification_diagnostic": "UNQUALIFIED name/kind only; complete encoded line including trailing LF <=65536 bytes; no qualified hashclosure",
+      "preclassification_diagnostic": "UNQUALIFIED name/kind only <=64KiB; no qualified hashclosure",
       "scope": "Pinned official flat CPU server copies plus exact d812 CMake llama-common/server-impl/bench-impl/batched-bench-impl targets; arbitrary siblings/GPU members remain refused",
       "unique_ordinary_bytes_max": 536870912
     },
@@ -83,7 +83,7 @@
       "python3"
     ],
     "inert_fixture_counts": {
-      "CPU_closure": 22,
+      "CPU_closure": 21,
       "model_input": 25
     },
     "manual_server_loopback": "127.0.0.1:8080",

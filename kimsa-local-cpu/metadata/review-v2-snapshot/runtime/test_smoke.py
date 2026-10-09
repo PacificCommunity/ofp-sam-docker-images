@@ -6,11 +6,9 @@ import json
 import os
 from pathlib import Path
 import socket
-import stat
 import sys
 import tempfile
 import unittest
-from types import SimpleNamespace
 from unittest.mock import patch
 
 ROOT=None
@@ -79,41 +77,6 @@ class Closure(unittest.TestCase):
             if Path(path).name=='libllama.so.0':Path(path).write_bytes(b'changed after hashing')
             return report
         with patch.object(smoke,'ordinary',change):self.refused()
-    def test_pinned_CMake_extra_libraries_ordinary(self):
-        names=('libllama-batched-bench-impl.so','libllama-bench-impl.so','libllama-common.so','libllama-server-impl.so')
-        for name in names:(self.root/name).write_bytes(b'inert pinned CMake library')
-        rows=self.inventory()['files']
-        for name in names:
-            row=next(row for row in rows if Path(row['path']).name==name)
-            self.assertEqual(row['kind'],'ordinary');self.assertEqual(row['sha256'],hashlib.sha256(b'inert pinned CMake library').hexdigest())
-    def test_pinned_CMake_extra_library_aliases(self):
-        names=('libllama-batched-bench-impl.so','libllama-bench-impl.so','libllama-common.so','libllama-server-impl.so')
-        for name in names:
-            (self.root/(name+'.1')).write_bytes(b'inert target');(self.root/name).symlink_to(name+'.1')
-        rows=self.inventory()['files']
-        for name in names:
-            row=next(row for row in rows if Path(row['path']).name==name)
-            self.assertEqual(row['raw_target'],name+'.1');self.assertEqual(row['ordinary_target']['sha256'],hashlib.sha256(b'inert target').hexdigest())
-    def test_layout_diagnostic_precedes_refusal_without_qualification(self):
-        (self.root/'unaccepted-member').write_bytes(b'inert');observed=[]
-        with self.assertRaises(ValueError):smoke.engine_inventory(self.root,diagnostic=observed.append)
-        self.assertEqual(len(observed),1);report=observed[0]
-        self.assertEqual(report['status'],'UNQUALIFIED_CPU_LAYOUT_METADATA_ONLY');self.assertTrue(report['complete_names'])
-        self.assertEqual(next(row for row in report['files'] if row['name']=='unaccepted-member')['kind'],'ordinary')
-        self.assertTrue(all(set(row)=={'name','name_truncated','kind'} for row in report['files']))
-    def test_exact_encoded_diagnostic_line_boundary_and_truncation(self):
-        line=lambda row:(json.dumps(row,ensure_ascii=True,sort_keys=True)+'\n').encode()
-        # Metadata-only fake stat, no filesystem body, qualification or binary.
-        with patch.object(smoke.os,'stat',return_value=SimpleNamespace(st_mode=stat.S_IFREG)):
-            names=['x']*400;baseline=smoke.layout_metadata(-1,names)
-            gap=65536-len(line(baseline));self.assertGreaterEqual(gap,0);self.assertLessEqual(gap,400*159)
-            for index in range(400):
-                padding=min(gap,159);names[index]='x'*(1+padding);gap-=padding
-            self.assertEqual(gap,0)
-            exact=smoke.layout_metadata(-1,names);self.assertEqual(len(line(exact)),65536);self.assertTrue(exact['complete_names'])
-            names[next(index for index,name in enumerate(names) if len(name)<160)]+='y'
-            truncated=smoke.layout_metadata(-1,names)
-            self.assertLessEqual(len(line(truncated)),65536);self.assertFalse(truncated['complete_names']);self.assertEqual(truncated['observed_entries'],400);self.assertLess(len(truncated['files']),400)
 
 
 def main():

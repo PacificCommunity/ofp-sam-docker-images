@@ -11,9 +11,7 @@ import subprocess
 import sys
 import time
 
-# Exact additional targets are defined by pinned d812 CMake sources retained in
-# metadata-v3: batched-bench, llama-bench, common, and server. No generic suffix.
-LIBRARY=re.compile(r'lib(?:llama(?:-batched-bench-impl|-bench-impl|-common|-server-impl)?|mtmd|ggml(?:-base|-cpu(?:-[A-Za-z0-9_-]+)?)?)\.so(?:\.[0-9]+)*\Z')
+LIBRARY=re.compile(r'lib(?:llama|mtmd|ggml(?:-base|-cpu(?:-[A-Za-z0-9_-]+)?)?)\.so(?:\.[0-9]+)*\Z')
 EXECUTABLES={'llama','llama-server'}
 
 
@@ -51,20 +49,7 @@ def ordinary(path,dir_fd=None,name=None,deadline=None,clock=time.monotonic):
     return dict(path=str(path),bytes=count,sha256=digest.hexdigest(),mode=format(stat.S_IMODE(info.st_mode),'04o'))
 
 
-def layout_metadata(fd,names):
-    rows=[]
-    for name in names[:1024]:
-        mode=os.stat(name,dir_fd=fd,follow_symlinks=False).st_mode
-        kind=('ordinary' if stat.S_ISREG(mode) else 'symlink' if stat.S_ISLNK(mode) else 'directory' if stat.S_ISDIR(mode) else 'fifo' if stat.S_ISFIFO(mode) else 'socket' if stat.S_ISSOCK(mode) else 'other_special')
-        rows.append(dict(name=name[:160],name_truncated=len(name)>160,kind=kind))
-    report=dict(status='UNQUALIFIED_CPU_LAYOUT_METADATA_ONLY',scope='Flat name/kind observation only; no accepted type/alias/hash/CPU/ABI closure',observed_entries=len(names),complete_names=len(rows)==len(names) and all(not row['name_truncated'] for row in rows),files=rows)
-    # The actual Linux print call appends one LF byte. Reserve that byte too.
-    while len(json.dumps(report,ensure_ascii=True,sort_keys=True).encode())+1>65536:
-        rows.pop();report['complete_names']=False
-    return report
-
-
-def engine_inventory(root,clock=time.monotonic,diagnostic=None):
+def engine_inventory(root,clock=time.monotonic):
     """Pinned CPU server scope: flat llama/llama-server and CPU shared libraries.
 
     The source cp-P retains library aliases. Their literal basename targets must
@@ -75,7 +60,6 @@ def engine_inventory(root,clock=time.monotonic,diagnostic=None):
     fd=os.open(root,os.O_RDONLY|os.O_DIRECTORY|os.O_NOFOLLOW)
     try:
         names=sorted(os.listdir(fd))
-        if diagnostic is not None:diagnostic(layout_metadata(fd,names))
         if not 1<=len(names)<=1024 or not EXECUTABLES.issubset(names):raise ValueError('Exact flat CPU executable scope required')
         for name in names:
             if len(name)>160 or (name not in EXECUTABLES and not LIBRARY.fullmatch(name)):raise ValueError('Unexpected CPU server closure member: '+name)
@@ -104,7 +88,7 @@ def engine_inventory(root,clock=time.monotonic,diagnostic=None):
             rows.append(dict(path=str(root/name),kind='library_alias',raw_target=aliases[name],ordinary_target=ordinary_rows[current],alias_chain=chain))
         if sorted(os.listdir(fd))!=names or any(identity(os.stat(name,dir_fd=fd,follow_symlinks=False))!=identity(initial[name]) for name in names) or any(os.readlink(name,dir_fd=fd)!=target for name,target in aliases.items()):raise ValueError('CPU closure changed during inventory')
         if clock()>=deadline:raise ValueError('Cooperative closure inventory deadline exhausted')
-        return dict(scope='Pinned official CPU server flat /app copies: ordinary llama/llama-server, libllama/core/common/server-impl/bench-impl/batched-bench-impl, libmtmd/libggml/base/cpu shared libraries and confined library aliases; no claimed full ELF dependency qualification',files=rows,unique_ordinary_bytes=total,ordinary_files=len(ordinary_rows),aliases=len(aliases),cooperative_seconds=15)
+        return dict(scope='Pinned official CPU server flat /app copies: ordinary llama/llama-server, libllama/libmtmd/libggml/base/cpu shared libraries and confined library aliases; no claimed full ELF dependency qualification',files=rows,unique_ordinary_bytes=total,ordinary_files=len(ordinary_rows),aliases=len(aliases),cooperative_seconds=15)
     finally:os.close(fd)
 
 
@@ -119,7 +103,7 @@ def main():
         if args.baseline is None:raise ValueError('Exact base runtime report required')
         baseline=json.loads(args.baseline.read_text())
         if baseline['status']!='PASS_BASE_RUNTIME_ONLY' or r!=baseline['R']:raise ValueError('R version/dependencies/library paths changed from immutable base')
-        engine=engine_inventory('/opt/llama',diagnostic=lambda row:print(json.dumps(row,ensure_ascii=True,sort_keys=True),flush=True))
+        engine=engine_inventory('/opt/llama')
         node=command(['/usr/local/bin/node','--version'])
         if node['stdout'].strip()!='v24.21.0':raise ValueError('Node version differs from publisher pin')
         env=dict(os.environ,LD_LIBRARY_PATH='/opt/llama')

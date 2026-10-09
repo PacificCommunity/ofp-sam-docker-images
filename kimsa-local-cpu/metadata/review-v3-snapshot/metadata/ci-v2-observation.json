@@ -1,0 +1,170 @@
+{
+  "actual_failure": "Unexpected CPU server closure member: libllama-batched-bench-impl.so",
+  "bounded_selected_actual_receipts": [
+    {
+      "report": "/opt/kimsa/provenance/base-runtime.json",
+      "sha256": "bcc4c35122cb26576cee87e6e3b5603d50e4879c2d52383972e16dfb25237e81",
+      "status": "PASS_BASE_RUNTIME_ONLY"
+    },
+    {
+      "errors": 0,
+      "failures": 0,
+      "model_execution": false,
+      "network": false,
+      "skips": 0,
+      "status": "PASS_INERT_FIXTURES_ONLY",
+      "tests": 25
+    },
+    {
+      "binary_execution": false,
+      "errors": 0,
+      "failures": 0,
+      "network": false,
+      "skips": 0,
+      "status": "PASS_INERT_CPU_CLOSURE_FIXTURES_ONLY",
+      "tests": 18
+    },
+    {
+      "attempts": 1,
+      "bytes": 522640096,
+      "bytes_received": 522640096,
+      "deadline_scope": "Cooperative110 includes full body/hash/fsync/publication/final receipt; no hard-kernel/abrupt-loss guarantee",
+      "elapsed_seconds": 11.246230467000004,
+      "expected_bytes": 522640096,
+      "expected_sha256": "7f4030143c1c477224c5434f8272c662a8b042079a0a584f0a27a1684fe2e1fa",
+      "filename": "qwen3-0.6b.gguf",
+      "gguf_header": {
+        "metadata_keys": 28,
+        "scope": "Header only; architecture/tokenizer/model compatibility unqualified",
+        "tensors": 311,
+        "version": 3
+      },
+      "mode": "0444",
+      "publisher_url": "https://registry.ollama.ai/v2/library/qwen3/blobs/sha256:7f4030143c1c477224c5434f8272c662a8b042079a0a584f0a27a1684fe2e1fa",
+      "received_prefix_sha256": "7f4030143c1c477224c5434f8272c662a8b042079a0a584f0a27a1684fe2e1fa",
+      "redirect_hosts": [
+        "dd20bb891979d25aebc8bec07b2b3bbc.r2.cloudflarestorage.com"
+      ],
+      "retries": 0,
+      "scope": "Public immutable build input only; no model loading/inference, parent-job qualification or output-cap exception",
+      "sha256": "7f4030143c1c477224c5434f8272c662a8b042079a0a584f0a27a1684fe2e1fa",
+      "status": "PASS_EXACT_PUBLIC_INPUT_ONLY",
+      "tls": "Default verified HTTPS; no user credentials, proxy config, retries or runtime download"
+    }
+  ],
+  "qualification": "Old25+18 fixtures and exact input acquisition/buildbaseline passed. Final executable ABI smoke did not pass, image not published, model load/API/inference unqualified. No new21fixture result inferred.",
+  "raw_log_bytes": 174851,
+  "raw_log_sha256": "44756c7e9fd30b974f3c5601fc78a3a34ba37d9741cc6323393a3c6ba264e18d",
+  "run_id": 37915071863,
+  "run_url": "https://github.com/PacificCommunity/ofp-sam-docker-images/actions/runs/37915071863",
+  "source_commit": "01c996cc44d1697644d12e41ca1699d7567918dd",
+  "status": "PREVIOUS_CI_FAILED_NO_PUBLISHED_IMAGE",
+  "terminal": {
+    "conclusion": "failure",
+    "databaseId": 37915071863,
+    "headSha": "01c996cc44d1697644d12e41ca1699d7567918dd",
+    "jobs": [
+      {
+        "completedAt": "2026-10-09T10:04:08Z",
+        "conclusion": "failure",
+        "databaseId": 113769138796,
+        "name": "build-and-push",
+        "startedAt": "2026-10-09T10:02:03Z",
+        "status": "completed",
+        "steps": [
+          {
+            "completedAt": "2026-10-09T10:02:05Z",
+            "conclusion": "success",
+            "name": "Set up job",
+            "number": 1,
+            "startedAt": "2026-10-09T10:02:04Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-09T10:02:10Z",
+            "conclusion": "success",
+            "name": "Checkout Repository",
+            "number": 2,
+            "startedAt": "2026-10-09T10:02:05Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-09T10:02:10Z",
+            "conclusion": "success",
+            "name": "Prepare Ephemeral Docker Config",
+            "number": 3,
+            "startedAt": "2026-10-09T10:02:10Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-09T10:02:25Z",
+            "conclusion": "success",
+            "name": "Set Up Docker Buildx",
+            "number": 4,
+            "startedAt": "2026-10-09T10:02:10Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-09T10:02:25Z",
+            "conclusion": "success",
+            "name": "Convert Repository Owner to Lowercase",
+            "number": 5,
+            "startedAt": "2026-10-09T10:02:25Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-09T10:02:26Z",
+            "conclusion": "success",
+            "name": "Detect Changed Directories",
+            "number": 6,
+            "startedAt": "2026-10-09T10:02:25Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-09T10:02:26Z",
+            "conclusion": "success",
+            "name": "Log in to GitHub Container Registry",
+            "number": 7,
+            "startedAt": "2026-10-09T10:02:26Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-09T10:04:05Z",
+            "conclusion": "failure",
+            "name": "Build and Push Docker Images",
+            "number": 8,
+            "startedAt": "2026-10-09T10:02:26Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-09T10:04:06Z",
+            "conclusion": "success",
+            "name": "Post Set Up Docker Buildx",
+            "number": 15,
+            "startedAt": "2026-10-09T10:04:05Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-09T10:04:06Z",
+            "conclusion": "success",
+            "name": "Post Checkout Repository",
+            "number": 16,
+            "startedAt": "2026-10-09T10:04:06Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-09T10:04:06Z",
+            "conclusion": "success",
+            "name": "Complete job",
+            "number": 17,
+            "startedAt": "2026-10-09T10:04:06Z",
+            "status": "completed"
+          }
+        ],
+        "url": "https://github.com/PacificCommunity/ofp-sam-docker-images/actions/runs/37915071863/job/113769138796"
+      }
+    ],
+    "status": "completed",
+    "url": "https://github.com/PacificCommunity/ofp-sam-docker-images/actions/runs/37915071863"
+  }
+}

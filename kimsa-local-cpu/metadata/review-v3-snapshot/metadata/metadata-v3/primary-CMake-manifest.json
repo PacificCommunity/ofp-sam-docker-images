@@ -1,0 +1,34 @@
+[
+  {
+    "TLS": "Normal verified system TLS",
+    "bytes": 745,
+    "file": "llama-batched-bench-CMakeLists.txt",
+    "scope": "Pinned primary CMake text only; no binaries/layers/modelbody",
+    "sha256": "6ab4f1741f2d2c95506e0ce2d67521baab07a28077383f752ff4a1db6666c95a",
+    "url": "https://raw.githubusercontent.com/ggml-org/llama.cpp/d81235049384534c167caea52b85a694f6103d14/tools/batched-bench/CMakeLists.txt"
+  },
+  {
+    "TLS": "Normal verified system TLS",
+    "bytes": 699,
+    "file": "llama-bench-CMakeLists.txt",
+    "scope": "Pinned primary CMake text only; no binaries/layers/modelbody",
+    "sha256": "0d3c923bfc475ecf498160ff453db21e5ccbf0d512c75e52dcef828999a92e64",
+    "url": "https://raw.githubusercontent.com/ggml-org/llama.cpp/d81235049384534c167caea52b85a694f6103d14/tools/llama-bench/CMakeLists.txt"
+  },
+  {
+    "TLS": "Normal verified system TLS",
+    "bytes": 5020,
+    "file": "llama-common-CMakeLists.txt",
+    "scope": "Only direct linked common/server CMake primary text to complete exact default CPU shared-library namespace; no binaries/layers/modelbody",
+    "sha256": "67cedba04a44face1177e3aa9fc192712873dda0b30bde1ab356007dcde0d9f1",
+    "url": "https://raw.githubusercontent.com/ggml-org/llama.cpp/d81235049384534c167caea52b85a694f6103d14/common/CMakeLists.txt"
+  },
+  {
+    "TLS": "Normal verified system TLS",
+    "bytes": 1826,
+    "file": "llama-server-CMakeLists.txt",
+    "scope": "Only direct linked common/server CMake primary text to complete exact default CPU shared-library namespace; no binaries/layers/modelbody",
+    "sha256": "553ce6725d470274a6bb2b120da87b5328497a1a6c760ae8a5510c7277e05180",
+    "url": "https://raw.githubusercontent.com/ggml-org/llama.cpp/d81235049384534c167caea52b85a694f6103d14/tools/server/CMakeLists.txt"
+  }
+]

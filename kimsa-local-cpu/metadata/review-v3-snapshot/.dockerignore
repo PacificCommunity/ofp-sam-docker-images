@@ -1,0 +1,8 @@
+**
+!Dockerfile
+!runtime/
+!runtime/*.py
+!provenance/
+!provenance/*.json
+!licenses/
+!licenses/*.txt
