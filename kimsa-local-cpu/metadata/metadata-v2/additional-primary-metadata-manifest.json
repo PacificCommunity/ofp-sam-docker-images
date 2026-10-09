@@ -1,0 +1,50 @@
+[
+  {
+    "bytes": 1078,
+    "file": "llama-LICENSE.txt",
+    "http_status": 200,
+    "scope": "Primary public source or JSON metadata only; verified systemTLS; no runtime/modelbody",
+    "sha256": "94f29bbed6a22c35b992c5c6ebf0e7c92f13b836b90f36f461c9cf2f0f1d010d",
+    "url": "https://raw.githubusercontent.com/ggml-org/llama.cpp/d81235049384534c167caea52b85a694f6103d14/LICENSE"
+  },
+  {
+    "bytes": 222368,
+    "file": "llama-arg.cpp",
+    "http_status": 200,
+    "scope": "Primary public source or JSON metadata only; verified systemTLS; no runtime/modelbody",
+    "sha256": "60fe5331fbc60b7dcefcebce8d2097b5b986a1cd3a4dca126c0e6d21060df4d3",
+    "url": "https://raw.githubusercontent.com/ggml-org/llama.cpp/d81235049384534c167caea52b85a694f6103d14/common/arg.cpp"
+  },
+  {
+    "bytes": 5035,
+    "file": "node-official-Dockerfile",
+    "http_status": 200,
+    "scope": "Primary public source or JSON metadata only; verified systemTLS; no runtime/modelbody",
+    "sha256": "900128d44c3aa6377fde276c4111be8b60693b21f3955267803f1800ab2046de",
+    "url": "https://raw.githubusercontent.com/nodejs/docker-node/93a7bafc324a85ac1ee461604cff87cffacb6d7a/24/bookworm-slim/Dockerfile"
+  },
+  {
+    "bytes": 9067,
+    "file": "qwen-upstream-model-metadata.json",
+    "http_status": 200,
+    "scope": "Primary public source or JSON metadata only; verified systemTLS; no runtime/modelbody",
+    "sha256": "1ec04cff6745f70fe65a08f7d584886ce52f0efb18bb41b82f2a9ee5d6a25b44",
+    "url": "https://huggingface.co/api/models/Qwen/Qwen3-0.6B"
+  },
+  {
+    "bytes": 11343,
+    "file": "qwen-upstream-LICENSE.txt",
+    "http_status": 200,
+    "scope": "Exact revision public model license/card text only; not modelbody",
+    "sha256": "832dd9e00a68dd83b3c3fb9f5588dad7dcf337a0db50f7d9483f310cd292e92e",
+    "url": "https://huggingface.co/Qwen/Qwen3-0.6B/raw/c1899de289a04d12100db370d81485cdf75e47ca/LICENSE"
+  },
+  {
+    "bytes": 13965,
+    "file": "qwen-upstream-README.md",
+    "http_status": 200,
+    "scope": "Exact revision public model license/card text only; not modelbody",
+    "sha256": "1ab64a26fcb3b461423b89a433a8c858f1bf8d4086f979cbb3ff878d47cf20e9",
+    "url": "https://huggingface.co/Qwen/Qwen3-0.6B/raw/c1899de289a04d12100db370d81485cdf75e47ca/README.md"
+  }
+]

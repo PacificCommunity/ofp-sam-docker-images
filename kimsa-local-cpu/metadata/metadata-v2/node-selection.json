@@ -1,0 +1,41 @@
+{
+  "amd64_manifest_digest": "sha256:51b1100cc2a83d370c6a60952e3f2989c8a43159d0e38586e090f3b3326efefd",
+  "command": [
+    "node"
+  ],
+  "config_digest": "sha256:470015c1ab1577c19efce2e80cdad4afd9c682cf8f4dcf3dccae5abfd9113397",
+  "entrypoint": [
+    "docker-entrypoint.sh"
+  ],
+  "index_digest": "sha256:d6aa754f16b3197301076f047b5def2f02ea1dbbc2ca920407d46d7ec7f87b20",
+  "labels": null,
+  "layers": [
+    {
+      "digest": "sha256:7fd1ebe418b5079d4aa36f416af9b143d127bc75b0155d71cb5fd559b5e04d39",
+      "mediaType": "application/vnd.oci.image.layer.v1.tar+gzip",
+      "size": 28249323
+    },
+    {
+      "digest": "sha256:517d640e32835287653c4b15eb5d9f6bcf48e103baea4f7e29bac937002f649b",
+      "mediaType": "application/vnd.oci.image.layer.v1.tar+gzip",
+      "size": 3313
+    },
+    {
+      "digest": "sha256:11ffcabe0f772f0f1a9c80b4b290b5ec0de54f11c671f0fa10e5844f9b52d17a",
+      "mediaType": "application/vnd.oci.image.layer.v1.tar+gzip",
+      "size": 50860509
+    },
+    {
+      "digest": "sha256:1a0cf4b1ffc8dd659bb8c6e90471bc8fec24620e4fdb68bb2b6faa56154ae146",
+      "mediaType": "application/vnd.oci.image.layer.v1.tar+gzip",
+      "size": 1713044
+    },
+    {
+      "digest": "sha256:08489011619dfda982191cb9cc0418dc48ea3b1341588aeef534e4db0ab4d3d0",
+      "mediaType": "application/vnd.oci.image.layer.v1.tar+gzip",
+      "size": 447
+    }
+  ],
+  "observed_tag": "docker.io/library/node:24.21.0-bookworm-slim",
+  "working_dir": null
+}

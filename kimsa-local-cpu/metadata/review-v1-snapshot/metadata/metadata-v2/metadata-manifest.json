@@ -1,0 +1,130 @@
+[
+  {
+    "bytes": 1419,
+    "file": "llama-server-index.json",
+    "http_status": 200,
+    "scope": "Public source/OCI JSON only; normal trusted TLS; anonymous pull-token held only in memory; no layers/binaries/models or user credentials",
+    "selected_headers": {
+      "Content-Length": "1419",
+      "Content-Type": "application/vnd.oci.image.index.v1+json",
+      "Docker-Content-Digest": "sha256:2f8ebc2dde83c4bd7e5c6d61efa57965e0d5a79d29802c246c4593740d9c04c1"
+    },
+    "sha256": "2f8ebc2dde83c4bd7e5c6d61efa57965e0d5a79d29802c246c4593740d9c04c1",
+    "url": "https://ghcr.io/v2/ggml-org/llama.cpp/manifests/server-b11429"
+  },
+  {
+    "bytes": 1746,
+    "file": "llama-server-amd64-manifest.json",
+    "http_status": 200,
+    "scope": "Public source/OCI JSON only; normal trusted TLS; anonymous pull-token held only in memory; no layers/binaries/models or user credentials",
+    "selected_headers": {
+      "Content-Length": "1746",
+      "Content-Type": "application/vnd.oci.image.manifest.v1+json",
+      "Docker-Content-Digest": "sha256:a7c742ec2070a17d715c02d4329c049a984c81c3234f9ab14bdb14e46b077317"
+    },
+    "sha256": "a7c742ec2070a17d715c02d4329c049a984c81c3234f9ab14bdb14e46b077317",
+    "url": "https://ghcr.io/v2/ggml-org/llama.cpp/manifests/sha256:a7c742ec2070a17d715c02d4329c049a984c81c3234f9ab14bdb14e46b077317"
+  },
+  {
+    "bytes": 4735,
+    "file": "llama-server-amd64-config.json",
+    "http_status": 200,
+    "scope": "Public source/OCI JSON only; normal trusted TLS; anonymous pull-token held only in memory; no layers/binaries/models or user credentials",
+    "selected_headers": {
+      "Content-Length": "4735",
+      "Content-Type": "application/octet-stream",
+      "Docker-Content-Digest": null
+    },
+    "sha256": "6219d926c9ba7857e323aa913b0c0ea79cf7b89a118afb4cb1d50b5636283098",
+    "url": "https://ghcr.io/v2/ggml-org/llama.cpp/blobs/sha256:6219d926c9ba7857e323aa913b0c0ea79cf7b89a118afb4cb1d50b5636283098"
+  },
+  {
+    "bytes": 3929,
+    "file": "node-index.json",
+    "http_status": 200,
+    "scope": "Public source/OCI JSON only; normal trusted TLS; anonymous pull-token held only in memory; no layers/binaries/models or user credentials",
+    "selected_headers": {
+      "Content-Length": "3929",
+      "Content-Type": "application/vnd.oci.image.index.v1+json",
+      "Docker-Content-Digest": "sha256:d6aa754f16b3197301076f047b5def2f02ea1dbbc2ca920407d46d7ec7f87b20"
+    },
+    "sha256": "d6aa754f16b3197301076f047b5def2f02ea1dbbc2ca920407d46d7ec7f87b20",
+    "url": "https://registry-1.docker.io/v2/library/node/manifests/24.21.0-bookworm-slim"
+  },
+  {
+    "bytes": 1929,
+    "file": "node-amd64-manifest.json",
+    "http_status": 200,
+    "scope": "Public source/OCI JSON only; normal trusted TLS; anonymous pull-token held only in memory; no layers/binaries/models or user credentials",
+    "selected_headers": {
+      "Content-Length": "1929",
+      "Content-Type": "application/vnd.oci.image.manifest.v1+json",
+      "Docker-Content-Digest": "sha256:51b1100cc2a83d370c6a60952e3f2989c8a43159d0e38586e090f3b3326efefd"
+    },
+    "sha256": "51b1100cc2a83d370c6a60952e3f2989c8a43159d0e38586e090f3b3326efefd",
+    "url": "https://registry-1.docker.io/v2/library/node/manifests/sha256:51b1100cc2a83d370c6a60952e3f2989c8a43159d0e38586e090f3b3326efefd"
+  },
+  {
+    "bytes": 6715,
+    "file": "node-amd64-config.json",
+    "http_status": 200,
+    "scope": "Public source/OCI JSON only; normal trusted TLS; anonymous pull-token held only in memory; no layers/binaries/models or user credentials",
+    "selected_headers": {
+      "Content-Length": "6715",
+      "Content-Type": "application/octet-stream",
+      "Docker-Content-Digest": null
+    },
+    "sha256": "470015c1ab1577c19efce2e80cdad4afd9c682cf8f4dcf3dccae5abfd9113397",
+    "url": "https://registry-1.docker.io/v2/library/node/blobs/sha256:470015c1ab1577c19efce2e80cdad4afd9c682cf8f4dcf3dccae5abfd9113397"
+  },
+  {
+    "bytes": 9737,
+    "file": "base-index.json",
+    "http_status": 200,
+    "scope": "Public source/OCI JSON only; normal trusted TLS; anonymous pull-token held only in memory; no layers/binaries/models or user credentials",
+    "selected_headers": {
+      "Content-Length": "9737",
+      "Content-Type": "application/vnd.docker.distribution.manifest.v2+json",
+      "Docker-Content-Digest": "sha256:c87f1f6d9d4f62dc447844b58afe35f96af175bf933cb6cffbbbe39a59172360"
+    },
+    "sha256": "c87f1f6d9d4f62dc447844b58afe35f96af175bf933cb6cffbbbe39a59172360",
+    "url": "https://ghcr.io/v2/pacificcommunity/tuna-flow/manifests/sha256:c87f1f6d9d4f62dc447844b58afe35f96af175bf933cb6cffbbbe39a59172360"
+  },
+  {
+    "bytes": 40006,
+    "file": "base-amd64-config.json",
+    "http_status": 200,
+    "scope": "Public source/OCI JSON only; normal trusted TLS; anonymous pull-token held only in memory; no layers/binaries/models or user credentials",
+    "selected_headers": {
+      "Content-Length": "40006",
+      "Content-Type": "application/octet-stream",
+      "Docker-Content-Digest": null
+    },
+    "sha256": "898925450ab7ec3f99cb9d8427cc37d24097cc2fe9f0468d74f70aaf35daec3a",
+    "url": "https://ghcr.io/v2/pacificcommunity/tuna-flow/blobs/sha256:898925450ab7ec3f99cb9d8427cc37d24097cc2fe9f0468d74f70aaf35daec3a"
+  },
+  {
+    "bytes": 12274,
+    "file": "llama-docker.md",
+    "http_status": 200,
+    "scope": "Pinned public primary source text; not executed",
+    "sha256": "73f5543c6c7a5fce2e8dfc104c0ecec7af1ffa344c9c12f25753b29427c842c4",
+    "url": "https://raw.githubusercontent.com/ggml-org/llama.cpp/d81235049384534c167caea52b85a694f6103d14/docs/docker.md"
+  },
+  {
+    "bytes": 3212,
+    "file": "llama-cpu.Dockerfile",
+    "http_status": 200,
+    "scope": "Pinned public primary source text; not executed",
+    "sha256": "760f473703f7d34649ffb6c6dd58bee6a4baccdda598ab1033a9e70d362f5f92",
+    "url": "https://raw.githubusercontent.com/ggml-org/llama.cpp/d81235049384534c167caea52b85a694f6103d14/.devops/cpu.Dockerfile"
+  },
+  {
+    "bytes": 25944,
+    "file": "llama-docker.yml",
+    "http_status": 200,
+    "scope": "Pinned public primary source text; not executed",
+    "sha256": "3c1c6dfcc09cfa23c1b6155fa88a54d66bae1723ea3aad2ccb30f74c5a9c70de",
+    "url": "https://raw.githubusercontent.com/ggml-org/llama.cpp/d81235049384534c167caea52b85a694f6103d14/.github/workflows/docker.yml"
+  }
+]
